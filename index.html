@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lorena & Marcelo - O Nosso Casamento</title>
+  <meta name="description"
+    content="Site de casamento de Lorena e Marcelo. Confira nossa história, confirme presença e participe da nossa lista de presentes!" />
+  <link rel="stylesheet" href="./style.css" />
+</head>
+
+<body>
+  <!-- Header -->
+  <header>
+    <div class="container nav-wrapper">
+      <nav>
+        <div class="logo">L & M</div>
+        <ul class="nav-links">
+          <li><a href="#hero">Início</a></li>
+          <li><a href="#story">Nossa História</a></li>
+          <li><a href="#competition">Lista de Casamento</a></li>
+          <li><a href="#rsvp">Presença</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section id="hero">
+    <div class="hero-content">
+      <div class="hero-date">30 de Agosto de 2026</div>
+      <h1>Lorena & Marcelo</h1>
+      <p class="story-content" style="margin-top: 1rem; margin-bottom: 2rem;">
+        Estamos muito felizes em celebrar este momento especial com vocês!
+      </p>
+      <a href="#competition" class="btn btn-primary">Ver Lista de Presentes</a>
+    </div>
+  </section>
+
+  <!-- Our Story Section -->
+  <section id="story" class="container">
+    <h2 class="section-title">Nossa História</h2>
+    <div class="story-content">
+      <p>
+        Tudo começou com um olhar, um sorriso e muitas conversas que duravam horas.
+        Ao longo do tempo, descobrimos que nossos sonhos se complementavam perfeitamente.
+        Agora, estamos prontos para dar o próximo passo e construir a nossa família.
+      </p>
+    </div>
+  </section>
+
+  <!-- Honeymoon Competition Section -->
+  <section id="competition" class="container">
+    <h2 class="section-title">Lista de Casamento: A Competição</h2>
+    <p class="story-content" style="margin-bottom: 3rem;">
+      Nosso maior presente é a sua presença, mas se quiser nos presentear de outra forma,
+      ajude a decidir o destino da nossa lua de mel! O noivo escolheu um destino, e a noiva escolheu outro.
+      Cada R$1,00 equivale a 1 ponto na votação. Qual destino vai vencer?
+    </p>
+
+    <div class="competition-grid">
+      <!-- Groom's Destination -->
+      <div class="destination-card" id="groom-card">
+        <img src="/images/disney.png"
+          alt="Destino do Noivo" class="destination-image" />
+        <div class="destination-info">
+          <h3>Time Noivo: Disney Paris</h3>
+          <div class="points-display" id="groom-points">0 pts</div>
+          <div class="progress-bar">
+            <div class="progress-fill" id="groom-progress"></div>
+          </div>
+
+          <div class="gifts-list">
+            <div class="gift-item">
+              <h4>Ingresso do Parque</h4>
+              <div class="gift-price">R$ 150,00</div>
+              <button class="btn btn-secondary btn-sm"
+                onclick="app.addToCart('Groom', 'Ingresso do Parque', 150)">Adicionar</button>
+            </div>
+            <div class="gift-item">
+              <h4>Lanche do Mickey</h4>
+              <div class="gift-price">R$ 300,00</div>
+              <button class="btn btn-secondary btn-sm"
+                onclick="app.addToCart('Groom', 'Lanche do Mickey', 300)">Adicionar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bride's Destination -->
+      <div class="destination-card" id="bride-card">
+        <img src="/images/cote.png"
+          alt="Destino da Noiva" class="destination-image" />
+        <div class="destination-info">
+          <h3>Time Noiva: Cote D’Azur</h3>
+          <div class="points-display" id="bride-points">0 pts</div>
+          <div class="progress-bar">
+            <div class="progress-fill" id="bride-progress"></div>
+          </div>
+
+          <div class="gifts-list">
+            <div class="gift-item">
+              <h4>Passeio de Barco</h4>
+              <div class="gift-price">R$ 150,00</div>
+              <button class="btn btn-primary btn-sm"
+                onclick="app.addToCart('Bride', 'Passeio de Barco', 150)">Adicionar</button>
+            </div>
+            <div class="gift-item">
+              <h4>Almoço em Nice</h4>
+              <div class="gift-price">R$ 300,00</div>
+              <button class="btn btn-primary btn-sm"
+                onclick="app.addToCart('Bride', 'Almoço em Nice', 300)">Adicionar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RSVP Section -->
+  <section id="rsvp">
+    <div class="container rsvp-content">
+      <h2 class="section-title">Confirme sua Presença</h2>
+      <p style="margin-bottom: 2rem; font-size: 1.125rem;">
+        Por favor, confirme sua presença e a dos seus acompanhantes através da nossa plataforma oficial.
+      </p>
+      <!-- This link will be replaced with the actual Assessoria VIP link -->
+      <a href="https://assessoriavip.com.br" target="_blank" rel="noopener noreferrer" class="btn btn-accent btn-lg">
+        Confirmar Presença
+      </a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <p>&copy; 2026 Lorena & Marcelo. Feito com amor.</p>
+    </div>
+  </footer>
+
+  <!-- Cart / Checkout Modal Overlay -->
+  <div id="cart-overlay">
+    <div class="cart-modal">
+
+      <!-- Cart Items Section -->
+      <div id="cart-view">
+        <div class="cart-header">
+          <h3>Sua Contribuição</h3>
+          <button class="close-btn" onclick="app.closeCart()">&times;</button>
+        </div>
+
+        <div class="cart-items" id="cart-items-container">
+          <!-- Items injected by JS -->
+        </div>
+
+        <div class="cart-total">
+          <span>Total:</span>
+          <span id="cart-total-value">R$ 0,00</span>
+        </div>
+
+        <div style="margin-bottom: 1rem;">
+          <label for="guest-name" style="display:block; margin-bottom: 0.5rem; font-weight: 500;">Seu Nome:</label>
+          <input type="text" id="guest-name" placeholder="Como devemos agradecer?"
+            style="width: 100%; padding: 0.75rem; border: 1px solid #cbd5e1; border-radius: 0.5rem;" required />
+        </div>
+
+        <button class="btn btn-secondary" style="width: 100%;" onclick="app.proceedToPix()">Finalizar com PIX</button>
+      </div>
+
+      <!-- PIX Payment Section -->
+      <div id="pix-view" class="pix-section">
+        <div class="cart-header">
+          <h3>Pagamento via PIX</h3>
+          <button class="close-btn" onclick="app.closeCart()">&times;</button>
+        </div>
+        <p>Escaneie o QR Code abaixo com o aplicativo do seu banco:</p>
+
+        <div class="qr-code-container">
+          <canvas id="pix-qr-code"></canvas>
+        </div>
+
+        <p style="margin-bottom: 0.5rem;">Ou use o Pix Copia e Cola:</p>
+        <div class="copy-paste-container">
+          <input type="text" id="pix-payload" class="copy-input" readonly value="00020126580014br.gov.bcb.pix..." />
+          <button class="btn btn-primary copy-btn" onclick="app.copyPixPayload()">Copiar</button>
+        </div>
+
+        <button class="btn btn-accent" style="width: 100%; margin-top: 1rem;" onclick="app.confirmTransfer()">
+          Já fiz a transferência!
+        </button>
+      </div>
+
+      <!-- Success Section -->
+      <div id="success-view" class="pix-section">
+        <div class="cart-header" style="justify-content: center;">
+          <h3 style="color: var(--color-primary);">Muito Obrigado! ❤️</h3>
+        </div>
+        <p style="margin-bottom: 1.5rem;">
+          Sua contribuição foi registrada e os pontos já foram adicionados ao placar!
+        </p>
+        <button class="btn btn-secondary" style="width: 100%;" onclick="app.closeCart()">Voltar para o site</button>
+      </div>
+
+    </div>
+  </div>
+
+  <script type="module" src="./main.js"></script>
+</body>
+
+</html>

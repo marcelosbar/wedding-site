@@ -1,5 +1,5 @@
 import QRCode from 'qrcode';
-import { db, transactionsRef, addDoc, onSnapshot, query } from './firebase.js';
+import { transactionsRef, addDoc, onSnapshot, query } from './firebase.js';
 
 class WeddingApp {
   constructor() {
@@ -92,7 +92,7 @@ class WeddingApp {
     
     // In a real app, you construct a valid BR Code (PIX Payload) here based on your Pix Key
     // For demonstration, we use a mock payload
-    const pixKey = "celular_ou_cpf"; // TODO: Configure actual PIX key
+    const pixKey = "celular_ou_cpf"; // Insira a sua chave PIX real aqui
     const mockPayload = `00020126360014br.gov.bcb.pix0114${pixKey}5204000053039865405${total.toFixed(2)}5802BR5915LORENA E MARCELO6009SAO PAULO62070503***6304ABCD`;
     
     document.getElementById('pix-payload').value = mockPayload;
@@ -109,11 +109,14 @@ class WeddingApp {
     }
   }
 
-  copyPixPayload() {
+  async copyPixPayload() {
     const input = document.getElementById('pix-payload');
-    input.select();
-    document.execCommand('copy');
-    alert("Código PIX copiado!");
+    try {
+      await navigator.clipboard.writeText(input.value);
+      alert("Código PIX copiado!");
+    } catch (err) {
+      console.error('Falha ao copiar o código PIX', err);
+    }
   }
 
   // --- FIREBASE / COMPLETION LOGIC ---
@@ -179,13 +182,13 @@ class WeddingApp {
         console.log("Waiting for proper Firebase Config to enable real-time sync.");
       });
     } catch (e) {
-      // Firebase not configured
+      console.warn("Firebase not configured correctly for realtime sync.", e);
     }
   }
 
   simulateLocalScoreboard(list, amount) {
-    let groomPts = parseInt(this.groomPointsEl.innerText) || 0;
-    let bridePts = parseInt(this.bridePointsEl.innerText) || 0;
+    let groomPts = Number.parseInt(this.groomPointsEl.innerText, 10) || 0;
+    let bridePts = Number.parseInt(this.bridePointsEl.innerText, 10) || 0;
 
     if (list === 'Groom') groomPts += amount;
     if (list === 'Bride') bridePts += amount;
@@ -208,4 +211,4 @@ class WeddingApp {
 
 // Initialize App and expose to window for HTML inline onClick access
 const app = new WeddingApp();
-window.app = app;
+globalThis.app = app;

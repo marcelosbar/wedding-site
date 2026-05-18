@@ -1,7 +1,7 @@
 import QRCode from 'qrcode';
 import { transactionsRef, addDoc, onSnapshot, query } from './firebase.js';
 
-class WeddingApp {
+export class WeddingApp {
   constructor() {
     this.cart = [];
     this.currentList = null; // 'Groom' or 'Bride'
@@ -210,5 +210,11 @@ class WeddingApp {
 }
 
 // Initialize App and expose to window for HTML inline onClick access
-const app = new WeddingApp();
-globalThis.app = app;
+try {
+  if (globalThis.window !== undefined) {
+    globalThis.window.app = new WeddingApp();
+    console.log("WeddingApp initialized and attached to window.app successfully.");
+  }
+} catch (error) {
+  console.error("Failed to initialize WeddingApp:", error);
+}

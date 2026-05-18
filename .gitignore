@@ -17,10 +17,6 @@ dist-ssr
 # Firebase cache
 .firebase/
 
-# AI Agent cache
-.agents/
-skills-lock.json
-
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

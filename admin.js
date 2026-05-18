@@ -1,5 +1,5 @@
 import { db, onSnapshot, query, auth, googleProvider } from './firebase.js';
-import { doc, updateDoc, collection } from 'firebase/firestore';
+import { doc, updateDoc, collection, getDoc } from 'firebase/firestore';
 import { signInWithPopup, signOut, onAuthStateChanged } from 'firebase/auth';
 
 class AdminApp {
@@ -18,19 +18,38 @@ class AdminApp {
       }[tag] || tag)
     );
   }
+
+  async isAdmin(email) {
+    try {
+      const adminDoc = await getDoc(doc(db, 'config', 'admins'));
+      if (adminDoc.exists()) {
+        const emails = adminDoc.data().emails || [];
+        return emails.includes(email);
+      }
+      return false;
+    } catch (e) {
+      console.error('Error checking admin status', e);
+      return false;
+    }
+  }
+
   constructor() {
     this.loginScreen = document.getElementById('login-screen');
     this.dashboardScreen = document.getElementById('dashboard-screen');
     this.tableBody = document.getElementById('admin-table-body');
 
     // Mudar UI automaticamente quando o login mudar
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
+    onAuthStateChanged(auth, async (user) => {
+      if (user && await this.isAdmin(user.email)) {
         this.loggedIn = true;
         this.loginScreen.style.display = 'none';
         this.dashboardScreen.style.display = 'block';
         this.fetchData();
       } else {
+        if (user) {
+          alert('Acesso negado. Este e-mail não tem permissão de administrador.');
+          signOut(auth);
+        }
         this.loggedIn = false;
         this.loginScreen.style.display = 'flex';
         this.dashboardScreen.style.display = 'none';

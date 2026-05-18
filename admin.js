@@ -5,6 +5,19 @@ import { signInWithPopup, signOut, onAuthStateChanged } from 'firebase/auth';
 class AdminApp {
   loggedIn = false;
   transactions = [];
+
+  escapeHTML(str) {
+    if (typeof str !== 'string') return '';
+    return str.replace(/[&<>'"]/g, 
+      tag => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        "'": '&#39;',
+        '"': '&quot;'
+      }[tag] || tag)
+    );
+  }
   constructor() {
     this.loginScreen = document.getElementById('login-screen');
     this.dashboardScreen = document.getElementById('dashboard-screen');
@@ -85,7 +98,7 @@ class AdminApp {
       }
 
       tr.innerHTML = `
-        <td>${t.guestName}</td>
+        <td>${this.escapeHTML(t.guestName)}</td>
         <td>R$ ${t.totalAmount.toFixed(2)}</td>
         <td>${t.listChosen === 'Groom' ? 'Noivo' : 'Noiva'}</td>
         <td><span class="status-badge ${statusClass}">${statusText}</span></td>

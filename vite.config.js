@@ -9,5 +9,12 @@ export default defineConfig({
         admin: resolve(__dirname, 'admin.html')
       }
     }
+  },
+  test: {
+    environment: 'jsdom',
+    coverage: {
+      reporter: ['text', 'lcov'],
+      reportsDirectory: './coverage'
+    }
   }
 });

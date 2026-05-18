@@ -1,35 +1,45 @@
-import { db, onSnapshot, query } from './firebase.js';
+import { db, onSnapshot, query, auth, googleProvider } from './firebase.js';
 import { doc, updateDoc, collection } from 'firebase/firestore';
+import { signInWithPopup, signOut, onAuthStateChanged } from 'firebase/auth';
 
 class AdminApp {
+  loggedIn = false;
+  transactions = [];
   constructor() {
-    this.loggedIn = false;
-    this.transactions = [];
-    // Super secure password for demonstration (TODO: change this or use Firebase Auth)
-    this.secret = "casamento2026"; 
-    
     this.loginScreen = document.getElementById('login-screen');
     this.dashboardScreen = document.getElementById('dashboard-screen');
     this.tableBody = document.getElementById('admin-table-body');
+
+    // Mudar UI automaticamente quando o login mudar
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        this.loggedIn = true;
+        this.loginScreen.style.display = 'none';
+        this.dashboardScreen.style.display = 'block';
+        this.fetchData();
+      } else {
+        this.loggedIn = false;
+        this.loginScreen.style.display = 'flex';
+        this.dashboardScreen.style.display = 'none';
+      }
+    });
   }
 
-  login() {
-    const pwd = document.getElementById('admin-pwd').value;
-    if (pwd === this.secret) {
-      this.loggedIn = true;
-      this.loginScreen.style.display = 'none';
-      this.dashboardScreen.style.display = 'block';
-      this.fetchData();
-    } else {
-      alert("Senha incorreta!");
+  async login() {
+    try {
+      await signInWithPopup(auth, googleProvider);
+    } catch (error) {
+      console.error("Erro no login com Google", error);
+      alert("Falha ao fazer login com o Google.");
     }
   }
 
-  logout() {
-    this.loggedIn = false;
-    document.getElementById('admin-pwd').value = '';
-    this.loginScreen.style.display = 'flex';
-    this.dashboardScreen.style.display = 'none';
+  async logout() {
+    try {
+      await signOut(auth);
+    } catch (error) {
+      console.error("Erro ao deslogar", error);
+    }
   }
 
   fetchData() {
@@ -48,6 +58,7 @@ class AdminApp {
         alert("Erro ao conectar com Firebase. Verifique se as regras e configurações estão corretas.");
       });
     } catch (e) {
+      console.warn("Firebase not initialized yet.", e);
       this.tableBody.innerHTML = `<tr><td colspan="5" style="text-align:center;">Firebase não configurado. Adicione a config em firebase.js</td></tr>`;
     }
   }
@@ -103,4 +114,4 @@ class AdminApp {
 }
 
 const adminApp = new AdminApp();
-window.adminApp = adminApp;
+globalThis.adminApp = adminApp;

@@ -1,0 +1,130 @@
+/**
+ * @vitest-environment jsdom
+ */
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { PixCheckout } from '../src/js/pix.js';
+import { Cart } from '../src/js/cart.js';
+import { Scoreboard } from '../src/js/scoreboard.js';
+
+vi.mock('../src/js/firebase.js', () => ({
+  transactionsRef: {},
+  addDoc: vi.fn(),
+  onSnapshot: vi.fn(),
+  query: vi.fn()
+}));
+
+vi.mock('qrcode', () => ({
+  default: {
+    toCanvas: vi.fn()
+  }
+}));
+
+function setupDOM() {
+  document.body.innerHTML = `
+    <div id="cart-overlay"></div>
+    <div id="cart-view"></div>
+    <div id="pix-view"></div>
+    <div id="success-view"></div>
+    <div id="cart-items-container"></div>
+    <div id="cart-total-value"></div>
+    <div id="groom-points">0 pts</div>
+    <div id="groom-progress"></div>
+    <div id="bride-points">0 pts</div>
+    <div id="bride-progress"></div>
+    <input id="guest-name" value="" />
+    <input id="pix-payload" value="" />
+    <canvas id="pix-qr-code"></canvas>
+  `;
+}
+
+function createInstances() {
+  const cartElements = {
+    overlay: document.getElementById('cart-overlay'),
+    cartView: document.getElementById('cart-view'),
+    pixView: document.getElementById('pix-view'),
+    successView: document.getElementById('success-view'),
+    cartItemsContainer: document.getElementById('cart-items-container'),
+    cartTotalValue: document.getElementById('cart-total-value'),
+  };
+  const scoreboardElements = {
+    groomPointsEl: document.getElementById('groom-points'),
+    groomProgressEl: document.getElementById('groom-progress'),
+    bridePointsEl: document.getElementById('bride-points'),
+    brideProgressEl: document.getElementById('bride-progress'),
+  };
+  const cart = new Cart(cartElements);
+  const scoreboard = new Scoreboard(scoreboardElements);
+  const pix = new PixCheckout(cart, scoreboard, cartElements);
+  return { cart, scoreboard, pix };
+}
+
+describe('PixCheckout', () => {
+  let pix, cart;
+
+  beforeEach(() => {
+    setupDOM();
+    const instances = createInstances();
+    pix = instances.pix;
+    cart = instances.cart;
+  });
+
+  it('should alert if guest name is empty', async () => {
+    const alertMock = vi.spyOn(globalThis, 'alert').mockImplementation(() => {});
+    document.getElementById('guest-name').value = '';
+    await pix.proceedToPix();
+    expect(alertMock).toHaveBeenCalledWith('Por favor, preencha o seu nome para sabermos quem está nos presenteando!');
+    alertMock.mockRestore();
+  });
+
+  it('should generate QR code and switch to PIX view', async () => {
+    const QRCode = (await import('qrcode')).default;
+    document.getElementById('guest-name').value = 'João';
+    cart.addToCart('Groom', 'Gift', 100);
+    await pix.proceedToPix();
+    expect(QRCode.toCanvas).toHaveBeenCalled();
+    expect(document.getElementById('pix-view').classList.contains('active')).toBe(true);
+  });
+
+  it('should handle QR code error gracefully', async () => {
+    const QRCode = (await import('qrcode')).default;
+    QRCode.toCanvas.mockRejectedValueOnce(new Error('QR Error'));
+    const alertMock = vi.spyOn(globalThis, 'alert').mockImplementation(() => {});
+    document.getElementById('guest-name').value = 'João';
+    cart.addToCart('Groom', 'Gift', 100);
+    await pix.proceedToPix();
+    expect(alertMock).toHaveBeenCalledWith('Erro ao gerar QR Code');
+    alertMock.mockRestore();
+  });
+
+  it('should copy PIX payload to clipboard', async () => {
+    const writeTextMock = vi.fn().mockResolvedValue();
+    Object.assign(navigator, { clipboard: { writeText: writeTextMock } });
+    const alertMock = vi.spyOn(globalThis, 'alert').mockImplementation(() => {});
+    document.getElementById('pix-payload').value = 'test-payload';
+    await pix.copyPixPayload();
+    expect(writeTextMock).toHaveBeenCalledWith('test-payload');
+    expect(alertMock).toHaveBeenCalledWith('Código PIX copiado!');
+    alertMock.mockRestore();
+  });
+
+  it('should reset cart and show success view on confirmTransfer', async () => {
+    document.getElementById('guest-name').value = 'Maria';
+    cart.addToCart('Bride', 'Gift', 200);
+    await pix.confirmTransfer();
+    expect(cart.items.length).toBe(0);
+    expect(cart.currentList).toBeNull();
+    expect(document.getElementById('success-view').classList.contains('active')).toBe(true);
+    expect(document.getElementById('cart-view').style.display).toBe('none');
+  });
+
+  it('should fall back to local simulation when Firebase fails', async () => {
+    const { addDoc } = await import('../src/js/firebase.js');
+    addDoc.mockRejectedValueOnce(new Error('Firebase offline'));
+    document.getElementById('guest-name').value = 'Carlos';
+    cart.addToCart('Groom', 'Gift', 300);
+    const simulateSpy = vi.spyOn(pix.scoreboard, 'simulateLocalScoreboard');
+    await pix.confirmTransfer();
+    expect(simulateSpy).toHaveBeenCalledWith('Groom', 300);
+    simulateSpy.mockRestore();
+  });
+});

@@ -1,23 +1,11 @@
 import { db, onSnapshot, query, auth, googleProvider } from './firebase.js';
 import { doc, updateDoc, collection, getDoc } from 'firebase/firestore';
 import { signInWithPopup, signOut, onAuthStateChanged } from 'firebase/auth';
+import { escapeHTML } from './utils.js';
 
 class AdminApp {
   loggedIn = false;
   transactions = [];
-
-  escapeHTML(str) {
-    if (typeof str !== 'string') return '';
-    return str.replace(/[&<>'"]/g, 
-      tag => ({
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        "'": '&#39;',
-        '"': '&quot;'
-      }[tag] || tag)
-    );
-  }
 
   async isAdmin(email) {
     try {
@@ -117,7 +105,7 @@ class AdminApp {
       }
 
       tr.innerHTML = `
-        <td>${this.escapeHTML(t.guestName)}</td>
+        <td>${escapeHTML(t.guestName)}</td>
         <td>R$ ${t.totalAmount.toFixed(2)}</td>
         <td>${t.listChosen === 'Groom' ? 'Noivo' : 'Noiva'}</td>
         <td><span class="status-badge ${statusClass}">${statusText}</span></td>

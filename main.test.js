@@ -147,6 +147,16 @@ describe('WeddingApp openCart & closeCart', () => {
 
     expect(app.overlay.classList.contains('active')).toBe(false);
   });
+
+  it('should reset successView and restore cartView display on closeCart', () => {
+    app.successView.classList.add('active');
+    app.cartView.style.display = 'none';
+
+    app.closeCart();
+
+    expect(app.successView.classList.contains('active')).toBe(false);
+    expect(app.cartView.style.display).toBe('block');
+  });
 });
 
 describe('WeddingApp removeFromCart edge cases', () => {
@@ -246,6 +256,15 @@ describe('WeddingApp confirmTransfer', () => {
     expect(document.getElementById('guest-name').value).toBe('');
     expect(app.successView.classList.contains('active')).toBe(true);
     expect(app.pixView.classList.contains('active')).toBe(false);
+  });
+
+  it('should hide cartView after confirming transfer to prevent QR code from reappearing', async () => {
+    document.getElementById('guest-name').value = 'Ana';
+    app.addToCart('Groom', 'Gift', 100);
+
+    await app.confirmTransfer();
+
+    expect(app.cartView.style.display).toBe('none');
   });
 
   it('should fall back to local simulation when Firebase fails', async () => {

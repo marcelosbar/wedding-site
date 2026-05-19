@@ -77,7 +77,8 @@ export class WeddingApp {
 
   closeCart() {
     this.overlay.classList.remove('active');
-    // We don't clear the cart here so they can resume, unless they completed it
+    this.successView.classList.remove('active');
+    this.cartView.style.display = 'block';
   }
 
   // --- PIX LOGIC ---
@@ -143,17 +144,13 @@ export class WeddingApp {
     }
 
     this.pixView.classList.remove('active');
+    this.cartView.style.display = 'none';
     this.successView.classList.add('active');
     
     // Reset cart
     this.cart = [];
     this.currentList = null;
     document.getElementById('guest-name').value = '';
-    
-    // Ensure display blocks are reset for next open
-    setTimeout(() => {
-      this.cartView.style.display = 'block';
-    }, 500);
   }
 
   // Listen to transactions and update points automatically

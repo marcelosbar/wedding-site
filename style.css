@@ -109,6 +109,49 @@ nav {
   color: var(--color-secondary);
 }
 
+/* Hamburger Button (hidden on desktop) */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  z-index: 200;
+}
+
+.hamburger span {
+  display: block;
+  width: 24px;
+  height: 2.5px;
+  background: var(--color-text-main);
+  border-radius: 2px;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.hamburger.active span:nth-child(1) {
+  transform: translateY(7.5px) rotate(45deg);
+}
+
+.hamburger.active span:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger.active span:nth-child(3) {
+  transform: translateY(-7.5px) rotate(-45deg);
+}
+
+.nav-links a {
+  font-weight: 500;
+  color: var(--color-text-main);
+  transition: color 0.3s ease;
+}
+
+.nav-links a:hover {
+  color: var(--color-secondary);
+}
+
 /* Button Styles */
 .btn {
   display: inline-block;
@@ -197,6 +240,7 @@ nav {
 /* Sections Base */
 section {
   padding: 6rem 0;
+  scroll-margin-top: 70px;
 }
 
 .section-title {
@@ -445,7 +489,6 @@ footer {
   padding: 2rem 0;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
   .competition-grid {
     grid-template-columns: 1fr;
@@ -454,8 +497,32 @@ footer {
   .hero-content h1 {
     font-size: 2.5rem;
   }
-  
+
+  .hamburger {
+    display: flex;
+  }
+
   .nav-links {
-    display: none; /* simple mobile approach */
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    flex-direction: column;
+    padding: 1.5rem;
+    gap: 1rem;
+    box-shadow: var(--shadow-md);
+  }
+
+  .nav-links.open {
+    display: flex;
+  }
+
+  .nav-links a {
+    display: block;
+    padding: 0.5rem 0;
+    font-size: 1.1rem;
   }
 }

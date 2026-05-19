@@ -11,6 +11,7 @@ export class PixCheckout {
     this.cartView = elements.cartView;
     this.pixView = elements.pixView;
     this.successView = elements.successView;
+    this.isProcessing = false;
   }
 
   async proceedToPix() {
@@ -51,31 +52,40 @@ export class PixCheckout {
   }
 
   async confirmTransfer() {
-    const guestName = document.getElementById('guest-name').value.trim();
-    const total = this.cart.getTotal();
-    const list = this.cart.currentList;
-
-    const transactionData = {
-      guestName,
-      totalAmount: total,
-      listChosen: list,
-      status: 'pending',
-      timestamp: new Date().toISOString()
-    };
+    if (this.isProcessing) return;
+    this.isProcessing = true;
 
     try {
-      await addDoc(transactionsRef, transactionData);
-    } catch (e) {
-      console.error('Firebase is not configured correctly yet or network error. Running local simulation.', e);
-      this.scoreboard.simulateLocalScoreboard(list, total);
+      const guestName = document.getElementById('guest-name').value.trim();
+      const total = this.cart.getTotal();
+      const list = this.cart.currentList;
+
+      if (total <= 0) return;
+
+      const transactionData = {
+        guestName,
+        totalAmount: total,
+        listChosen: list,
+        status: 'pending',
+        timestamp: new Date().toISOString()
+      };
+
+      try {
+        await addDoc(transactionsRef, transactionData);
+      } catch (e) {
+        console.error('Firebase is not configured correctly yet or network error. Running local simulation.', e);
+        this.scoreboard.simulateLocalScoreboard(list, total);
+      }
+
+      this.pixView.classList.remove('active');
+      this.cartView.style.display = 'none';
+      this.successView.classList.add('active');
+
+      // Reset cart and form
+      this.cart.reset();
+      document.getElementById('guest-name').value = '';
+    } finally {
+      this.isProcessing = false;
     }
-
-    this.pixView.classList.remove('active');
-    this.cartView.style.display = 'none';
-    this.successView.classList.add('active');
-
-    // Reset cart and form
-    this.cart.reset();
-    document.getElementById('guest-name').value = '';
   }
 }

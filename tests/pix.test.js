@@ -127,4 +127,17 @@ describe('PixCheckout', () => {
     expect(simulateSpy).toHaveBeenCalledWith('Groom', 300);
     simulateSpy.mockRestore();
   });
+
+  it('should prevent double submission on confirmTransfer', async () => {
+    const { addDoc } = await import('../src/js/firebase.js');
+    addDoc.mockClear();
+    document.getElementById('guest-name').value = 'Double Clicker';
+    cart.addToCart('Bride', 'Gift', 200);
+
+    const p1 = pix.confirmTransfer();
+    const p2 = pix.confirmTransfer();
+    await Promise.all([p1, p2]);
+
+    expect(addDoc).toHaveBeenCalledTimes(1);
+  });
 });

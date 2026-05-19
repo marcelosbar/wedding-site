@@ -76,6 +76,7 @@ export class Cart {
 
   openCart() {
     this.overlay.classList.add('active');
+    this.cartView.style.display = 'block';
     this.cartView.classList.add('active');
     this.pixView.classList.remove('active');
     this.successView.classList.remove('active');
@@ -83,8 +84,6 @@ export class Cart {
 
   closeCart() {
     this.overlay.classList.remove('active');
-    this.successView.classList.remove('active');
-    this.cartView.style.display = 'block';
   }
 
   getTotal() {
@@ -94,5 +93,6 @@ export class Cart {
   reset() {
     this.items = [];
     this.currentList = null;
+    this.renderCart();
   }
 }

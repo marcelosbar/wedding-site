@@ -89,14 +89,23 @@ describe('Cart', () => {
     expect(cart.cartView.classList.contains('active')).toBe(true);
   });
 
-  it('should remove active class and reset views on closeCart', () => {
+  it('should remove active class on closeCart', () => {
     cart.openCart();
-    cart.successView.classList.add('active');
-    cart.cartView.style.display = 'none';
     cart.closeCart();
     expect(cart.overlay.classList.contains('active')).toBe(false);
-    expect(cart.successView.classList.contains('active')).toBe(false);
+  });
+
+  it('should reset inner views when openCart is called', () => {
+    cart.successView.classList.add('active');
+    cart.pixView.classList.add('active');
+    cart.cartView.style.display = 'none';
+
+    cart.openCart();
+
     expect(cart.cartView.style.display).toBe('block');
+    expect(cart.cartView.classList.contains('active')).toBe(true);
+    expect(cart.pixView.classList.contains('active')).toBe(false);
+    expect(cart.successView.classList.contains('active')).toBe(false);
   });
 
   it('should calculate total with getTotal()', () => {
@@ -105,11 +114,13 @@ describe('Cart', () => {
     expect(cart.getTotal()).toBe(350);
   });
 
-  it('should reset items and list on reset()', () => {
+  it('should reset items, list, and UI on reset()', () => {
     cart.addToCart('Groom', 'Gift', 100);
     cart.reset();
     expect(cart.items.length).toBe(0);
     expect(cart.currentList).toBeNull();
+    expect(document.getElementById('cart-items-container').children.length).toBe(0);
+    expect(document.getElementById('cart-total-value').innerText).toBe('R$ 0.00');
   });
 
   it('should control floating button visibility and badges when rendering', () => {

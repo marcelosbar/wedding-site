@@ -12,6 +12,10 @@ function createMockElements() {
     <div id="success-view"></div>
     <div id="cart-items-container"></div>
     <div id="cart-total-value"></div>
+    <button id="floating-cart-btn"></button>
+    <span id="floating-cart-badge"></span>
+    <button id="nav-cart-link" style="display: none;"></button>
+    <span id="nav-cart-badge"></span>
   `;
   return {
     overlay: document.getElementById('cart-overlay'),
@@ -20,6 +24,10 @@ function createMockElements() {
     successView: document.getElementById('success-view'),
     cartItemsContainer: document.getElementById('cart-items-container'),
     cartTotalValue: document.getElementById('cart-total-value'),
+    floatingCartBtn: document.getElementById('floating-cart-btn'),
+    floatingCartBadge: document.getElementById('floating-cart-badge'),
+    navCartLink: document.getElementById('nav-cart-link'),
+    navCartBadge: document.getElementById('nav-cart-badge'),
   };
 }
 
@@ -102,5 +110,23 @@ describe('Cart', () => {
     cart.reset();
     expect(cart.items.length).toBe(0);
     expect(cart.currentList).toBeNull();
+  });
+
+  it('should control floating button visibility and badges when rendering', () => {
+    expect(cart.floatingCartBtn.classList.contains('visible')).toBe(false);
+    expect(cart.navCartLink.style.display).toBe('none');
+
+    cart.addToCart('Groom', 'Gift A', 50);
+    cart.renderCart();
+
+    expect(cart.floatingCartBtn.classList.contains('visible')).toBe(true);
+    expect(cart.navCartLink.style.display).toBe('inline-block');
+    expect(String(cart.floatingCartBadge.innerText)).toBe('1');
+    expect(String(cart.navCartBadge.innerText)).toBe('1');
+
+    cart.removeFromCart(cart.items[0].id);
+    // removeFromCart triggers renderCart automatically
+    expect(cart.floatingCartBtn.classList.contains('visible')).toBe(false);
+    expect(cart.navCartLink.style.display).toBe('none');
   });
 });

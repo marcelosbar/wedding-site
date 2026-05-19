@@ -6,12 +6,16 @@ import { PixCheckout } from '../src/js/pix.js';
 import { Cart } from '../src/js/cart.js';
 import { Scoreboard } from '../src/js/scoreboard.js';
 
-vi.mock('../src/js/firebase.js', () => ({
-  transactionsRef: {},
-  addDoc: vi.fn(),
-  onSnapshot: vi.fn(),
-  query: vi.fn()
-}));
+vi.mock('../src/js/firebase.js', () => {
+  globalThis.__mockOnSnapshot = globalThis.__mockOnSnapshot || vi.fn();
+  globalThis.__mockQuery = globalThis.__mockQuery || vi.fn();
+  return {
+    transactionsRef: {},
+    addDoc: vi.fn(),
+    onSnapshot: globalThis.__mockOnSnapshot,
+    query: globalThis.__mockQuery
+  };
+});
 
 vi.mock('qrcode', () => ({
   default: {
@@ -27,10 +31,15 @@ function setupDOM() {
     <div id="success-view"></div>
     <div id="cart-items-container"></div>
     <div id="cart-total-value"></div>
-    <div id="groom-points">0 pts</div>
-    <div id="groom-progress"></div>
-    <div id="bride-points">0 pts</div>
-    <div id="bride-progress"></div>
+    <button id="floating-cart-btn"></button>
+    <span id="floating-cart-badge"></span>
+    <button id="nav-cart-link" style="display: none;"></button>
+    <span id="nav-cart-badge"></span>
+    <div id="global-groom-points">0 pts</div>
+    <div id="global-bride-points">0 pts</div>
+    <div id="global-groom-fill" style="width: 50%"></div>
+    <div id="global-bride-fill" style="width: 50%"></div>
+    <div id="global-progress-divider" style="left: 50%"></div>
     <input id="guest-name" value="" />
     <input id="pix-payload" value="" />
     <canvas id="pix-qr-code"></canvas>
@@ -45,12 +54,17 @@ function createInstances() {
     successView: document.getElementById('success-view'),
     cartItemsContainer: document.getElementById('cart-items-container'),
     cartTotalValue: document.getElementById('cart-total-value'),
+    floatingCartBtn: document.getElementById('floating-cart-btn'),
+    floatingCartBadge: document.getElementById('floating-cart-badge'),
+    navCartLink: document.getElementById('nav-cart-link'),
+    navCartBadge: document.getElementById('nav-cart-badge'),
   };
   const scoreboardElements = {
-    groomPointsEl: document.getElementById('groom-points'),
-    groomProgressEl: document.getElementById('groom-progress'),
-    bridePointsEl: document.getElementById('bride-points'),
-    brideProgressEl: document.getElementById('bride-progress'),
+    groomPointsBarEl: document.getElementById('global-groom-points'),
+    bridePointsBarEl: document.getElementById('global-bride-points'),
+    groomFillEl: document.getElementById('global-groom-fill'),
+    brideFillEl: document.getElementById('global-bride-fill'),
+    dividerEl: document.getElementById('global-progress-divider'),
   };
   const cart = new Cart(cartElements);
   const scoreboard = new Scoreboard(scoreboardElements);

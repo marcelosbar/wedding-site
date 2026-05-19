@@ -5,10 +5,11 @@ import { transactionsRef, onSnapshot, query } from './firebase.js';
  */
 export class Scoreboard {
   constructor(elements) {
-    this.groomPointsEl = elements.groomPointsEl;
-    this.groomProgressEl = elements.groomProgressEl;
-    this.bridePointsEl = elements.bridePointsEl;
-    this.brideProgressEl = elements.brideProgressEl;
+    this.groomPointsBarEl = elements.groomPointsBarEl;
+    this.bridePointsBarEl = elements.bridePointsBarEl;
+    this.groomFillEl = elements.groomFillEl;
+    this.brideFillEl = elements.brideFillEl;
+    this.dividerEl = elements.dividerEl;
   }
 
   initRealtimeScoreboard() {
@@ -39,8 +40,8 @@ export class Scoreboard {
   }
 
   simulateLocalScoreboard(list, amount) {
-    let groomPts = Number.parseInt(this.groomPointsEl.innerText, 10) || 0;
-    let bridePts = Number.parseInt(this.bridePointsEl.innerText, 10) || 0;
+    let groomPts = Number.parseInt(this.groomPointsBarEl.innerText, 10) || 0;
+    let bridePts = Number.parseInt(this.bridePointsBarEl.innerText, 10) || 0;
 
     if (list === 'Groom') groomPts += amount;
     if (list === 'Bride') bridePts += amount;
@@ -49,14 +50,20 @@ export class Scoreboard {
   }
 
   updateScoreboardUI(groomPts, bridePts) {
-    this.groomPointsEl.innerText = `${groomPts} pts`;
-    this.bridePointsEl.innerText = `${bridePts} pts`;
+    if (this.groomPointsBarEl) this.groomPointsBarEl.innerText = `${groomPts} pts`;
+    if (this.bridePointsBarEl) this.bridePointsBarEl.innerText = `${bridePts} pts`;
 
     const total = groomPts + bridePts;
-    const groomPercent = total > 0 ? (groomPts / total) * 100 : 0;
-    const bridePercent = total > 0 ? (bridePts / total) * 100 : 0;
+    let groomPercent = 50;
+    let bridePercent = 50;
 
-    this.groomProgressEl.style.width = `${groomPercent}%`;
-    this.brideProgressEl.style.width = `${bridePercent}%`;
+    if (total > 0) {
+      groomPercent = (groomPts / total) * 100;
+      bridePercent = (bridePts / total) * 100;
+    }
+
+    if (this.groomFillEl) this.groomFillEl.style.width = `${groomPercent}%`;
+    if (this.brideFillEl) this.brideFillEl.style.width = `${bridePercent}%`;
+    if (this.dividerEl) this.dividerEl.style.left = `${groomPercent}%`;
   }
 }

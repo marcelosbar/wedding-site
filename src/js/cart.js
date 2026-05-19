@@ -11,6 +11,10 @@ export class Cart {
     this.successView = elements.successView;
     this.cartItemsContainer = elements.cartItemsContainer;
     this.cartTotalValue = elements.cartTotalValue;
+    this.floatingCartBtn = elements.floatingCartBtn;
+    this.floatingCartBadge = elements.floatingCartBadge;
+    this.navCartLink = elements.navCartLink;
+    this.navCartBadge = elements.navCartBadge;
   }
 
   addToCart(listName, itemName, price) {
@@ -31,9 +35,8 @@ export class Cart {
     if (this.items.length === 0) {
       this.currentList = null;
       this.closeCart();
-    } else {
-      this.renderCart();
     }
+    this.renderCart();
   }
 
   renderCart() {
@@ -54,7 +57,21 @@ export class Cart {
       this.cartItemsContainer.appendChild(el);
     });
 
-    this.cartTotalValue.innerText = `R$ ${total.toFixed(2)}`;
+    if (this.cartTotalValue) {
+      this.cartTotalValue.innerText = `R$ ${total.toFixed(2)}`;
+    }
+
+    const count = this.items.length;
+    if (this.floatingCartBadge) this.floatingCartBadge.innerText = count;
+    if (this.navCartBadge) this.navCartBadge.innerText = count;
+
+    if (count > 0) {
+      if (this.floatingCartBtn) this.floatingCartBtn.classList.add('visible');
+      if (this.navCartLink) this.navCartLink.style.display = 'inline-block';
+    } else {
+      if (this.floatingCartBtn) this.floatingCartBtn.classList.remove('visible');
+      if (this.navCartLink) this.navCartLink.style.display = 'none';
+    }
   }
 
   openCart() {

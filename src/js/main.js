@@ -15,10 +15,15 @@ export class WeddingApp {
       successView: document.getElementById('success-view'),
       cartItemsContainer: document.getElementById('cart-items-container'),
       cartTotalValue: document.getElementById('cart-total-value'),
-      groomPointsEl: document.getElementById('groom-points'),
-      groomProgressEl: document.getElementById('groom-progress'),
-      bridePointsEl: document.getElementById('bride-points'),
-      brideProgressEl: document.getElementById('bride-progress'),
+      floatingCartBtn: document.getElementById('floating-cart-btn'),
+      floatingCartBadge: document.getElementById('floating-cart-badge'),
+      navCartLink: document.getElementById('nav-cart-link'),
+      navCartBadge: document.getElementById('nav-cart-badge'),
+      groomPointsBarEl: document.getElementById('global-groom-points'),
+      bridePointsBarEl: document.getElementById('global-bride-points'),
+      groomFillEl: document.getElementById('global-groom-fill'),
+      brideFillEl: document.getElementById('global-bride-fill'),
+      dividerEl: document.getElementById('global-progress-divider'),
     };
 
     // Initialize modules

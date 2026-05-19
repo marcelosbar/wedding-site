@@ -27,6 +27,7 @@
           <li><a href="#story">Nossa História</a></li>
           <li><a href="#competition">Lista de Casamento</a></li>
           <li><a href="#rsvp">Presença</a></li>
+          <li><button onclick="app.openCart()" id="nav-cart-link" style="display:none;">Carrinho <span id="nav-cart-badge" class="cart-badge-nav">0</span></button></li>
         </ul>
       </nav>
     </div>
@@ -65,6 +66,26 @@
       Cada R$1,00 equivale a 1 ponto na votação. Qual destino vai vencer?
     </p>
 
+    <div class="global-scoreboard-container">
+      <div class="scoreboard-labels">
+        <div class="team-label team-groom">
+          <span class="team-name">Time Noivo</span>
+          <span class="team-score" id="global-groom-points">0 pts</span>
+        </div>
+        <div class="team-label team-bride">
+          <span class="team-score" id="global-bride-points">0 pts</span>
+          <span class="team-name">Time Noiva</span>
+        </div>
+      </div>
+      <div class="global-progress-bar">
+        <div class="global-progress-fill groom-fill" id="global-groom-fill" style="width: 50%"></div>
+        <div class="global-progress-fill bride-fill" id="global-bride-fill" style="width: 50%"></div>
+        <div class="global-progress-divider" id="global-progress-divider" style="left: 50%">
+          <span class="divider-icon">❤️</span>
+        </div>
+      </div>
+    </div>
+
     <div class="competition-grid">
       <!-- Groom's Destination -->
       <div class="destination-card" id="groom-card">
@@ -72,10 +93,6 @@
           alt="Destino do Noivo" class="destination-image" />
         <div class="destination-info">
           <h3>Time Noivo: Disney Paris</h3>
-          <div class="points-display" id="groom-points">0 pts</div>
-          <div class="progress-bar">
-            <div class="progress-fill" id="groom-progress"></div>
-          </div>
 
           <div class="gifts-list">
             <div class="gift-item">
@@ -100,10 +117,6 @@
           alt="Destino da Noiva" class="destination-image" />
         <div class="destination-info">
           <h3>Time Noiva: Cote D’Azur</h3>
-          <div class="points-display" id="bride-points">0 pts</div>
-          <div class="progress-bar">
-            <div class="progress-fill" id="bride-progress"></div>
-          </div>
 
           <div class="gifts-list">
             <div class="gift-item">
@@ -210,6 +223,12 @@
 
     </div>
   </div>
+
+  <!-- Floating Cart Button -->
+  <button id="floating-cart-btn" class="floating-cart" onclick="app.openCart()" aria-label="Ver Carrinho">
+    <span class="cart-icon">🎁</span>
+    <span id="floating-cart-badge" class="cart-badge">0</span>
+  </button>
 
   <script type="module" src="./js/main.js"></script>
 </body>

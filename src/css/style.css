@@ -99,13 +99,19 @@ nav {
   list-style: none;
 }
 
-.nav-links a {
+.nav-links a, .nav-links button {
   font-weight: 500;
   color: var(--color-text-main);
   transition: color 0.3s ease;
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: inherit;
+  cursor: pointer;
+  padding: 0;
 }
 
-.nav-links a:hover {
+.nav-links a:hover, .nav-links button:hover {
   color: var(--color-secondary);
 }
 
@@ -142,15 +148,7 @@ nav {
   transform: translateY(-7.5px) rotate(-45deg);
 }
 
-.nav-links a {
-  font-weight: 500;
-  color: var(--color-text-main);
-  transition: color 0.3s ease;
-}
 
-.nav-links a:hover {
-  color: var(--color-secondary);
-}
 
 /* Button Styles */
 .btn {
@@ -487,6 +485,163 @@ footer {
   color: #94a3b8;
   text-align: center;
   padding: 2rem 0;
+}
+
+/* Global Scoreboard (Tug-of-War) */
+.global-scoreboard-container {
+  margin: 0 auto 3rem auto;
+  max-width: 800px;
+  background: var(--color-surface);
+  padding: 1.5rem 2rem;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+
+.scoreboard-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.team-label {
+  display: flex;
+  flex-direction: column;
+}
+
+.team-groom {
+  text-align: left;
+}
+
+.team-bride {
+  text-align: right;
+}
+
+.team-name {
+  font-weight: 600;
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.team-score {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-text-main);
+}
+
+.global-progress-bar {
+  width: 100%;
+  height: 20px;
+  background-color: #e2e8f0;
+  border-radius: var(--radius-full);
+  position: relative;
+  display: flex;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.global-progress-fill {
+  height: 100%;
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.groom-fill {
+  background: linear-gradient(90deg, #1e3a8a, var(--color-primary));
+  border-radius: var(--radius-full) 0 0 var(--radius-full);
+}
+
+.bride-fill {
+  background: linear-gradient(90deg, var(--color-secondary), var(--color-accent));
+  border-radius: 0 var(--radius-full) var(--radius-full) 0;
+}
+
+.global-progress-divider {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 40px;
+  height: 40px;
+  background: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  transition: left 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 10;
+}
+
+.divider-icon {
+  font-size: 1.2rem;
+  animation: pulse-heart 2s infinite ease-in-out;
+}
+
+@keyframes pulse-heart {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+/* Floating Cart Button & Badges */
+.floating-cart {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(10px);
+  border: 2px solid var(--color-accent);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 900;
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.floating-cart.visible {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.floating-cart:hover {
+  transform: scale(1.1);
+}
+
+.cart-icon {
+  font-size: 1.5rem;
+}
+
+.cart-badge, .cart-badge-nav {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: #dc2626;
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 700;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  border: 2px solid white;
+}
+
+.cart-badge-nav {
+  position: relative;
+  top: auto;
+  right: auto;
+  display: inline-flex;
+  margin-left: 0.5rem;
+  transform: translateY(-2px);
 }
 
 @media (max-width: 768px) {

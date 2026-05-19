@@ -19,6 +19,7 @@ export default defineConfig({
     environment: 'jsdom',
     coverage: {
       include: ['src/js/**'],
+      exclude: ['src/js/firebase.js'],
       reporter: ['text', 'lcov'],
       reportsDirectory: './coverage'
     }

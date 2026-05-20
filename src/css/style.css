@@ -304,8 +304,15 @@ section {
 }
 
 .destination-info h3 {
-  color: var(--color-secondary);
   font-size: 1.75rem;
+}
+
+#groom-card h3 {
+  color: var(--color-primary);
+}
+
+#bride-card h3 {
+  color: var(--color-secondary);
 }
 
 .points-display {
@@ -354,8 +361,15 @@ section {
 
 .gift-price {
   font-weight: 600;
-  color: var(--color-secondary);
   margin-bottom: 1rem;
+}
+
+#groom-card .gift-price {
+  color: var(--color-primary);
+}
+
+#bride-card .gift-price {
+  color: var(--color-secondary);
 }
 
 /* Cart Overlay */
@@ -527,7 +541,14 @@ footer {
 .team-score {
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--color-text-main);
+}
+
+.team-groom .team-score {
+  color: var(--color-primary);
+}
+
+.team-bride .team-score {
+  color: var(--color-secondary);
 }
 
 .global-progress-bar {

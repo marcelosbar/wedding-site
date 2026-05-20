@@ -14,6 +14,7 @@ This is a wedding website for Lorena and Marcelo. The primary goal is to provide
 4. **Backend**: Firebase Firestore is used for backend operations (specifically tracking points for the honeymoon competition). Ensure any new backend feature utilizes this existing Firebase setup.
 5. **Code Quality (SonarQube/SonarLint)**: The user has SonarQube/SonarLint installed in their IDE. Ensure all generated code strictly follows modern JavaScript/HTML/CSS best practices to avoid triggering linting warnings (e.g., use `Number.parseInt`, avoid deprecated functions like `execCommand`, prefer direct `undefined` checks over `typeof`, and use `globalThis`). Always fix any surfaced warnings immediately.
 6. **Test Coverage**: The project uses **Vitest** with **JSDOM** for unit testing. The CI/CD pipeline (GitHub Actions) runs tests and uploads coverage reports to **SonarCloud**. When adding or modifying business logic, **always write or update corresponding tests** in `main.test.js` to maintain coverage above 80%. Run `npm run test` locally before committing to verify.
+7. **CI/CD Security (Action Pinning)**: To protect against supply-chain attacks and ensure build reproducibility, always pin GitHub Actions in workflow files to a specific, immutable git commit SHA (e.g. `uses: trufflesecurity/trufflehog@a94d152bf65bebf5baa486d3d4dfee520af2ceed`) rather than using mutable tags or branch names (like `@main` or `@v3`). Document the friendly version in a comment beside it.
 
 ## Current State
 - The UI is complete and tested.

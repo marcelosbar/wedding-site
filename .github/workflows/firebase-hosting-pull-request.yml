@@ -18,8 +18,8 @@ jobs:
       - name: TruffleHog OSS Scan
         uses: trufflesecurity/trufflehog@a94d152bf65bebf5baa486d3d4dfee520af2ceed # v3.88.2
         with:
-          base: ${{ github.event.repository.default_branch }}
-          head: HEAD
+          base: ${{ github.event.pull_request.base.sha }}
+          head: ${{ github.event.pull_request.head.sha }}
           extra_args: --only-verified
       - run: npm ci --ignore-scripts
       - name: Run Tests & Generate Coverage

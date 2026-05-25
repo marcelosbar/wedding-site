@@ -1,3 +1,5 @@
+import { escapeHTML } from './utils.js';
+
 /**
  * Cart module — handles adding, removing, rendering cart items and modal visibility.
  */
@@ -48,7 +50,7 @@ export class Cart {
       const el = document.createElement('div');
       el.className = 'cart-item';
       el.innerHTML = `
-        <span>${item.name}</span>
+        <span>${escapeHTML(item.name)}</span>
         <div>
           <span style="margin-right: 1rem; font-weight: 500;">R$ ${item.price.toFixed(2)}</span>
           <button class="btn btn-sm" style="padding: 0.25rem 0.5rem; background: #ef4444; color: white;" onclick="app.removeFromCart(${item.id})">X</button>

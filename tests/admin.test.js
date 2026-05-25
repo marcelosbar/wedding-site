@@ -31,6 +31,8 @@ vi.mock('firebase/auth', () => {
     onAuthStateChanged: vi.fn((auth, cb) => {
       authCallback = cb; // Capture the callback to simulate auth state changes
     }),
+    setPersistence: vi.fn().mockResolvedValue(),
+    browserSessionPersistence: 'session',
     __triggerAuthStateChange: async (user) => {
       if (authCallback) await authCallback(user);
     }
@@ -145,8 +147,9 @@ describe('AdminApp', () => {
     expect(adminApp.dashboardScreen.style.display).toBe('none');
   });
 
-  it('should call signInWithPopup on login()', async () => {
+  it('should set auth persistence and call signInWithPopup on login()', async () => {
     await adminApp.login();
+    expect(firebaseAuthMock.setPersistence).toHaveBeenCalledWith(expect.anything(), firebaseAuthMock.browserSessionPersistence);
     expect(signInWithPopup).toHaveBeenCalled();
   });
 

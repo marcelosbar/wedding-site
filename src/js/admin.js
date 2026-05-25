@@ -1,6 +1,6 @@
 import { db, onSnapshot, query, auth, googleProvider } from './firebase.js';
 import { doc, updateDoc, collection, getDoc } from 'firebase/firestore';
-import { signInWithPopup, signOut, onAuthStateChanged } from 'firebase/auth';
+import { signInWithPopup, signOut, onAuthStateChanged, setPersistence, browserSessionPersistence } from 'firebase/auth';
 import { escapeHTML } from './utils.js';
 
 class AdminApp {
@@ -47,6 +47,7 @@ class AdminApp {
 
   async login() {
     try {
+      await setPersistence(auth, browserSessionPersistence);
       await signInWithPopup(auth, googleProvider);
     } catch (error) {
       console.error("Erro no login com Google", error);
@@ -109,13 +110,29 @@ class AdminApp {
         <td>R$ ${t.totalAmount.toFixed(2)}</td>
         <td>${t.listChosen === 'Groom' ? 'Noivo' : 'Noiva'}</td>
         <td><span class="status-badge ${statusClass}">${statusText}</span></td>
-        <td>
-          ${t.status === 'pending' ? `
-            <button class="btn btn-sm" style="background: #16a34a; color: white; padding: 0.25rem 0.5rem; border-radius: 4px;" onclick="adminApp.updateStatus('${t.id}', 'approved')">Aprovar</button>
-            <button class="btn btn-sm" style="background: #dc2626; color: white; padding: 0.25rem 0.5rem; border-radius: 4px;" onclick="adminApp.updateStatus('${t.id}', 'rejected')">Rejeitar</button>
-          ` : '-'}
-        </td>
+        <td class="action-cell"></td>
       `;
+
+      const actionCell = tr.querySelector('.action-cell');
+      if (t.status === 'pending') {
+        const approveBtn = document.createElement('button');
+        approveBtn.className = 'btn btn-sm';
+        approveBtn.style.cssText = 'background: #16a34a; color: white; padding: 0.25rem 0.5rem; border-radius: 4px; margin-right: 0.25rem;';
+        approveBtn.innerText = 'Aprovar';
+        approveBtn.addEventListener('click', () => this.updateStatus(t.id, 'approved'));
+
+        const rejectBtn = document.createElement('button');
+        rejectBtn.className = 'btn btn-sm';
+        rejectBtn.style.cssText = 'background: #dc2626; color: white; padding: 0.25rem 0.5rem; border-radius: 4px;';
+        rejectBtn.innerText = 'Rejeitar';
+        rejectBtn.addEventListener('click', () => this.updateStatus(t.id, 'rejected'));
+
+        actionCell.appendChild(approveBtn);
+        actionCell.appendChild(rejectBtn);
+      } else {
+        actionCell.innerText = '-';
+      }
+
       this.tableBody.appendChild(tr);
     });
   }

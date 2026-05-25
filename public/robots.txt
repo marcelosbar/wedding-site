@@ -1,0 +1,2 @@
+User-agent: *
+Sitemap: https://lorenaemarcelo2026.web.app/sitemap.xml

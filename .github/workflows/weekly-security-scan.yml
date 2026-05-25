@@ -11,6 +11,7 @@ on:
         type: string
 
 permissions:
+  contents: read
   issues: write # Required for ZAP to open GitHub issues for detected vulnerabilities
 
 jobs:

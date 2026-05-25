@@ -45,4 +45,45 @@ describe('Security Configuration Regressions', () => {
       expect(inlineEventMatch).toBeNull();
     });
   });
+
+  it('should define CSP frame-ancestors and form-action directives (ZAP alert 10055)', () => {
+    const configPath = path.resolve(__dirname, '../firebase.json');
+    const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+    const headers = config.hosting.headers[0].headers;
+
+    const cspHeader = headers.find(h => h.key === 'Content-Security-Policy');
+    expect(cspHeader).toBeDefined();
+
+    const cspValue = cspHeader.value;
+    // frame-ancestors and form-action do NOT fall back to default-src,
+    // so they must be explicitly declared to prevent ZAP alert 10055.
+    expect(cspValue).toContain("frame-ancestors 'self'");
+    expect(cspValue).toContain("form-action 'self'");
+  });
+
+  it('should set Cross-Origin-Embedder-Policy to credentialless (ZAP alert 90004)', () => {
+    const configPath = path.resolve(__dirname, '../firebase.json');
+    const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+    const headers = config.hosting.headers[0].headers;
+
+    const coepHeader = headers.find(h => h.key === 'Cross-Origin-Embedder-Policy');
+    expect(coepHeader).toBeDefined();
+    // 'unsafe-none' provides no isolation. 'credentialless' is the safe middle-ground:
+    // it provides cross-origin isolation without blocking Firebase Auth popups,
+    // which would happen with 'require-corp'.
+    expect(coepHeader.value).toBe('credentialless');
+  });
+
+  it('should keep Cross-Origin-Opener-Policy as same-origin-allow-popups (intentional)', () => {
+    const configPath = path.resolve(__dirname, '../firebase.json');
+    const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+    const headers = config.hosting.headers[0].headers;
+
+    const coopHeader = headers.find(h => h.key === 'Cross-Origin-Opener-Policy');
+    expect(coopHeader).toBeDefined();
+    // INTENTIONAL DEVIATION: ZAP prefers 'same-origin', but we use 'same-origin-allow-popups'
+    // to preserve the Google Sign-In popup flow used by the admin panel.
+    // Changing this to 'same-origin' would silently break Firebase Authentication.
+    expect(coopHeader.value).toBe('same-origin-allow-popups');
+  });
 });

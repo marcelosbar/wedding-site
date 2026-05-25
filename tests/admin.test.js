@@ -46,7 +46,7 @@ const alertMock = vi.spyOn(globalThis, 'alert').mockImplementation(() => {});
 const confirmMock = vi.spyOn(globalThis, 'confirm').mockImplementation(() => true);
 
 // 2. Import elements
-import { getDoc, updateDoc } from 'firebase/firestore';
+import { getDoc, updateDoc, collection } from 'firebase/firestore';
 import { signInWithPopup, signOut } from 'firebase/auth';
 import * as firebaseAuthMock from 'firebase/auth';
 
@@ -253,5 +253,14 @@ describe('AdminApp', () => {
     updateDoc.mockRejectedValueOnce(new Error('Failed'));
     await adminApp.updateStatus('123', 'approved');
     expect(alertMock).toHaveBeenCalledWith('Erro ao atualizar. Verifique as regras do Firebase Firestore.');
+  });
+
+  it('should render configuration error when collection throws', () => {
+    collection.mockImplementationOnce(() => {
+      throw new Error('Firebase offline');
+    });
+
+    adminApp.fetchData();
+    expect(adminApp.tableBody.innerHTML).toContain('Firebase não configurado');
   });
 });

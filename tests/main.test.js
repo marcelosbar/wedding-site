@@ -65,6 +65,14 @@ function setupDOM() {
     <div id="global-groom-fill"></div>
     <div id="global-bride-fill"></div>
     <div id="global-progress-divider"></div>
+    <button id="hamburger-btn"></button>
+    <div class="nav-links"></div>
+    <button class="add-to-cart-btn" data-list="Groom" data-item="Gift" data-price="100"></button>
+    <button class="close-cart-btn"></button>
+    <button id="proceed-to-pix-btn"></button>
+    <button id="copy-pix-payload-btn"></button>
+    <button id="confirm-transfer-btn"></button>
+    <button id="back-to-site-btn"></button>
   `;
 }
 
@@ -132,5 +140,44 @@ describe('WeddingApp Orchestrator', () => {
 
     app.updateScoreboardUI(150, 50);
     expect(mockScoreboardUpdate).toHaveBeenCalledWith(150, 50);
+  });
+
+  it('should handle all UI event listener clicks', () => {
+    // 1. Hamburger menu
+    const hamburgerBtn = document.getElementById('hamburger-btn');
+    const navLinks = document.querySelector('.nav-links');
+    hamburgerBtn.click();
+    expect(navLinks.classList.contains('open')).toBe(true);
+    expect(hamburgerBtn.classList.contains('active')).toBe(true);
+
+    // 2. Open cart button/links
+    document.getElementById('nav-cart-link').click();
+    expect(mockCartOpenCart).toHaveBeenCalled();
+    mockCartOpenCart.mockClear();
+
+    document.getElementById('floating-cart-btn').click();
+    expect(mockCartOpenCart).toHaveBeenCalled();
+
+    // 3. Add to cart buttons
+    document.querySelector('.add-to-cart-btn').click();
+    expect(mockCartAddToCart).toHaveBeenCalledWith('Groom', 'Gift', 100);
+
+    // 4. Close cart buttons
+    document.querySelector('.close-cart-btn').click();
+    expect(mockCartCloseCart).toHaveBeenCalled();
+    mockCartCloseCart.mockClear();
+
+    // 5. Checkout / PIX buttons
+    document.getElementById('proceed-to-pix-btn').click();
+    expect(mockPixProceed).toHaveBeenCalled();
+
+    document.getElementById('copy-pix-payload-btn').click();
+    expect(mockPixCopy).toHaveBeenCalled();
+
+    document.getElementById('confirm-transfer-btn').click();
+    expect(mockPixConfirm).toHaveBeenCalled();
+
+    document.getElementById('back-to-site-btn').click();
+    expect(mockCartCloseCart).toHaveBeenCalled();
   });
 });

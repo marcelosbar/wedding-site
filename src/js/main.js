@@ -32,6 +32,65 @@ export class WeddingApp {
     this.pix = new PixCheckout(this.cart, this.scoreboard, elements);
 
     this.scoreboard.initRealtimeScoreboard();
+    this.initEvents();
+  }
+
+  initEvents() {
+    // 1. Hamburger menu
+    const hamburgerBtn = document.getElementById('hamburger-btn');
+    if (hamburgerBtn) {
+      hamburgerBtn.addEventListener('click', () => {
+        document.querySelector('.nav-links').classList.toggle('open');
+        hamburgerBtn.classList.toggle('active');
+      });
+    }
+
+    // 2. Open cart button/links
+    const navCartLink = document.getElementById('nav-cart-link');
+    if (navCartLink) {
+      navCartLink.addEventListener('click', () => this.openCart());
+    }
+
+    const floatingCartBtn = document.getElementById('floating-cart-btn');
+    if (floatingCartBtn) {
+      floatingCartBtn.addEventListener('click', () => this.openCart());
+    }
+
+    // 3. Add to cart buttons
+    document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const list = e.currentTarget.getAttribute('data-list');
+        const item = e.currentTarget.getAttribute('data-item');
+        const price = Number.parseFloat(e.currentTarget.getAttribute('data-price'));
+        this.addToCart(list, item, price);
+      });
+    });
+
+    // 4. Close cart buttons
+    document.querySelectorAll('.close-cart-btn').forEach(btn => {
+      btn.addEventListener('click', () => this.closeCart());
+    });
+
+    // 5. Checkout / PIX buttons
+    const proceedToPixBtn = document.getElementById('proceed-to-pix-btn');
+    if (proceedToPixBtn) {
+      proceedToPixBtn.addEventListener('click', () => this.proceedToPix());
+    }
+
+    const copyPixPayloadBtn = document.getElementById('copy-pix-payload-btn');
+    if (copyPixPayloadBtn) {
+      copyPixPayloadBtn.addEventListener('click', () => this.copyPixPayload());
+    }
+
+    const confirmTransferBtn = document.getElementById('confirm-transfer-btn');
+    if (confirmTransferBtn) {
+      confirmTransferBtn.addEventListener('click', () => this.confirmTransfer());
+    }
+
+    const backToSiteBtn = document.getElementById('back-to-site-btn');
+    if (backToSiteBtn) {
+      backToSiteBtn.addEventListener('click', () => this.closeCart());
+    }
   }
 
   // --- Delegate Cart methods ---
@@ -50,11 +109,11 @@ export class WeddingApp {
   updateScoreboardUI(groomPts, bridePts) { this.scoreboard.updateScoreboardUI(groomPts, bridePts); }
 }
 
-// Initialize App and expose to window for HTML inline onClick access
+// Initialize App when DOM is loaded
 try {
   if (globalThis.window !== undefined) {
-    globalThis.window.app = new WeddingApp();
-    console.log('WeddingApp initialized and attached to window.app successfully.');
+    new WeddingApp();
+    console.log('WeddingApp initialized successfully.');
   }
 } catch (error) {
   console.error('Failed to initialize WeddingApp:', error);

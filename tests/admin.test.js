@@ -55,8 +55,12 @@ describe('AdminApp', () => {
 
   beforeAll(async () => {
     document.body.innerHTML = `
-      <div id="login-screen"></div>
-      <div id="dashboard-screen"></div>
+      <div id="login-screen">
+        <button id="admin-login-btn"></button>
+      </div>
+      <div id="dashboard-screen">
+        <button id="admin-logout-btn"></button>
+      </div>
       <table>
         <tbody id="admin-table-body"></tbody>
       </table>
@@ -80,6 +84,22 @@ describe('AdminApp', () => {
     expect(adminApp).toBeDefined();
     expect(adminApp.loginScreen).toBeDefined();
     expect(adminApp.dashboardScreen).toBeDefined();
+  });
+
+  it('should call login when admin-login-btn is clicked', async () => {
+    const loginSpy = vi.spyOn(adminApp, 'login').mockImplementation(async () => {});
+    const loginBtn = document.getElementById('admin-login-btn');
+    loginBtn.click();
+    expect(loginSpy).toHaveBeenCalled();
+    loginSpy.mockRestore();
+  });
+
+  it('should call logout when admin-logout-btn is clicked', async () => {
+    const logoutSpy = vi.spyOn(adminApp, 'logout').mockImplementation(async () => {});
+    const logoutBtn = document.getElementById('admin-logout-btn');
+    logoutBtn.click();
+    expect(logoutSpy).toHaveBeenCalled();
+    logoutSpy.mockRestore();
   });
 
   it('isAdmin should return true for valid admin email', async () => {

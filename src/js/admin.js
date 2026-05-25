@@ -26,11 +26,23 @@ class AdminApp {
     this.dashboardScreen = document.getElementById('dashboard-screen');
     this.tableBody = document.getElementById('admin-table-body');
 
+    const loginBtn = document.getElementById('admin-login-btn');
+    if (loginBtn) {
+      loginBtn.addEventListener('click', () => this.login());
+    }
+
+    const logoutBtn = document.getElementById('admin-logout-btn');
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', () => this.logout());
+    }
+
     // Mudar UI automaticamente quando o login mudar
     onAuthStateChanged(auth, async (user) => {
       if (user && await this.isAdmin(user.email)) {
         this.loggedIn = true;
+        this.loginScreen.classList.add('u-hidden');
         this.loginScreen.style.display = 'none';
+        this.dashboardScreen.classList.remove('u-hidden');
         this.dashboardScreen.style.display = 'block';
         this.fetchData();
       } else {
@@ -39,7 +51,9 @@ class AdminApp {
           signOut(auth);
         }
         this.loggedIn = false;
+        this.loginScreen.classList.remove('u-hidden');
         this.loginScreen.style.display = 'flex';
+        this.dashboardScreen.classList.add('u-hidden');
         this.dashboardScreen.style.display = 'none';
       }
     });
@@ -80,14 +94,14 @@ class AdminApp {
       });
     } catch (e) {
       console.warn("Firebase not initialized yet.", e);
-      this.tableBody.innerHTML = `<tr><td colspan="5" style="text-align:center;">Firebase não configurado. Adicione a config em firebase.js</td></tr>`;
+      this.tableBody.innerHTML = `<tr><td colspan="5" class="u-text-center">Firebase não configurado. Adicione a config em firebase.js</td></tr>`;
     }
   }
 
   renderTable() {
     this.tableBody.innerHTML = '';
     if (this.transactions.length === 0) {
-      this.tableBody.innerHTML = `<tr><td colspan="5" style="text-align:center;">Nenhuma transação encontrada.</td></tr>`;
+      this.tableBody.innerHTML = `<tr><td colspan="5" class="u-text-center">Nenhuma transação encontrada.</td></tr>`;
       return;
     }
 
@@ -116,14 +130,12 @@ class AdminApp {
       const actionCell = tr.querySelector('.action-cell');
       if (t.status === 'pending') {
         const approveBtn = document.createElement('button');
-        approveBtn.className = 'btn btn-sm';
-        approveBtn.style.cssText = 'background: #16a34a; color: white; padding: 0.25rem 0.5rem; border-radius: 4px; margin-right: 0.25rem;';
+        approveBtn.className = 'btn btn-sm admin-btn-approve';
         approveBtn.innerText = 'Aprovar';
         approveBtn.addEventListener('click', () => this.updateStatus(t.id, 'approved'));
 
         const rejectBtn = document.createElement('button');
-        rejectBtn.className = 'btn btn-sm';
-        rejectBtn.style.cssText = 'background: #dc2626; color: white; padding: 0.25rem 0.5rem; border-radius: 4px;';
+        rejectBtn.className = 'btn btn-sm admin-btn-reject';
         rejectBtn.innerText = 'Rejeitar';
         rejectBtn.addEventListener('click', () => this.updateStatus(t.id, 'rejected'));
 

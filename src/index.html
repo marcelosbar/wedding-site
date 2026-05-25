@@ -17,7 +17,7 @@
     <div class="container nav-wrapper">
       <nav>
         <div class="logo">L & M</div>
-        <button class="hamburger" id="hamburger-btn" aria-label="Menu" onclick="document.querySelector('.nav-links').classList.toggle('open'); this.classList.toggle('active')">
+        <button class="hamburger" id="hamburger-btn" aria-label="Menu">
           <span></span>
           <span></span>
           <span></span>
@@ -27,7 +27,7 @@
           <li><a href="#story">Nossa História</a></li>
           <li><a href="#competition">Lista de Casamento</a></li>
           <li><a href="#rsvp">Presença</a></li>
-          <li><button onclick="app.openCart()" id="nav-cart-link" style="display:none;">Carrinho <span id="nav-cart-badge" class="cart-badge-nav">0</span></button></li>
+          <li><button id="nav-cart-link" class="u-hidden">Carrinho <span id="nav-cart-badge" class="cart-badge-nav">0</span></button></li>
         </ul>
       </nav>
     </div>
@@ -38,7 +38,7 @@
     <div class="hero-content">
       <div class="hero-date">30 de Agosto de 2026</div>
       <h1>Lorena & Marcelo</h1>
-      <p class="story-content" style="margin-top: 1rem; margin-bottom: 2rem;">
+      <p class="story-content u-story-margin-1">
         Estamos muito felizes em celebrar este momento especial com vocês!
       </p>
       <a href="#competition" class="btn btn-primary">Ver Lista de Presentes</a>
@@ -60,7 +60,7 @@
   <!-- Honeymoon Competition Section -->
   <section id="competition" class="container">
     <h2 class="section-title">Lista de Casamento: A Competição</h2>
-    <p class="story-content" style="margin-bottom: 3rem;">
+    <p class="story-content u-story-margin-2">
       Nosso maior presente é a sua presença, mas se quiser nos presentear de outra forma,
       ajude a decidir o destino da nossa lua de mel! O noivo escolheu um destino, e a noiva escolheu outro.
       Cada R$1,00 equivale a 1 ponto na votação. Qual destino vai vencer?
@@ -78,9 +78,9 @@
         </div>
       </div>
       <div class="global-progress-bar">
-        <div class="global-progress-fill groom-fill" id="global-groom-fill" style="width: 50%"></div>
-        <div class="global-progress-fill bride-fill" id="global-bride-fill" style="width: 50%"></div>
-        <div class="global-progress-divider" id="global-progress-divider" style="left: 50%">
+        <div class="global-progress-fill groom-fill" id="global-groom-fill"></div>
+        <div class="global-progress-fill bride-fill" id="global-bride-fill"></div>
+        <div class="global-progress-divider" id="global-progress-divider">
           <span class="divider-icon">❤️</span>
         </div>
       </div>
@@ -98,14 +98,14 @@
             <div class="gift-item">
               <h4>Ingresso do Parque</h4>
               <div class="gift-price">R$ 150,00</div>
-              <button class="btn btn-primary btn-sm"
-                onclick="app.addToCart('Groom', 'Ingresso do Parque', 150)">Adicionar</button>
+              <button class="btn btn-primary btn-sm add-to-cart-btn"
+                data-list="Groom" data-item="Ingresso do Parque" data-price="150">Adicionar</button>
             </div>
             <div class="gift-item">
               <h4>Lanche do Mickey</h4>
               <div class="gift-price">R$ 300,00</div>
-              <button class="btn btn-primary btn-sm"
-                onclick="app.addToCart('Groom', 'Lanche do Mickey', 300)">Adicionar</button>
+              <button class="btn btn-primary btn-sm add-to-cart-btn"
+                data-list="Groom" data-item="Lanche do Mickey" data-price="300">Adicionar</button>
             </div>
           </div>
         </div>
@@ -122,14 +122,14 @@
             <div class="gift-item">
               <h4>Passeio de Barco</h4>
               <div class="gift-price">R$ 150,00</div>
-              <button class="btn btn-secondary btn-sm"
-                onclick="app.addToCart('Bride', 'Passeio de Barco', 150)">Adicionar</button>
+              <button class="btn btn-secondary btn-sm add-to-cart-btn"
+                data-list="Bride" data-item="Passeio de Barco" data-price="150">Adicionar</button>
             </div>
             <div class="gift-item">
               <h4>Almoço em Nice</h4>
               <div class="gift-price">R$ 300,00</div>
-              <button class="btn btn-secondary btn-sm"
-                onclick="app.addToCart('Bride', 'Almoço em Nice', 300)">Adicionar</button>
+              <button class="btn btn-secondary btn-sm add-to-cart-btn"
+                data-list="Bride" data-item="Almoço em Nice" data-price="300">Adicionar</button>
             </div>
           </div>
         </div>
@@ -141,7 +141,7 @@
   <section id="rsvp">
     <div class="container rsvp-content">
       <h2 class="section-title">Confirme sua Presença</h2>
-      <p style="margin-bottom: 2rem; font-size: 1.125rem;">
+      <p class="u-lead-text">
         Por favor, confirme sua presença e a dos seus acompanhantes através da nossa plataforma oficial.
       </p>
       <!-- This link will be replaced with the actual Assessoria VIP link -->
@@ -156,7 +156,7 @@
     <div class="container">
       <p>&copy; 2026 Lorena & Marcelo. Feito com amor.</p>
     </div>
-  </footer>
+  </section>
 
   <!-- Cart / Checkout Modal Overlay -->
   <div id="cart-overlay">
@@ -166,7 +166,7 @@
       <div id="cart-view">
         <div class="cart-header">
           <h3>Sua Contribuição</h3>
-          <button class="close-btn" onclick="app.closeCart()">&times;</button>
+          <button class="close-btn close-cart-btn" aria-label="Fechar Carrinho">&times;</button>
         </div>
 
         <div class="cart-items" id="cart-items-container">
@@ -178,20 +178,20 @@
           <span id="cart-total-value">R$ 0,00</span>
         </div>
 
-        <div style="margin-bottom: 1rem;">
-          <label for="guest-name" style="display:block; margin-bottom: 0.5rem; font-weight: 500;">Seu Nome:</label>
+        <div class="u-mb-4">
+          <label for="guest-name" class="u-display-block u-mb-2 u-font-weight-500">Seu Nome:</label>
           <input type="text" id="guest-name" placeholder="Como devemos agradecer?"
-            style="width: 100%; padding: 0.75rem; border: 1px solid #cbd5e1; border-radius: 0.5rem;" required />
+            class="u-input-text" required />
         </div>
 
-        <button class="btn btn-secondary" style="width: 100%;" onclick="app.proceedToPix()">Finalizar com PIX</button>
+        <button id="proceed-to-pix-btn" class="btn btn-secondary u-w-full">Finalizar com PIX</button>
       </div>
 
       <!-- PIX Payment Section -->
       <div id="pix-view" class="pix-section">
         <div class="cart-header">
           <h3>Pagamento via PIX</h3>
-          <button class="close-btn" onclick="app.closeCart()">&times;</button>
+          <button class="close-btn close-cart-btn" aria-label="Fechar Carrinho">&times;</button>
         </div>
         <p>Escaneie o QR Code abaixo com o aplicativo do seu banco:</p>
 
@@ -199,33 +199,33 @@
           <canvas id="pix-qr-code"></canvas>
         </div>
 
-        <p style="margin-bottom: 0.5rem;">Ou use o Pix Copia e Cola:</p>
+        <p class="u-mb-2">Ou use o Pix Copia e Cola:</p>
         <div class="copy-paste-container">
           <input type="text" id="pix-payload" class="copy-input" readonly value="00020126580014br.gov.bcb.pix..." />
-          <button class="btn btn-primary copy-btn" onclick="app.copyPixPayload()">Copiar</button>
+          <button id="copy-pix-payload-btn" class="btn btn-primary copy-btn">Copiar</button>
         </div>
 
-        <button class="btn btn-accent" style="width: 100%; margin-top: 1rem;" onclick="app.confirmTransfer()">
+        <button id="confirm-transfer-btn" class="btn btn-accent u-w-full u-mt-4">
           Já fiz a transferência!
         </button>
       </div>
 
       <!-- Success Section -->
       <div id="success-view" class="pix-section">
-        <div class="cart-header" style="justify-content: center;">
-          <h3 style="color: var(--color-primary);">Muito Obrigado! ❤️</h3>
+        <div class="cart-header u-justify-center">
+          <h3 class="u-text-primary">Muito Obrigado! ❤️</h3>
         </div>
-        <p style="margin-bottom: 1.5rem;">
+        <p class="u-mb-6">
           Sua contribuição foi registrada e os pontos já foram adicionados ao placar!
         </p>
-        <button class="btn btn-secondary" style="width: 100%;" onclick="app.closeCart()">Voltar para o site</button>
+        <button id="back-to-site-btn" class="btn btn-secondary u-w-full">Voltar para o site</button>
       </div>
 
     </div>
   </div>
 
   <!-- Floating Cart Button -->
-  <button id="floating-cart-btn" class="floating-cart" onclick="app.openCart()" aria-label="Ver Carrinho">
+  <button id="floating-cart-btn" class="floating-cart" aria-label="Ver Carrinho">
     <span class="cart-icon">🎁</span>
     <span id="floating-cart-badge" class="cart-badge">0</span>
   </button>

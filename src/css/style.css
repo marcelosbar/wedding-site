@@ -569,11 +569,13 @@ footer {
 .groom-fill {
   background: linear-gradient(90deg, #1e3a8a, var(--color-primary));
   border-radius: var(--radius-full) 0 0 var(--radius-full);
+  width: 50%;
 }
 
 .bride-fill {
   background: linear-gradient(90deg, var(--color-secondary), var(--color-accent));
   border-radius: 0 var(--radius-full) var(--radius-full) 0;
+  width: 50%;
 }
 
 .global-progress-divider {
@@ -590,6 +592,7 @@ footer {
   box-shadow: 0 4px 10px rgba(0,0,0,0.15);
   transition: left 0.8s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 10;
+  left: 50%;
 }
 
 .divider-icon {
@@ -702,3 +705,176 @@ footer {
     font-size: 1.1rem;
   }
 }
+
+/* Utility Classes for CSP Compliance */
+.u-hidden {
+  display: none !important;
+}
+
+.u-story-margin-1 {
+  margin-top: 1rem;
+  margin-bottom: 2rem;
+}
+
+.u-story-margin-2 {
+  margin-bottom: 3rem;
+}
+
+.u-lead-text {
+  margin-bottom: 2rem;
+  font-size: 1.125rem;
+}
+
+.u-mb-4 {
+  margin-bottom: 1rem;
+}
+
+.u-display-block {
+  display: block;
+}
+
+.u-mb-2 {
+  margin-bottom: 0.5rem;
+}
+
+.u-font-weight-500 {
+  font-weight: 500;
+}
+
+.u-input-text {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.5rem;
+}
+
+.u-w-full {
+  width: 100%;
+}
+
+.u-mt-4 {
+  margin-top: 1rem;
+}
+
+.u-justify-center {
+  justify-content: center;
+}
+
+.u-text-primary {
+  color: var(--color-primary);
+}
+
+.u-mb-6 {
+  margin-bottom: 1.5rem;
+}
+
+/* Admin Page Specific Styles */
+body.admin-body {
+  background-color: #f1f5f9;
+}
+
+.admin-container {
+  max-width: 800px;
+  margin: 4rem auto;
+  padding: 2rem;
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 2rem;
+}
+
+.admin-table th, .admin-table td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.status-badge {
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--radius-full);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.status-pending {
+  background: #fef08a;
+  color: #854d0e;
+}
+
+.status-approved {
+  background: #bbf7d0;
+  color: #166534;
+}
+
+.status-rejected {
+  background: #fecaca;
+  color: #991b1b;
+}
+
+.admin-login-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background-color: #fff;
+  color: #333;
+  border: 1px solid #ccc;
+}
+
+.admin-login-btn:hover {
+  background-color: #f8fafc;
+  color: #111;
+}
+
+.admin-google-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.admin-header-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.admin-intro-text {
+  margin-top: 1rem;
+  color: var(--color-text-muted);
+}
+
+.admin-btn-approve {
+  background: #16a34a;
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  margin-right: 0.25rem;
+}
+
+.admin-btn-approve:hover {
+  background: #15803d;
+}
+
+.admin-btn-reject {
+  background: #dc2626;
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}
+
+.admin-btn-reject:hover {
+  background: #b91c1c;
+}
+
+.btn-sm {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+}
+
+.u-text-center {
+  text-align: center;
+}
+

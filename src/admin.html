@@ -5,52 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Painel Admin - Lorena & Marcelo</title>
     <link rel="stylesheet" href="./css/style.css" />
-    <style>
-      body { background-color: #f1f5f9; }
-      .admin-container {
-        max-width: 800px;
-        margin: 4rem auto;
-        padding: 2rem;
-        background: var(--color-surface);
-        border-radius: var(--radius-lg);
-        box-shadow: var(--shadow-md);
-      }
-      .admin-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 2rem;
-      }
-      .admin-table th, .admin-table td {
-        padding: 1rem;
-        text-align: left;
-        border-bottom: 1px solid #e2e8f0;
-      }
-      .status-badge {
-        padding: 0.25rem 0.5rem;
-        border-radius: var(--radius-full);
-        font-size: 0.875rem;
-        font-weight: 600;
-      }
-      .status-pending { background: #fef08a; color: #854d0e; }
-      .status-approved { background: #bbf7d0; color: #166534; }
-      .status-rejected { background: #fecaca; color: #991b1b; }
-      
-      #login-screen {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 1rem;
-        padding: 4rem 0;
-      }
-    </style>
   </head>
-  <body>
+  <body class="admin-body">
     <div class="admin-container">
       <div id="login-screen">
         <h2>Painel de Controle</h2>
-        <p style="margin-bottom: 1.5rem;">Acesso Restrito Aos Noivos</p>
-        <button class="btn btn-primary" onclick="adminApp.login()" style="display: flex; align-items: center; gap: 10px; background-color: #fff; color: #333; border: 1px solid #ccc;">
-          <svg style="width:20px;height:20px;" viewBox="0 0 48 48">
+        <p class="u-mb-6">Acesso Restrito Aos Noivos</p>
+        <button class="btn btn-primary admin-login-btn" id="admin-login-btn">
+          <svg class="admin-google-icon" viewBox="0 0 48 48">
             <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
             <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
             <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
@@ -60,13 +22,13 @@
         </button>
       </div>
 
-      <div id="dashboard-screen" style="display: none;">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
+      <div id="dashboard-screen" class="u-hidden">
+        <div class="admin-header-flex">
           <h2>Painel de Validação (PIX)</h2>
-          <button class="btn btn-secondary btn-sm" onclick="adminApp.logout()">Sair</button>
+          <button class="btn btn-secondary btn-sm" id="admin-logout-btn">Sair</button>
         </div>
         
-        <p style="margin-top: 1rem; color: var(--color-text-muted);">
+        <p class="admin-intro-text">
           Aprove transações apenas quando o dinheiro cair na conta. Rejeitar removerá os pontos do placar.
         </p>
 
@@ -90,3 +52,4 @@
     <script type="module" src="./js/admin.js"></script>
   </body>
 </html>
+

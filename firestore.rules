@@ -21,16 +21,23 @@ service cloud.firestore {
                     && request.resource.data.status == 'pending'
                     && request.resource.data.totalAmount is number
                     && request.resource.data.totalAmount > 0
+                    && request.resource.data.totalAmount <= 5000
                     && request.resource.data.guestName is string
                     && request.resource.data.guestName.size() > 0
                     && request.resource.data.guestName.size() < 100
                     && (request.resource.data.listChosen == 'Groom' || request.resource.data.listChosen == 'Bride')
                     && request.resource.data.timestamp is string;
       
-      // Only the authorized admins can update or delete
-      allow update, delete: if request.auth != null
-                            && request.auth.token.email_verified == true
-                            && request.auth.token.email in get(/databases/$(database)/documents/config/admins).data.emails;
+      // Only the authorized admins can update
+      allow update: if request.auth != null
+                    && request.auth.token.email_verified == true
+                    && request.auth.token.email in get(/databases/$(database)/documents/config/admins).data.emails
+                    && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']);
+      
+      // Only the authorized admins can delete
+      allow delete: if request.auth != null
+                    && request.auth.token.email_verified == true
+                    && request.auth.token.email in get(/databases/$(database)/documents/config/admins).data.emails;
     }
   }
 }

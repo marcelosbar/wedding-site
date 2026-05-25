@@ -1,3 +1,5 @@
+import { escapeHTML } from './utils.js';
+
 /**
  * Cart module — handles adding, removing, rendering cart items and modal visibility.
  */
@@ -47,13 +49,28 @@ export class Cart {
       total += item.price;
       const el = document.createElement('div');
       el.className = 'cart-item';
-      el.innerHTML = `
-        <span>${item.name}</span>
-        <div>
-          <span style="margin-right: 1rem; font-weight: 500;">R$ ${item.price.toFixed(2)}</span>
-          <button class="btn btn-sm" style="padding: 0.25rem 0.5rem; background: #ef4444; color: white;" onclick="app.removeFromCart(${item.id})">X</button>
-        </div>
-      `;
+
+      const label = document.createElement('span');
+      label.innerHTML = escapeHTML(item.name);
+
+      const rightDiv = document.createElement('div');
+
+      const priceSpan = document.createElement('span');
+      priceSpan.style.cssText = 'margin-right: 1rem; font-weight: 500;';
+      priceSpan.innerText = `R$ ${item.price.toFixed(2)}`;
+
+      const removeBtn = document.createElement('button');
+      removeBtn.className = 'btn btn-sm';
+      removeBtn.style.cssText = 'padding: 0.25rem 0.5rem; background: #ef4444; color: white;';
+      removeBtn.innerText = 'X';
+      removeBtn.addEventListener('click', () => this.removeFromCart(item.id));
+
+      rightDiv.appendChild(priceSpan);
+      rightDiv.appendChild(removeBtn);
+
+      el.appendChild(label);
+      el.appendChild(rightDiv);
+
       this.cartItemsContainer.appendChild(el);
     });
 

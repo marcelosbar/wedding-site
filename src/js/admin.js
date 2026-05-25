@@ -1,6 +1,6 @@
 import { db, onSnapshot, query, auth, googleProvider } from './firebase.js';
 import { doc, updateDoc, collection, getDoc } from 'firebase/firestore';
-import { signInWithPopup, signOut, onAuthStateChanged } from 'firebase/auth';
+import { signInWithPopup, signOut, onAuthStateChanged, setPersistence, browserSessionPersistence } from 'firebase/auth';
 import { escapeHTML } from './utils.js';
 
 class AdminApp {
@@ -26,11 +26,23 @@ class AdminApp {
     this.dashboardScreen = document.getElementById('dashboard-screen');
     this.tableBody = document.getElementById('admin-table-body');
 
+    const loginBtn = document.getElementById('admin-login-btn');
+    if (loginBtn) {
+      loginBtn.addEventListener('click', () => this.login());
+    }
+
+    const logoutBtn = document.getElementById('admin-logout-btn');
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', () => this.logout());
+    }
+
     // Mudar UI automaticamente quando o login mudar
     onAuthStateChanged(auth, async (user) => {
       if (user && await this.isAdmin(user.email)) {
         this.loggedIn = true;
+        this.loginScreen.classList.add('u-hidden');
         this.loginScreen.style.display = 'none';
+        this.dashboardScreen.classList.remove('u-hidden');
         this.dashboardScreen.style.display = 'block';
         this.fetchData();
       } else {
@@ -39,7 +51,9 @@ class AdminApp {
           signOut(auth);
         }
         this.loggedIn = false;
+        this.loginScreen.classList.remove('u-hidden');
         this.loginScreen.style.display = 'flex';
+        this.dashboardScreen.classList.add('u-hidden');
         this.dashboardScreen.style.display = 'none';
       }
     });
@@ -47,6 +61,7 @@ class AdminApp {
 
   async login() {
     try {
+      await setPersistence(auth, browserSessionPersistence);
       await signInWithPopup(auth, googleProvider);
     } catch (error) {
       console.error("Erro no login com Google", error);
@@ -79,14 +94,14 @@ class AdminApp {
       });
     } catch (e) {
       console.warn("Firebase not initialized yet.", e);
-      this.tableBody.innerHTML = `<tr><td colspan="5" style="text-align:center;">Firebase não configurado. Adicione a config em firebase.js</td></tr>`;
+      this.tableBody.innerHTML = `<tr><td colspan="5" class="u-text-center">Firebase não configurado. Adicione a config em firebase.js</td></tr>`;
     }
   }
 
   renderTable() {
     this.tableBody.innerHTML = '';
     if (this.transactions.length === 0) {
-      this.tableBody.innerHTML = `<tr><td colspan="5" style="text-align:center;">Nenhuma transação encontrada.</td></tr>`;
+      this.tableBody.innerHTML = `<tr><td colspan="5" class="u-text-center">Nenhuma transação encontrada.</td></tr>`;
       return;
     }
 
@@ -109,13 +124,27 @@ class AdminApp {
         <td>R$ ${t.totalAmount.toFixed(2)}</td>
         <td>${t.listChosen === 'Groom' ? 'Noivo' : 'Noiva'}</td>
         <td><span class="status-badge ${statusClass}">${statusText}</span></td>
-        <td>
-          ${t.status === 'pending' ? `
-            <button class="btn btn-sm" style="background: #16a34a; color: white; padding: 0.25rem 0.5rem; border-radius: 4px;" onclick="adminApp.updateStatus('${t.id}', 'approved')">Aprovar</button>
-            <button class="btn btn-sm" style="background: #dc2626; color: white; padding: 0.25rem 0.5rem; border-radius: 4px;" onclick="adminApp.updateStatus('${t.id}', 'rejected')">Rejeitar</button>
-          ` : '-'}
-        </td>
+        <td class="action-cell"></td>
       `;
+
+      const actionCell = tr.querySelector('.action-cell');
+      if (t.status === 'pending') {
+        const approveBtn = document.createElement('button');
+        approveBtn.className = 'btn btn-sm admin-btn-approve';
+        approveBtn.innerText = 'Aprovar';
+        approveBtn.addEventListener('click', () => this.updateStatus(t.id, 'approved'));
+
+        const rejectBtn = document.createElement('button');
+        rejectBtn.className = 'btn btn-sm admin-btn-reject';
+        rejectBtn.innerText = 'Rejeitar';
+        rejectBtn.addEventListener('click', () => this.updateStatus(t.id, 'rejected'));
+
+        actionCell.appendChild(approveBtn);
+        actionCell.appendChild(rejectBtn);
+      } else {
+        actionCell.innerText = '-';
+      }
+
       this.tableBody.appendChild(tr);
     });
   }

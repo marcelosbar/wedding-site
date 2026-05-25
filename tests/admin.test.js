@@ -31,6 +31,8 @@ vi.mock('firebase/auth', () => {
     onAuthStateChanged: vi.fn((auth, cb) => {
       authCallback = cb; // Capture the callback to simulate auth state changes
     }),
+    setPersistence: vi.fn().mockResolvedValue(),
+    browserSessionPersistence: 'session',
     __triggerAuthStateChange: async (user) => {
       if (authCallback) await authCallback(user);
     }
@@ -44,7 +46,7 @@ const alertMock = vi.spyOn(globalThis, 'alert').mockImplementation(() => {});
 const confirmMock = vi.spyOn(globalThis, 'confirm').mockImplementation(() => true);
 
 // 2. Import elements
-import { getDoc, updateDoc } from 'firebase/firestore';
+import { getDoc, updateDoc, collection } from 'firebase/firestore';
 import { signInWithPopup, signOut } from 'firebase/auth';
 import * as firebaseAuthMock from 'firebase/auth';
 
@@ -53,8 +55,12 @@ describe('AdminApp', () => {
 
   beforeAll(async () => {
     document.body.innerHTML = `
-      <div id="login-screen"></div>
-      <div id="dashboard-screen"></div>
+      <div id="login-screen">
+        <button id="admin-login-btn"></button>
+      </div>
+      <div id="dashboard-screen">
+        <button id="admin-logout-btn"></button>
+      </div>
       <table>
         <tbody id="admin-table-body"></tbody>
       </table>
@@ -78,6 +84,22 @@ describe('AdminApp', () => {
     expect(adminApp).toBeDefined();
     expect(adminApp.loginScreen).toBeDefined();
     expect(adminApp.dashboardScreen).toBeDefined();
+  });
+
+  it('should call login when admin-login-btn is clicked', async () => {
+    const loginSpy = vi.spyOn(adminApp, 'login').mockImplementation(async () => {});
+    const loginBtn = document.getElementById('admin-login-btn');
+    loginBtn.click();
+    expect(loginSpy).toHaveBeenCalled();
+    loginSpy.mockRestore();
+  });
+
+  it('should call logout when admin-logout-btn is clicked', async () => {
+    const logoutSpy = vi.spyOn(adminApp, 'logout').mockImplementation(async () => {});
+    const logoutBtn = document.getElementById('admin-logout-btn');
+    logoutBtn.click();
+    expect(logoutSpy).toHaveBeenCalled();
+    logoutSpy.mockRestore();
   });
 
   it('isAdmin should return true for valid admin email', async () => {
@@ -145,8 +167,9 @@ describe('AdminApp', () => {
     expect(adminApp.dashboardScreen.style.display).toBe('none');
   });
 
-  it('should call signInWithPopup on login()', async () => {
+  it('should set auth persistence and call signInWithPopup on login()', async () => {
     await adminApp.login();
+    expect(firebaseAuthMock.setPersistence).toHaveBeenCalledWith(expect.anything(), firebaseAuthMock.browserSessionPersistence);
     expect(signInWithPopup).toHaveBeenCalled();
   });
 
@@ -230,5 +253,14 @@ describe('AdminApp', () => {
     updateDoc.mockRejectedValueOnce(new Error('Failed'));
     await adminApp.updateStatus('123', 'approved');
     expect(alertMock).toHaveBeenCalledWith('Erro ao atualizar. Verifique as regras do Firebase Firestore.');
+  });
+
+  it('should render configuration error when collection throws', () => {
+    collection.mockImplementationOnce(() => {
+      throw new Error('Firebase offline');
+    });
+
+    adminApp.fetchData();
+    expect(adminApp.tableBody.innerHTML).toContain('Firebase não configurado');
   });
 });

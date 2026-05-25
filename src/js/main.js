@@ -59,9 +59,9 @@ export class WeddingApp {
     // 3. Add to cart buttons
     document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
-        const list = e.currentTarget.getAttribute('data-list');
-        const item = e.currentTarget.getAttribute('data-item');
-        const price = Number.parseFloat(e.currentTarget.getAttribute('data-price'));
+        const list = e.currentTarget.dataset.list;
+        const item = e.currentTarget.dataset.item;
+        const price = Number.parseFloat(e.currentTarget.dataset.price);
         this.addToCart(list, item, price);
       });
     });

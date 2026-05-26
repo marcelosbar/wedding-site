@@ -91,6 +91,24 @@ export class WeddingApp {
     if (backToSiteBtn) {
       backToSiteBtn.addEventListener('click', () => this.closeCart());
     }
+
+    // 6. Gift list tabs
+    document.querySelectorAll('.gifts-tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const panelId = btn.getAttribute('aria-controls');
+        document.querySelectorAll('.gifts-tab-btn').forEach(b => {
+          b.classList.remove('active');
+          b.setAttribute('aria-selected', 'false');
+        });
+        document.querySelectorAll('.gifts-tab-panel').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        btn.setAttribute('aria-selected', 'true');
+        const panel = document.getElementById(panelId);
+        if (panel) {
+          panel.classList.add('active');
+        }
+      });
+    });
   }
 
   // --- Delegate Cart methods ---

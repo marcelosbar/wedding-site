@@ -887,3 +887,76 @@ body.admin-body {
   text-align: center;
 }
 
+/* Gift List Tabs */
+.gifts-tabs {
+  margin-bottom: 4rem;
+}
+
+.gifts-tab-buttons {
+  display: flex;
+  gap: 0;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+
+.gifts-tab-btn {
+  flex: 1;
+  padding: 1rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  background: #e2e8f0;
+  color: var(--color-text-muted);
+  transition: all 0.3s ease;
+  border-bottom: 3px solid transparent;
+  font-family: inherit;
+}
+
+.gifts-tab-btn:first-child {
+  border-right: 1px solid #cbd5e1;
+}
+
+.gifts-tab-btn:first-child.active {
+  background: var(--color-surface);
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+}
+
+.gifts-tab-btn:last-child.active {
+  background: var(--color-surface);
+  color: var(--color-secondary);
+  border-bottom-color: var(--color-secondary);
+}
+
+.gifts-tab-panel {
+  display: none;
+  background: var(--color-surface);
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+}
+
+.gifts-tab-panel.active {
+  display: block;
+}
+
+.gifts-tab-panel .destination-card {
+  border-radius: 0;
+  box-shadow: none;
+  transform: none;
+}
+
+.gifts-tab-panel .destination-card:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+@media (max-width: 768px) {
+  .gifts-tab-btn {
+    font-size: 0.85rem;
+    padding: 0.75rem 0.5rem;
+  }
+}
+

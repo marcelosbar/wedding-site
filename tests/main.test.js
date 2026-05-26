@@ -73,6 +73,14 @@ function setupDOM() {
     <button id="copy-pix-payload-btn"></button>
     <button id="confirm-transfer-btn"></button>
     <button id="back-to-site-btn"></button>
+    <div class="gifts-tab-buttons">
+      <button class="gifts-tab-btn active" role="tab" aria-selected="true"
+        aria-controls="tab-groom" id="tab-btn-groom">Time Noivo</button>
+      <button class="gifts-tab-btn" role="tab" aria-selected="false"
+        aria-controls="tab-bride" id="tab-btn-bride">Time Noiva</button>
+    </div>
+    <div class="gifts-tab-panel active" id="tab-groom"></div>
+    <div class="gifts-tab-panel" id="tab-bride"></div>
   `;
 }
 
@@ -179,5 +187,42 @@ describe('WeddingApp Orchestrator', () => {
 
     document.getElementById('back-to-site-btn').click();
     expect(mockCartCloseCart).toHaveBeenCalled();
+  });
+
+  it('should switch to the bride tab when its button is clicked', () => {
+    const groomBtn = document.getElementById('tab-btn-groom');
+    const brideBtn = document.getElementById('tab-btn-bride');
+    const groomPanel = document.getElementById('tab-groom');
+    const bridePanel = document.getElementById('tab-bride');
+
+    // Initial state: groom is active
+    expect(groomBtn.classList.contains('active')).toBe(true);
+    expect(groomPanel.classList.contains('active')).toBe(true);
+    expect(bridePanel.classList.contains('active')).toBe(false);
+
+    brideBtn.click();
+
+    expect(brideBtn.classList.contains('active')).toBe(true);
+    expect(brideBtn.getAttribute('aria-selected')).toBe('true');
+    expect(bridePanel.classList.contains('active')).toBe(true);
+    expect(groomBtn.classList.contains('active')).toBe(false);
+    expect(groomBtn.getAttribute('aria-selected')).toBe('false');
+    expect(groomPanel.classList.contains('active')).toBe(false);
+  });
+
+  it('should switch back to groom tab when its button is clicked', () => {
+    const groomBtn = document.getElementById('tab-btn-groom');
+    const brideBtn = document.getElementById('tab-btn-bride');
+    const groomPanel = document.getElementById('tab-groom');
+    const bridePanel = document.getElementById('tab-bride');
+
+    brideBtn.click(); // go to bride
+    groomBtn.click(); // back to groom
+
+    expect(groomBtn.classList.contains('active')).toBe(true);
+    expect(groomBtn.getAttribute('aria-selected')).toBe('true');
+    expect(groomPanel.classList.contains('active')).toBe(true);
+    expect(brideBtn.classList.contains('active')).toBe(false);
+    expect(bridePanel.classList.contains('active')).toBe(false);
   });
 });

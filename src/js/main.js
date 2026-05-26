@@ -91,6 +91,35 @@ export class WeddingApp {
     if (backToSiteBtn) {
       backToSiteBtn.addEventListener('click', () => this.closeCart());
     }
+
+    // 6. Gifts modal — open
+    document.querySelectorAll('.gifts-modal-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const modalId = btn.dataset.modal;
+        const overlay = document.getElementById(modalId);
+        if (overlay) {
+          overlay.classList.add('active');
+          overlay.setAttribute('aria-hidden', 'false');
+        }
+      });
+    });
+
+    // 7. Gifts modal — close (X button and backdrop click)
+    document.querySelectorAll('.gifts-modal-overlay').forEach(overlay => {
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+          overlay.classList.remove('active');
+          overlay.setAttribute('aria-hidden', 'true');
+        }
+      });
+      const closeBtn = overlay.querySelector('.gifts-modal-close');
+      if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+          overlay.classList.remove('active');
+          overlay.setAttribute('aria-hidden', 'true');
+        });
+      }
+    });
   }
 
   // --- Delegate Cart methods ---

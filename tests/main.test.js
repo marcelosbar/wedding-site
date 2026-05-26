@@ -73,6 +73,20 @@ function setupDOM() {
     <button id="copy-pix-payload-btn"></button>
     <button id="confirm-transfer-btn"></button>
     <button id="back-to-site-btn"></button>
+    <div id="groom-card">
+      <button class="gifts-toggle-btn" data-target="groom-gifts-list" data-count="10">
+        <span class="gifts-toggle-text">Ver Presentes (10)</span>
+        <span class="gifts-toggle-icon">&#9660;</span>
+      </button>
+      <div class="gifts-list gifts-list-collapsible" id="groom-gifts-list"></div>
+    </div>
+    <div id="bride-card">
+      <button class="gifts-toggle-btn" data-target="bride-gifts-list" data-count="6">
+        <span class="gifts-toggle-text">Ver Presentes (6)</span>
+        <span class="gifts-toggle-icon">&#9660;</span>
+      </button>
+      <div class="gifts-list gifts-list-collapsible" id="bride-gifts-list"></div>
+    </div>
   `;
 }
 
@@ -179,5 +193,43 @@ describe('WeddingApp Orchestrator', () => {
 
     document.getElementById('back-to-site-btn').click();
     expect(mockCartCloseCart).toHaveBeenCalled();
+  });
+
+  it('should open the gift list when toggle button is clicked', () => {
+    const btn = document.querySelector('[data-target="groom-gifts-list"]');
+    const list = document.getElementById('groom-gifts-list');
+    const textEl = btn.querySelector('.gifts-toggle-text');
+
+    expect(list.classList.contains('open')).toBe(false);
+    btn.click();
+    expect(list.classList.contains('open')).toBe(true);
+    expect(btn.classList.contains('open')).toBe(true);
+    expect(textEl.textContent).toBe('Ocultar Presentes');
+  });
+
+  it('should close the gift list when toggle button is clicked again', () => {
+    const btn = document.querySelector('[data-target="groom-gifts-list"]');
+    const list = document.getElementById('groom-gifts-list');
+    const textEl = btn.querySelector('.gifts-toggle-text');
+
+    btn.click(); // open
+    btn.click(); // close
+    expect(list.classList.contains('open')).toBe(false);
+    expect(btn.classList.contains('open')).toBe(false);
+    expect(textEl.textContent).toBe('Ver Presentes (10)');
+  });
+
+  it('should toggle bride gift list independently', () => {
+    const btn = document.querySelector('[data-target="bride-gifts-list"]');
+    const list = document.getElementById('bride-gifts-list');
+    const textEl = btn.querySelector('.gifts-toggle-text');
+
+    btn.click();
+    expect(list.classList.contains('open')).toBe(true);
+    expect(textEl.textContent).toBe('Ocultar Presentes');
+
+    btn.click();
+    expect(list.classList.contains('open')).toBe(false);
+    expect(textEl.textContent).toBe('Ver Presentes (6)');
   });
 });

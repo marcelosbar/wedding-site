@@ -887,3 +887,67 @@ body.admin-body {
   text-align: center;
 }
 
+/* Accordion Gift List */
+.gifts-list-collapsible {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.45s ease, opacity 0.35s ease, padding 0.35s ease;
+  opacity: 0;
+  padding: 0;
+  gap: 0;
+}
+
+.gifts-list-collapsible.open {
+  max-height: 2000px;
+  opacity: 1;
+  padding: 1rem;
+  gap: 1.5rem;
+}
+
+.gifts-toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.65rem 1.25rem;
+  margin: 1rem 0 0.25rem;
+  border-radius: var(--radius-full);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: transparent;
+  font-size: 0.95rem;
+  font-family: inherit;
+}
+
+#groom-card .gifts-toggle-btn {
+  color: var(--color-primary);
+  border: 2px solid var(--color-primary);
+}
+
+#groom-card .gifts-toggle-btn:hover {
+  background: var(--color-primary);
+  color: white;
+}
+
+#bride-card .gifts-toggle-btn {
+  color: var(--color-secondary);
+  border: 2px solid var(--color-secondary);
+}
+
+#bride-card .gifts-toggle-btn:hover {
+  background: var(--color-secondary);
+  color: white;
+}
+
+.gifts-toggle-icon {
+  display: inline-block;
+  transition: transform 0.35s ease;
+  font-style: normal;
+}
+
+.gifts-toggle-btn.open .gifts-toggle-icon {
+  transform: rotate(180deg);
+}
+

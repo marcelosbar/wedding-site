@@ -91,6 +91,22 @@ export class WeddingApp {
     if (backToSiteBtn) {
       backToSiteBtn.addEventListener('click', () => this.closeCart());
     }
+
+    // 6. Accordion gift list toggles
+    document.querySelectorAll('.gifts-toggle-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const targetId = btn.dataset.target;
+        const list = document.getElementById(targetId);
+        const isOpen = list.classList.contains('open');
+        const count = btn.dataset.count;
+        list.classList.toggle('open');
+        btn.classList.toggle('open');
+        const textEl = btn.querySelector('.gifts-toggle-text');
+        if (textEl) {
+          textEl.textContent = isOpen ? `Ver Presentes (${count})` : 'Ocultar Presentes';
+        }
+      });
+    });
   }
 
   // --- Delegate Cart methods ---

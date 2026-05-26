@@ -94,7 +94,12 @@
         <div class="destination-info">
           <h3>Time Noivo: Disney Paris</h3>
 
-          <div class="gifts-list">
+          <button class="gifts-toggle-btn" data-target="groom-gifts-list" data-count="10">
+            <span class="gifts-toggle-text">Ver Presentes (10)</span>
+            <span class="gifts-toggle-icon" aria-hidden="true">&#9660;</span>
+          </button>
+
+          <div class="gifts-list gifts-list-collapsible" id="groom-gifts-list">
             <div class="gift-item">
               <h4>Foto Oficial no Parque</h4>
               <div class="gift-price">R$ 60,00</div>
@@ -164,9 +169,14 @@
         <img src="/images/cote.png"
           alt="Destino da Noiva" class="destination-image" />
         <div class="destination-info">
-          <h3>Time Noiva: Cote D’Azur</h3>
+          <h3>Time Noiva: Cote D'Azur</h3>
 
-          <div class="gifts-list">
+          <button class="gifts-toggle-btn" data-target="bride-gifts-list" data-count="6">
+            <span class="gifts-toggle-text">Ver Presentes (6)</span>
+            <span class="gifts-toggle-icon" aria-hidden="true">&#9660;</span>
+          </button>
+
+          <div class="gifts-list gifts-list-collapsible" id="bride-gifts-list">
             <div class="gift-item">
               <h4>Taça de Vinho Rosé</h4>
               <div class="gift-price">R$ 60,00</div>

@@ -73,6 +73,14 @@ function setupDOM() {
     <button id="copy-pix-payload-btn"></button>
     <button id="confirm-transfer-btn"></button>
     <button id="back-to-site-btn"></button>
+    <button class="gifts-modal-btn" data-modal="groom-gifts-modal">Ver Presentes</button>
+    <button class="gifts-modal-btn" data-modal="bride-gifts-modal">Ver Presentes</button>
+    <div id="groom-gifts-modal" class="gifts-modal-overlay" aria-hidden="true">
+      <button class="gifts-modal-close">x</button>
+    </div>
+    <div id="bride-gifts-modal" class="gifts-modal-overlay" aria-hidden="true">
+      <button class="gifts-modal-close">x</button>
+    </div>
   `;
 }
 
@@ -179,5 +187,50 @@ describe('WeddingApp Orchestrator', () => {
 
     document.getElementById('back-to-site-btn').click();
     expect(mockCartCloseCart).toHaveBeenCalled();
+  });
+
+  it('should open the gifts modal when the open button is clicked', () => {
+    const btn = document.querySelector('[data-modal="groom-gifts-modal"]');
+    const overlay = document.getElementById('groom-gifts-modal');
+
+    expect(overlay.classList.contains('active')).toBe(false);
+    btn.click();
+    expect(overlay.classList.contains('active')).toBe(true);
+    expect(overlay.getAttribute('aria-hidden')).toBe('false');
+  });
+
+  it('should close the gifts modal when the X button is clicked', () => {
+    const openBtn = document.querySelector('[data-modal="groom-gifts-modal"]');
+    const overlay = document.getElementById('groom-gifts-modal');
+    const closeBtn = overlay.querySelector('.gifts-modal-close');
+
+    openBtn.click();
+    expect(overlay.classList.contains('active')).toBe(true);
+    closeBtn.click();
+    expect(overlay.classList.contains('active')).toBe(false);
+    expect(overlay.getAttribute('aria-hidden')).toBe('true');
+  });
+
+  it('should close the gifts modal when clicking the backdrop', () => {
+    const openBtn = document.querySelector('[data-modal="groom-gifts-modal"]');
+    const overlay = document.getElementById('groom-gifts-modal');
+
+    openBtn.click();
+    expect(overlay.classList.contains('active')).toBe(true);
+    overlay.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    // click on overlay itself (e.target === overlay)
+    const event = new MouseEvent('click', { bubbles: false });
+    Object.defineProperty(event, 'target', { value: overlay });
+    overlay.dispatchEvent(event);
+    expect(overlay.classList.contains('active')).toBe(false);
+  });
+
+  it('should open the bride gifts modal independently', () => {
+    const btn = document.querySelector('[data-modal="bride-gifts-modal"]');
+    const overlay = document.getElementById('bride-gifts-modal');
+
+    btn.click();
+    expect(overlay.classList.contains('active')).toBe(true);
+    expect(overlay.getAttribute('aria-hidden')).toBe('false');
   });
 });

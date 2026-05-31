@@ -36,7 +36,7 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
           command: code test
-          args: --severity-threshold=high
+          args: --severity-threshold=high --include-ignores
       - name: Run Tests & Generate Coverage
         run: npm run test
       - name: SonarCloud Scan

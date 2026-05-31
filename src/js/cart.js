@@ -32,7 +32,7 @@ export class Cart {
       const wrapper = document.createElement('div');
       wrapper.className = 'gift-control-wrapper';
 
-      parent.insertBefore(wrapper, btn);
+      btn.before(wrapper);
       wrapper.appendChild(btn);
 
       const listName = btn.dataset.list;

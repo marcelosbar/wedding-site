@@ -112,3 +112,23 @@ body.admin-body {
   padding: 0.25rem 0.5rem;
   font-size: 0.875rem;
 }
+
+.admin-message-cell {
+  max-width: 250px;
+  word-break: break-word;
+  white-space: normal;
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+.badge-private {
+  background-color: #cbd5e1;
+  color: #334155;
+  font-size: 0.75rem;
+  padding: 0.125rem 0.375rem;
+  border-radius: var(--radius-md);
+  font-weight: 500;
+  display: inline-block;
+  margin-left: 0.25rem;
+}
+

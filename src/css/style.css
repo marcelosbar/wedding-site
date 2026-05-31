@@ -887,31 +887,117 @@ body.admin-body {
   text-align: center;
 }
 
-/* Gift item badge indicating quantity in cart */
-.gift-item {
-  position: relative;
+/* Gift item quantity controls wrapper */
+.gift-control-wrapper {
+  margin-top: 0.75rem;
+  width: 100%;
 }
 
-.gift-qty-badge {
-  position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
-  font-size: 0.75rem;
+.gift-control-wrapper .add-to-cart-btn {
+  width: 100%;
+}
+
+.gift-qty-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin: 0 auto;
+}
+
+.gift-item-qty-btn {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
   font-weight: 600;
-  padding: 0.25rem 0.5rem;
-  border-radius: var(--radius-full);
-  box-shadow: var(--shadow-sm);
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: var(--radius-md);
 }
 
-#groom-gifts-modal .gift-qty-badge {
-  background-color: #dbeafe; /* Light blue matching groom theme */
-  color: #1e40af;
+.gift-item-qty-val {
+  font-size: 1rem;
+  font-weight: 700;
+  min-width: 20px;
+  text-align: center;
 }
 
-#bride-gifts-modal .gift-qty-badge {
-  background-color: #ffedd5; /* Light orange matching bride theme */
-  color: #c2410c;
+/* Cart Item Grouped Layout and Quantity Controls */
+.cart-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.cart-item-qty-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.cart-qty-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  color: var(--color-text-main);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.cart-qty-btn:hover {
+  background: #e2e8f0;
+}
+
+.cart-qty-val {
+  font-weight: 600;
+  font-size: 0.9rem;
+  min-width: 14px;
+  text-align: center;
+}
+
+.cart-item-name {
+  flex: 1;
+  font-size: 0.95rem;
+  font-weight: 500;
+  text-align: left;
+}
+
+.cart-item-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.cart-item-price {
+  font-weight: 600;
+  color: var(--color-text-main);
+}
+
+.cart-item-remove-btn {
+  background: none;
+  border: none;
+  color: #ef4444;
+  font-size: 1.25rem;
+  cursor: pointer;
+  padding: 0.25rem;
+  line-height: 1;
+  transition: color 0.2s ease;
+}
+
+.cart-item-remove-btn:hover {
+  color: #b91c1c;
 }
 
 /* Gifts Modal */

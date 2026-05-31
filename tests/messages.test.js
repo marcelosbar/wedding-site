@@ -19,12 +19,14 @@ import { onSnapshot } from '../src/js/firebase.js';
 
 function createMockElements() {
   document.body.innerHTML = `
-    <div id="messages-carousel-track">
-      <p class="u-text-center u-text-muted">Carregando...</p>
-    </div>
-    <button id="carousel-prev"></button>
-    <button id="carousel-next"></button>
-    <div id="carousel-dots"></div>
+    <section id="messages">
+      <div id="messages-carousel-track">
+        <p class="u-text-center u-text-muted">Carregando...</p>
+      </div>
+      <button id="carousel-prev"></button>
+      <button id="carousel-next"></button>
+      <div id="carousel-dots"></div>
+    </section>
   `;
   return {
     trackEl: document.getElementById('messages-carousel-track'),
@@ -244,5 +246,20 @@ describe('MessagesCarousel', () => {
     expect(slides[0].querySelector('.message-text').classList.contains('length-short')).toBe(true);
     expect(slides[1].querySelector('.message-text').classList.contains('length-medium')).toBe(true);
     expect(slides[2].querySelector('.message-text').classList.contains('length-long')).toBe(true);
+  });
+
+  it('should hide the messages section in production if no approved messages exist', () => {
+    vi.spyOn(carousel, 'isLocalDev').mockReturnValue(false);
+
+    carousel.init();
+
+    const snapshotCallback = onSnapshot.mock.calls[0][1];
+    snapshotCallback([]); // empty list
+
+    expect(carousel.messages.length).toBe(0); // no mock messages fallback
+    
+    // The messages section should have class 'u-hidden'
+    const section = document.getElementById('messages');
+    expect(section.classList.contains('u-hidden')).toBe(true);
   });
 });

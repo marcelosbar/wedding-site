@@ -27,6 +27,18 @@ export class MessagesCarousel {
   }
 
   /**
+   * Helper to check if running in local development mode.
+   */
+  isLocalDev() {
+    return (
+      globalThis.location &&
+      (globalThis.location.hostname === 'localhost' ||
+       globalThis.location.hostname === '127.0.0.1' ||
+       globalThis.location.hostname === '')
+    );
+  }
+
+  /**
    * Subscribes to transaction collection snapshots or falls back to mock data.
    */
   loadMessages() {
@@ -57,18 +69,28 @@ export class MessagesCarousel {
         // Sort by timestamp (newest first)
         this.messages.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 
-        if (this.messages.length === 0) {
+        if (this.messages.length === 0 && this.isLocalDev()) {
           this.renderMockMessages();
         } else {
           this.render();
         }
       }, (error) => {
-        console.warn('Firebase error fetching messages. Using mock messages.', error);
-        this.renderMockMessages();
+        console.warn('Firebase error fetching messages.', error);
+        if (this.isLocalDev()) {
+          this.renderMockMessages();
+        } else {
+          this.messages = [];
+          this.render();
+        }
       });
     } catch (e) {
-      console.warn('Firebase not configured. Using mock messages.', e);
-      this.renderMockMessages();
+      console.warn('Firebase not configured.', e);
+      if (this.isLocalDev()) {
+        this.renderMockMessages();
+      } else {
+        this.messages = [];
+        this.render();
+      }
     }
   }
 
@@ -125,16 +147,23 @@ export class MessagesCarousel {
   render() {
     if (!this.trackEl) return;
 
-    this.trackEl.innerHTML = '';
-    if (this.dotsEl) this.dotsEl.innerHTML = '';
+    const messagesSection = document.getElementById('messages');
 
     if (this.messages.length === 0) {
-      this.trackEl.innerHTML = '<p class="u-text-center u-text-muted">Nenhuma mensagem disponível.</p>';
-      if (this.prevBtn) this.prevBtn.style.display = 'none';
-      if (this.nextBtn) this.nextBtn.style.display = 'none';
+      if (messagesSection) {
+        messagesSection.classList.add('u-hidden');
+      }
+      this.trackEl.innerHTML = '';
       this.stopAutoplay();
       return;
     }
+
+    if (messagesSection) {
+      messagesSection.classList.remove('u-hidden');
+    }
+
+    this.trackEl.innerHTML = '';
+    if (this.dotsEl) this.dotsEl.innerHTML = '';
 
     const showControls = this.messages.length > 1;
     if (this.prevBtn) this.prevBtn.style.display = showControls ? 'flex' : 'none';

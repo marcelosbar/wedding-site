@@ -1,6 +1,8 @@
 import { Cart } from './cart.js';
 import { PixCheckout } from './pix.js';
 import { Scoreboard } from './scoreboard.js';
+import { MessagesCarousel } from './messages.js';
+
 
 /**
  * WeddingApp — Orchestrator that composes Cart, PixCheckout, and Scoreboard modules.
@@ -25,14 +27,20 @@ export class WeddingApp {
       brideFillEl: document.getElementById('global-bride-fill'),
       dividerEl: document.getElementById('global-progress-divider'),
       backToListBtn: document.getElementById('cart-back-to-list-btn'),
+      trackEl: document.getElementById('messages-carousel-track'),
+      prevBtn: document.getElementById('carousel-prev'),
+      nextBtn: document.getElementById('carousel-next'),
+      dotsEl: document.getElementById('carousel-dots'),
     };
 
     // Initialize modules
     this.cart = new Cart(elements);
     this.scoreboard = new Scoreboard(elements);
     this.pix = new PixCheckout(this.cart, this.scoreboard, elements);
+    this.messagesCarousel = new MessagesCarousel(elements);
 
     this.scoreboard.initRealtimeScoreboard();
+    this.messagesCarousel.init();
     this.initEvents();
   }
 

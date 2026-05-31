@@ -42,3 +42,32 @@
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
 }
+
+.btn-link {
+  background: none;
+  border: none;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  display: inline-block;
+  transition: color 0.2s ease;
+  text-decoration: underline;
+}
+
+.btn-link.groom {
+  color: var(--color-primary);
+}
+
+.btn-link.groom:hover {
+  color: #1e40af;
+}
+
+.btn-link.bride {
+  color: var(--color-secondary);
+}
+
+.btn-link.bride:hover {
+  color: #c2410c;
+}

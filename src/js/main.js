@@ -24,6 +24,7 @@ export class WeddingApp {
       groomFillEl: document.getElementById('global-groom-fill'),
       brideFillEl: document.getElementById('global-bride-fill'),
       dividerEl: document.getElementById('global-progress-divider'),
+      backToListBtn: document.getElementById('cart-back-to-list-btn'),
     };
 
     // Initialize modules
@@ -141,8 +142,10 @@ export class WeddingApp {
   }
 
   openCart() {
+    const activeModal = document.querySelector('.gifts-modal-overlay.active');
+    const previousModalId = activeModal ? activeModal.id : null;
     this.closeGiftsModals();
-    this.cart.openCart();
+    this.cart.openCart(previousModalId);
   }
 
   closeCart() { this.cart.closeCart(); }

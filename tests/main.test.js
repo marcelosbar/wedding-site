@@ -73,6 +73,7 @@ function setupDOM() {
     <button id="copy-pix-payload-btn"></button>
     <button id="confirm-transfer-btn"></button>
     <button id="back-to-site-btn"></button>
+    <button id="cart-back-to-list-btn" class="u-hidden"></button>
     <button class="gifts-modal-btn" data-modal="groom-gifts-modal">Ver Presentes</button>
     <button class="gifts-modal-btn" data-modal="bride-gifts-modal">Ver Presentes</button>
     <div id="groom-gifts-modal" class="gifts-modal-overlay" aria-hidden="true">
@@ -250,7 +251,7 @@ describe('WeddingApp Orchestrator', () => {
 
     expect(document.getElementById('groom-gifts-modal').classList.contains('active')).toBe(false);
     expect(document.getElementById('bride-gifts-modal').classList.contains('active')).toBe(false);
-    expect(mockCartOpenCart).toHaveBeenCalled();
+    expect(mockCartOpenCart).toHaveBeenCalledWith('groom-gifts-modal');
   });
 
   it('closeGiftsModals should set aria-hidden=true on closed overlays', () => {

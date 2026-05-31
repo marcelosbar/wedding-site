@@ -162,7 +162,21 @@
             class="u-input-text" required />
         </div>
 
+        <div class="u-mb-4">
+          <label for="guest-message" class="u-display-block u-mb-2 u-font-weight-500">Mensagem (Opcional):</label>
+          <textarea id="guest-message" placeholder="Deixe uma mensagem para os noivos!"
+            class="u-input-text" rows="3" maxlength="500"></textarea>
+        </div>
+
+        <div class="u-mb-4 checkbox-wrapper">
+          <input type="checkbox" id="message-public" checked />
+          <label for="message-public" class="u-font-weight-500">Tornar mensagem pública no site</label>
+        </div>
+
         <button id="proceed-to-pix-btn" class="btn btn-secondary u-w-full">Finalizar com PIX</button>
+        <div class="cart-back-container u-text-center u-mt-4">
+          <button id="cart-back-to-list-btn" class="btn-link u-hidden">Voltar para a lista</button>
+        </div>
       </div>
 
       <!-- PIX Payment Section -->

@@ -16,14 +16,15 @@ function createMockElements() {
     <span id="floating-cart-badge"></span>
     <button id="nav-cart-link" style="display: none;"></button>
     <span id="nav-cart-badge"></span>
+    <button id="cart-back-to-list-btn" class="u-hidden"></button>
     
-    <div id="groom-gifts-modal">
+    <div id="groom-gifts-modal" class="gifts-modal-overlay">
       <div class="gift-item" id="groom-item-1">
         <h4>Orelhinhas de Noivos</h4>
         <button class="add-to-cart-btn" data-item="Orelhinhas de Noivos" data-list="Groom" data-price="80">Adicionar</button>
       </div>
     </div>
-    <div id="bride-gifts-modal">
+    <div id="bride-gifts-modal" class="gifts-modal-overlay">
       <div class="gift-item" id="bride-item-1">
         <h4>Taça de Vinho Rosé</h4>
         <button class="add-to-cart-btn" data-item="Taça de Vinho Rosé" data-list="Bride" data-price="60">Adicionar</button>
@@ -41,6 +42,7 @@ function createMockElements() {
     floatingCartBadge: document.getElementById('floating-cart-badge'),
     navCartLink: document.getElementById('nav-cart-link'),
     navCartBadge: document.getElementById('nav-cart-badge'),
+    backToListBtn: document.getElementById('cart-back-to-list-btn'),
   };
 }
 
@@ -63,13 +65,11 @@ describe('Cart', () => {
     expect(cart.items[0].name).toBe('Test Gift');
   });
 
-  it('should prevent mixing items from different lists', () => {
-    const alertMock = vi.spyOn(globalThis, 'alert').mockImplementation(() => {});
+  it('should allow mixing items from different lists', () => {
     cart.addToCart('Groom', 'Gift 1', 100);
     cart.addToCart('Bride', 'Gift 2', 200);
-    expect(cart.items.length).toBe(1);
-    expect(alertMock).toHaveBeenCalled();
-    alertMock.mockRestore();
+    expect(cart.items.length).toBe(2);
+    expect(cart.currentList).toBe('mixed');
   });
 
   it('should remove an item and reset list when empty', () => {
@@ -87,12 +87,29 @@ describe('Cart', () => {
     expect(cart.currentList).toBe('Groom');
   });
 
-  it('should render cart items and calculate total', () => {
+  it('should render cart items grouped by list and calculate total', () => {
     cart.addToCart('Groom', 'Gift A', 50);
     cart.addToCart('Groom', 'Gift B', 75);
+    cart.addToCart('Bride', 'Gift C', 100);
     cart.renderCart();
-    expect(document.getElementById('cart-items-container').children.length).toBe(2);
-    expect(document.getElementById('cart-total-value').textContent).toBe('R$ 125.00');
+    // 2 headers (Groom and Bride) + 3 items = 5 children
+    expect(document.getElementById('cart-items-container').children.length).toBe(5);
+    expect(document.getElementById('cart-total-value').textContent).toBe('R$ 225.00');
+  });
+
+  it('should show back to list button dynamically based on previous modal id', () => {
+    expect(cart.backToListBtn.classList.contains('u-hidden')).toBe(true);
+
+    cart.openCart('groom-gifts-modal');
+    expect(cart.backToListBtn.classList.contains('u-hidden')).toBe(false);
+    expect(cart.backToListBtn.textContent).toBe('← Voltar para Lista do Noivo');
+
+    cart.openCart('bride-gifts-modal');
+    expect(cart.backToListBtn.classList.contains('u-hidden')).toBe(false);
+    expect(cart.backToListBtn.textContent).toBe('← Voltar para Lista da Noiva');
+
+    cart.openCart();
+    expect(cart.backToListBtn.classList.contains('u-hidden')).toBe(true);
   });
 
   it('should add active class on openCart', () => {
@@ -198,10 +215,11 @@ describe('Cart', () => {
     cart.renderCart();
 
     const container = document.getElementById('cart-items-container');
-    // Should group identical items, so only 2 rows should exist instead of 3
-    expect(container.children.length).toBe(2);
+    // Group header ("Time Noivo") + 2 items = 3 children
+    expect(container.children.length).toBe(3);
 
-    let firstRow = container.children[0];
+    // Header is children[0], Orelhinhas is children[1], Coffee is children[2]
+    let firstRow = container.children[1];
     expect(firstRow.querySelector('.cart-item-name').textContent).toBe('Orelhinhas de Noivos');
     expect(firstRow.querySelector('.cart-qty-val').textContent).toBe('2');
     expect(firstRow.querySelector('.cart-item-price').textContent).toBe('R$ 160.00');
@@ -211,7 +229,7 @@ describe('Cart', () => {
     btnPlus.click();
 
     // Re-query after click because DOM is re-rendered
-    firstRow = container.children[0];
+    firstRow = container.children[1];
     expect(firstRow.querySelector('.cart-qty-val').textContent).toBe('3');
     expect(firstRow.querySelector('.cart-item-price').textContent).toBe('R$ 240.00');
 
@@ -220,13 +238,14 @@ describe('Cart', () => {
     btnMinus.click();
 
     // Re-query after click because DOM is re-rendered
-    firstRow = container.children[0];
+    firstRow = container.children[1];
     expect(firstRow.querySelector('.cart-qty-val').textContent).toBe('2');
     expect(firstRow.querySelector('.cart-item-price').textContent).toBe('R$ 160.00');
 
     // Test remove button inside the cart row
     const removeBtn = firstRow.querySelector('.cart-item-remove-btn');
     removeBtn.click();
-    expect(container.children.length).toBe(1); // Only the coffee remains
+    // Only Group header + coffee = 2 children remains
+    expect(container.children.length).toBe(2); 
   });
 });

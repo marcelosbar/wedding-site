@@ -1,0 +1,61 @@
+/* Utility Classes for CSP Compliance */
+.u-hidden {
+  display: none !important;
+}
+
+.u-story-margin-1 {
+  margin-top: 1rem;
+  margin-bottom: 2rem;
+}
+
+.u-story-margin-2 {
+  margin-bottom: 3rem;
+}
+
+.u-lead-text {
+  margin-bottom: 2rem;
+  font-size: 1.125rem;
+}
+
+.u-mb-4 {
+  margin-bottom: 1rem;
+}
+
+.u-display-block {
+  display: block;
+}
+
+.u-mb-2 {
+  margin-bottom: 0.5rem;
+}
+
+.u-font-weight-500 {
+  font-weight: 500;
+}
+
+.u-input-text {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.5rem;
+}
+
+.u-w-full {
+  width: 100%;
+}
+
+.u-mt-4 {
+  margin-top: 1rem;
+}
+
+.u-justify-center {
+  justify-content: center;
+}
+
+.u-text-primary {
+  color: var(--color-primary);
+}
+
+.u-mb-6 {
+  margin-bottom: 1.5rem;
+}

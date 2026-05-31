@@ -16,6 +16,19 @@ function createMockElements() {
     <span id="floating-cart-badge"></span>
     <button id="nav-cart-link" style="display: none;"></button>
     <span id="nav-cart-badge"></span>
+    
+    <div id="groom-gifts-modal">
+      <div class="gift-item" id="groom-item-1">
+        <h4>Orelhinhas de Noivos</h4>
+        <button class="add-to-cart-btn" data-item="Orelhinhas de Noivos" data-list="Groom" data-price="80">Adicionar</button>
+      </div>
+    </div>
+    <div id="bride-gifts-modal">
+      <div class="gift-item" id="bride-item-1">
+        <h4>Taça de Vinho Rosé</h4>
+        <button class="add-to-cart-btn" data-item="Taça de Vinho Rosé" data-list="Bride" data-price="60">Adicionar</button>
+      </div>
+    </div>
   `;
   return {
     overlay: document.getElementById('cart-overlay'),
@@ -61,8 +74,7 @@ describe('Cart', () => {
 
   it('should remove an item and reset list when empty', () => {
     cart.addToCart('Groom', 'Gift', 100);
-    const id = cart.items[0].id;
-    cart.removeFromCart(id);
+    cart.removeFromCart('Gift');
     expect(cart.items.length).toBe(0);
     expect(cart.currentList).toBeNull();
   });
@@ -70,7 +82,7 @@ describe('Cart', () => {
   it('should keep list when removing one of multiple items', () => {
     cart.addToCart('Groom', 'Gift A', 50);
     cart.addToCart('Groom', 'Gift B', 75);
-    cart.removeFromCart(cart.items[0].id);
+    cart.removeFromCart('Gift A');
     expect(cart.items.length).toBe(1);
     expect(cart.currentList).toBe('Groom');
   });
@@ -80,7 +92,7 @@ describe('Cart', () => {
     cart.addToCart('Groom', 'Gift B', 75);
     cart.renderCart();
     expect(document.getElementById('cart-items-container').children.length).toBe(2);
-    expect(document.getElementById('cart-total-value').innerText).toBe('R$ 125.00');
+    expect(document.getElementById('cart-total-value').textContent).toBe('R$ 125.00');
   });
 
   it('should add active class on openCart', () => {
@@ -120,7 +132,7 @@ describe('Cart', () => {
     expect(cart.items.length).toBe(0);
     expect(cart.currentList).toBeNull();
     expect(document.getElementById('cart-items-container').children.length).toBe(0);
-    expect(document.getElementById('cart-total-value').innerText).toBe('R$ 0.00');
+    expect(document.getElementById('cart-total-value').textContent).toBe('R$ 0.00');
   });
 
   it('should control floating button visibility and badges when rendering', () => {
@@ -132,12 +144,89 @@ describe('Cart', () => {
 
     expect(cart.floatingCartBtn.classList.contains('visible')).toBe(true);
     expect(cart.navCartLink.style.display).toBe('inline-block');
-    expect(String(cart.floatingCartBadge.innerText)).toBe('1');
-    expect(String(cart.navCartBadge.innerText)).toBe('1');
+    expect(String(cart.floatingCartBadge.textContent)).toBe('1');
+    expect(String(cart.navCartBadge.textContent)).toBe('1');
 
-    cart.removeFromCart(cart.items[0].id);
+    cart.removeFromCart('Gift A');
     // removeFromCart triggers renderCart automatically
     expect(cart.floatingCartBtn.classList.contains('visible')).toBe(false);
     expect(cart.navCartLink.style.display).toBe('none');
+  });
+
+  it('should sync gift quantities controls correctly and not auto-open cart when adding items', () => {
+    const itemEl = document.getElementById('groom-item-1');
+    const wrapper = itemEl.querySelector('.gift-control-wrapper');
+    expect(wrapper).not.toBeNull();
+
+    const btnAdd = wrapper.querySelector('.add-to-cart-btn');
+    const controls = wrapper.querySelector('.gift-qty-controls');
+    const qtyVal = wrapper.querySelector('.gift-item-qty-val');
+
+    // 1. Initial state: add-to-cart visible, controls hidden
+    expect(btnAdd.classList.contains('u-hidden')).toBe(false);
+    expect(controls.classList.contains('u-hidden')).toBe(true);
+
+    // 2. Add one item (should NOT auto-open cart)
+    cart.addToCart('Groom', 'Orelhinhas de Noivos', 80);
+    expect(cart.items.length).toBe(1);
+    expect(cart.overlay.classList.contains('active')).toBe(false); // didn't open cart!
+
+    // Controls should now be visible and display 1
+    expect(btnAdd.classList.contains('u-hidden')).toBe(true);
+    expect(controls.classList.contains('u-hidden')).toBe(false);
+    expect(qtyVal.textContent).toBe('1');
+
+    // 3. Add same item again (quantity is 2)
+    cart.addToCart('Groom', 'Orelhinhas de Noivos', 80);
+    expect(qtyVal.textContent).toBe('2');
+
+    // 4. Decrement quantity (using decrementCartItem)
+    cart.decrementCartItem('Orelhinhas de Noivos');
+    expect(qtyVal.textContent).toBe('1');
+
+    // 5. Decrement again (reverts to Add to cart button)
+    cart.decrementCartItem('Orelhinhas de Noivos');
+    expect(btnAdd.classList.contains('u-hidden')).toBe(false);
+    expect(controls.classList.contains('u-hidden')).toBe(true);
+  });
+
+  it('should group identical items and allow modifying quantity from the cart view', () => {
+    cart.addToCart('Groom', 'Orelhinhas de Noivos', 80);
+    cart.addToCart('Groom', 'Orelhinhas de Noivos', 80);
+    cart.addToCart('Groom', 'Café da Manhã no Hotel Disney', 120);
+
+    cart.renderCart();
+
+    const container = document.getElementById('cart-items-container');
+    // Should group identical items, so only 2 rows should exist instead of 3
+    expect(container.children.length).toBe(2);
+
+    let firstRow = container.children[0];
+    expect(firstRow.querySelector('.cart-item-name').textContent).toBe('Orelhinhas de Noivos');
+    expect(firstRow.querySelector('.cart-qty-val').textContent).toBe('2');
+    expect(firstRow.querySelector('.cart-item-price').textContent).toBe('R$ 160.00');
+
+    // Test plus button inside the cart row
+    const btnPlus = firstRow.querySelector('.cart-qty-btn.btn-plus');
+    btnPlus.click();
+
+    // Re-query after click because DOM is re-rendered
+    firstRow = container.children[0];
+    expect(firstRow.querySelector('.cart-qty-val').textContent).toBe('3');
+    expect(firstRow.querySelector('.cart-item-price').textContent).toBe('R$ 240.00');
+
+    // Test minus button inside the cart row
+    const btnMinus = firstRow.querySelector('.cart-qty-btn.btn-minus');
+    btnMinus.click();
+
+    // Re-query after click because DOM is re-rendered
+    firstRow = container.children[0];
+    expect(firstRow.querySelector('.cart-qty-val').textContent).toBe('2');
+    expect(firstRow.querySelector('.cart-item-price').textContent).toBe('R$ 160.00');
+
+    // Test remove button inside the cart row
+    const removeBtn = firstRow.querySelector('.cart-item-remove-btn');
+    removeBtn.click();
+    expect(container.children.length).toBe(1); // Only the coffee remains
   });
 });

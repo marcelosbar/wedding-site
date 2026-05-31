@@ -5,7 +5,7 @@ import { escapeHTML } from './utils.js';
  */
 export class Cart {
   constructor(elements) {
-    this.items = [];
+    this.items = []; // stores { name: itemName, price: unitPrice, quantity: q }
     this.currentList = null; // 'Groom' or 'Bride'
     this.overlay = elements.overlay;
     this.cartView = elements.cartView;
@@ -17,6 +17,56 @@ export class Cart {
     this.floatingCartBadge = elements.floatingCartBadge;
     this.navCartLink = elements.navCartLink;
     this.navCartBadge = elements.navCartBadge;
+
+    this._initGiftControls();
+    this.renderCart();
+  }
+
+  _initGiftControls() {
+    if (typeof document === 'undefined') return;
+
+    document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
+      const parent = btn.parentNode;
+      if (!parent) return;
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'gift-control-wrapper';
+
+      btn.before(wrapper);
+      wrapper.appendChild(btn);
+
+      const listName = btn.dataset.list;
+      const itemName = btn.dataset.item;
+      const price = btn.dataset.price;
+      const themeClass = btn.classList.contains('btn-primary') ? 'btn-primary' : 'btn-secondary';
+
+      const controls = document.createElement('div');
+      controls.className = 'gift-qty-controls u-hidden';
+
+      const btnMinus = document.createElement('button');
+      btnMinus.className = `btn btn-sm gift-item-qty-btn btn-minus ${themeClass}`;
+      btnMinus.innerHTML = '&minus;';
+      btnMinus.dataset.item = itemName;
+      btnMinus.addEventListener('click', () => this.decrementCartItem(itemName));
+
+      const qtyVal = document.createElement('span');
+      qtyVal.className = 'gift-item-qty-val';
+      qtyVal.textContent = '0';
+
+      const btnPlus = document.createElement('button');
+      btnPlus.className = `btn btn-sm gift-item-qty-btn btn-plus ${themeClass}`;
+      btnPlus.innerHTML = '&plus;';
+      btnPlus.dataset.item = itemName;
+      btnPlus.dataset.list = listName;
+      btnPlus.dataset.price = price;
+      btnPlus.addEventListener('click', () => this.addToCart(listName, itemName, Number.parseFloat(price)));
+
+      controls.appendChild(btnMinus);
+      controls.appendChild(qtyVal);
+      controls.appendChild(btnPlus);
+
+      wrapper.appendChild(controls);
+    });
   }
 
   addToCart(listName, itemName, price) {
@@ -26,14 +76,35 @@ export class Cart {
     }
 
     this.currentList = listName;
-    this.items.push({ id: Date.now(), name: itemName, price });
+    const existing = this.items.find(item => item.name === itemName);
+    if (existing) {
+      existing.quantity += 1;
+    } else {
+      this.items.push({ name: itemName, price, quantity: 1 });
+    }
 
     this.renderCart();
-    this.openCart();
   }
 
-  removeFromCart(id) {
-    this.items = this.items.filter(item => item.id !== id);
+  decrementCartItem(itemName) {
+    const existing = this.items.find(item => item.name === itemName);
+    if (existing) {
+      existing.quantity -= 1;
+      if (existing.quantity <= 0) {
+        this.items = this.items.filter(item => item.name !== itemName);
+      }
+    }
+
+    if (this.items.length === 0) {
+      this.currentList = null;
+      this.closeCart();
+    }
+
+    this.renderCart();
+  }
+
+  removeFromCart(itemName) {
+    this.items = this.items.filter(item => item.name !== itemName);
     if (this.items.length === 0) {
       this.currentList = null;
       this.closeCart();
@@ -46,41 +117,83 @@ export class Cart {
     let total = 0;
 
     this.items.forEach(item => {
-      total += item.price;
+      const itemTotal = item.price * item.quantity;
+      total += itemTotal;
+
       const el = document.createElement('div');
       el.className = 'cart-item';
 
-      const label = document.createElement('span');
-      label.innerHTML = escapeHTML(item.name);
+      // 1. Quantity controls
+      const qtyDiv = document.createElement('div');
+      qtyDiv.className = 'cart-item-qty-controls';
 
+      const btnMinus = document.createElement('button');
+      btnMinus.className = 'cart-qty-btn btn-minus';
+      btnMinus.innerHTML = '&minus;';
+      btnMinus.addEventListener('click', () => this.decrementCartItem(item.name));
+
+      const qtyVal = document.createElement('span');
+      qtyVal.className = 'cart-qty-val';
+      qtyVal.textContent = item.quantity;
+
+      const btnPlus = document.createElement('button');
+      btnPlus.className = 'cart-qty-btn btn-plus';
+      btnPlus.innerHTML = '&plus;';
+      btnPlus.addEventListener('click', () => this.addToCart(this.currentList, item.name, item.price));
+
+      qtyDiv.appendChild(btnMinus);
+      qtyDiv.appendChild(qtyVal);
+      qtyDiv.appendChild(btnPlus);
+
+      // 2. Name
+      const nameSpan = document.createElement('span');
+      nameSpan.className = 'cart-item-name';
+      nameSpan.innerHTML = escapeHTML(item.name);
+
+      // 3. Right side (price + remove)
       const rightDiv = document.createElement('div');
+      rightDiv.className = 'cart-item-right';
 
       const priceSpan = document.createElement('span');
-      priceSpan.style.cssText = 'margin-right: 1rem; font-weight: 500;';
-      priceSpan.innerText = `R$ ${item.price.toFixed(2)}`;
+      priceSpan.className = 'cart-item-price';
+      priceSpan.textContent = `R$ ${itemTotal.toFixed(2)}`;
 
       const removeBtn = document.createElement('button');
-      removeBtn.className = 'btn btn-sm';
-      removeBtn.style.cssText = 'padding: 0.25rem 0.5rem; background: #ef4444; color: white;';
-      removeBtn.innerText = 'X';
-      removeBtn.addEventListener('click', () => this.removeFromCart(item.id));
+      removeBtn.className = 'cart-item-remove-btn';
+      removeBtn.innerHTML = '&times;';
+      removeBtn.addEventListener('click', () => this.removeFromCart(item.name));
 
       rightDiv.appendChild(priceSpan);
       rightDiv.appendChild(removeBtn);
 
-      el.appendChild(label);
+      el.appendChild(qtyDiv);
+      el.appendChild(nameSpan);
       el.appendChild(rightDiv);
 
       this.cartItemsContainer.appendChild(el);
     });
 
     if (this.cartTotalValue) {
-      this.cartTotalValue.innerText = `R$ ${total.toFixed(2)}`;
+      this.cartTotalValue.textContent = `R$ ${total.toFixed(2)}`;
     }
 
-    const count = this.items.length;
-    if (this.floatingCartBadge) this.floatingCartBadge.innerText = count;
-    if (this.navCartBadge) this.navCartBadge.innerText = count;
+    const count = this.items.reduce((sum, item) => sum + item.quantity, 0);
+    if (this.floatingCartBadge) this.floatingCartBadge.textContent = count;
+    if (this.navCartBadge) this.navCartBadge.textContent = count;
+
+    if (typeof document !== 'undefined') {
+      document.querySelectorAll('.view-cart-modal-btn .modal-cart-count').forEach(badge => {
+        badge.textContent = count;
+      });
+
+      document.querySelectorAll('.gifts-modal-footer').forEach(footer => {
+        if (count > 0) {
+          footer.classList.remove('u-hidden');
+        } else {
+          footer.classList.add('u-hidden');
+        }
+      });
+    }
 
     if (count > 0) {
       if (this.floatingCartBtn) this.floatingCartBtn.classList.add('visible');
@@ -89,6 +202,36 @@ export class Cart {
       if (this.floatingCartBtn) this.floatingCartBtn.classList.remove('visible');
       if (this.navCartLink) this.navCartLink.style.display = 'none';
     }
+
+    this._syncGiftQuantities();
+  }
+
+  _syncGiftQuantities() {
+    if (typeof document === 'undefined') return;
+
+    const counts = {};
+    this.items.forEach(item => {
+      counts[item.name] = item.quantity;
+    });
+
+    document.querySelectorAll('.gift-control-wrapper').forEach(wrapper => {
+      const btnAdd = wrapper.querySelector('.add-to-cart-btn');
+      const controls = wrapper.querySelector('.gift-qty-controls');
+      const qtyVal = wrapper.querySelector('.gift-item-qty-val');
+      if (!btnAdd || !controls || !qtyVal) return;
+
+      const itemName = btnAdd.dataset.item;
+      const count = counts[itemName] || 0;
+
+      if (count > 0) {
+        btnAdd.classList.add('u-hidden');
+        controls.classList.remove('u-hidden');
+        qtyVal.textContent = count;
+      } else {
+        btnAdd.classList.remove('u-hidden');
+        controls.classList.add('u-hidden');
+      }
+    });
   }
 
   openCart() {
@@ -104,7 +247,7 @@ export class Cart {
   }
 
   getTotal() {
-    return this.items.reduce((sum, item) => sum + item.price, 0);
+    return this.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   }
 
   reset() {

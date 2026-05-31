@@ -59,9 +59,10 @@ export class WeddingApp {
     // 3. Add to cart buttons
     document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
-        const list = e.currentTarget.dataset.list;
-        const item = e.currentTarget.dataset.item;
-        const price = Number.parseFloat(e.currentTarget.dataset.price);
+        const currentBtn = e.currentTarget;
+        const list = currentBtn.dataset.list;
+        const item = currentBtn.dataset.item;
+        const price = Number.parseFloat(currentBtn.dataset.price);
         this.addToCart(list, item, price);
       });
     });
@@ -91,13 +92,62 @@ export class WeddingApp {
     if (backToSiteBtn) {
       backToSiteBtn.addEventListener('click', () => this.closeCart());
     }
+
+    // 6. Gifts modal — open
+    document.querySelectorAll('.gifts-modal-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const modalId = btn.dataset.modal;
+        const overlay = document.getElementById(modalId);
+        if (overlay) {
+          overlay.classList.add('active');
+          overlay.setAttribute('aria-hidden', 'false');
+        }
+      });
+    });
+
+    // 7. Gifts modal — close (X button and backdrop click)
+    document.querySelectorAll('.gifts-modal-overlay').forEach(overlay => {
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+          overlay.classList.remove('active');
+          overlay.setAttribute('aria-hidden', 'true');
+        }
+      });
+      const closeBtn = overlay.querySelector('.gifts-modal-close');
+      if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+          overlay.classList.remove('active');
+          overlay.setAttribute('aria-hidden', 'true');
+        });
+      }
+    });
+
+    // 8. View cart button inside gifts modal
+    document.querySelectorAll('.view-cart-modal-btn').forEach(btn => {
+      btn.addEventListener('click', () => this.openCart());
+    });
   }
 
   // --- Delegate Cart methods ---
   addToCart(listName, itemName, price) { this.cart.addToCart(listName, itemName, price); }
   removeFromCart(id) { this.cart.removeFromCart(id); }
-  openCart() { this.cart.openCart(); }
+
+  /** Close any open gifts modal overlay before opening the cart (fix #2: no double backdrops). */
+  closeGiftsModals() {
+    document.querySelectorAll('.gifts-modal-overlay.active').forEach(overlay => {
+      overlay.classList.remove('active');
+      overlay.setAttribute('aria-hidden', 'true');
+    });
+  }
+
+  openCart() {
+    this.closeGiftsModals();
+    this.cart.openCart();
+  }
+
   closeCart() { this.cart.closeCart(); }
+
+
 
   // --- Delegate PIX methods ---
   proceedToPix() { return this.pix.proceedToPix(); }

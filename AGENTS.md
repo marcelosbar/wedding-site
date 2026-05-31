@@ -28,3 +28,8 @@ This is a wedding website for Lorena and Marcelo. The primary goal is to provide
 - Admin panel is located at `admin.html`, protected by Google Sign-In with an email allowlist stored in Firestore (`/config/admins`).
 - CI/CD pipeline runs Vitest + SonarCloud before deploying to Firebase Hosting.
 - Security headers (CSP, HSTS, X-Frame-Options) are configured in `firebase.json`.
+
+## SonarQube CLI Integration
+For local code quality checks and issue inspection, developers and AI agents can use the official **SonarQube CLI** (`sonar` command).
+- **List PR Issues**: Run `sonar list issues -p wedding-site --pull-request <pr_id>` to fetch open issues for a pull request.
+- **Reference**: Refer to the SonarQube CLI LLM context file at [cli.sonarqube.com/llms.txt](https://cli.sonarqube.com/llms.txt) for detailed CLI usage instructions and configurations.

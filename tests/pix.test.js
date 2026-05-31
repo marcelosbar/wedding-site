@@ -26,9 +26,15 @@ vi.mock('qrcode', () => ({
 function setupDOM() {
   document.body.innerHTML = `
     <div id="cart-overlay"></div>
-    <div id="cart-view"></div>
-    <div id="pix-view"></div>
-    <div id="success-view"></div>
+    <div id="cart-view">
+      <h3 id="cart-title" tabindex="-1">Sua Contribuição</h3>
+    </div>
+    <div id="pix-view">
+      <h3 id="pix-title" tabindex="-1">Pagamento via PIX</h3>
+    </div>
+    <div id="success-view">
+      <h3 id="success-title" tabindex="-1">Muito Obrigado!</h3>
+    </div>
     <div id="cart-items-container"></div>
     <div id="cart-total-value"></div>
     <button id="floating-cart-btn"></button>
@@ -122,6 +128,16 @@ describe('PixCheckout', () => {
     expect(writeTextMock).toHaveBeenCalledWith('test-payload');
     expect(alertMock).toHaveBeenCalledWith('Código PIX copiado!');
     alertMock.mockRestore();
+  });
+
+  it('should handle clipboard copy error gracefully', async () => {
+    const writeTextMock = vi.fn().mockRejectedValue(new Error('Clipboard blocked'));
+    Object.assign(navigator, { clipboard: { writeText: writeTextMock } });
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    document.getElementById('pix-payload').value = 'test-payload';
+    await pix.copyPixPayload();
+    expect(consoleSpy).toHaveBeenCalled();
+    consoleSpy.mockRestore();
   });
 
   it('should reset cart, show success view, and clear form fields including message fields on confirmTransfer', async () => {

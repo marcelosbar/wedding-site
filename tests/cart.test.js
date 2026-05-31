@@ -7,9 +7,15 @@ import { Cart } from '../src/js/cart.js';
 function createMockElements() {
   document.body.innerHTML = `
     <div id="cart-overlay"></div>
-    <div id="cart-view"></div>
-    <div id="pix-view"></div>
-    <div id="success-view"></div>
+    <div id="cart-view">
+      <h3 id="cart-title" tabindex="-1">Sua Contribuição</h3>
+    </div>
+    <div id="pix-view">
+      <h3 id="pix-title" tabindex="-1">Pagamento via PIX</h3>
+    </div>
+    <div id="success-view">
+      <h3 id="success-title" tabindex="-1">Muito Obrigado!</h3>
+    </div>
     <div id="cart-items-container"></div>
     <div id="cart-total-value"></div>
     <button id="floating-cart-btn"></button>

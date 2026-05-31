@@ -13,6 +13,7 @@ on:
 permissions:
   contents: read
   issues: write # Required for ZAP to open GitHub issues for detected vulnerabilities
+  security-events: write # Required for Snyk SARIF upload to GitHub Security tab
 
 jobs:
   zap_scan:
@@ -28,6 +29,26 @@ jobs:
         uses: trufflesecurity/trufflehog@a94d152bf65bebf5baa486d3d4dfee520af2ceed # v3.88.2
         with:
           extra_args: --only-verified
+
+      - name: Install Dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Snyk Weekly Dependency Scan
+        uses: snyk/actions/node@8e119fbb6c251787721d34ba683ed48eba792766 # master @ 2026-05-27
+        continue-on-error: true # Report only — do not block the ZAP scan
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --severity-threshold=high
+
+      - name: Snyk Code Weekly Scan
+        uses: snyk/actions/node@8e119fbb6c251787721d34ba683ed48eba792766 # master @ 2026-05-27
+        continue-on-error: true # Report only — catches new SAST rules published since last deploy
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          command: code test
+          args: --severity-threshold=high
 
       - name: OWASP ZAP Full Scan
         uses: zaproxy/action-full-scan@3c58388149901b9a03b7718852c5ba889646c27c # v0.13.0

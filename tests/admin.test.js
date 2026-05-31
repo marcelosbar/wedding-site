@@ -199,8 +199,8 @@ describe('AdminApp', () => {
     
     // Mock a snapshot with some docs
     const mockSnapshot = [
-      { id: '1', data: () => ({ guestName: 'Alice', totalAmount: 100, listChosen: 'Groom', status: 'pending', timestamp: '2026-01-01' }) },
-      { id: '2', data: () => ({ guestName: 'Bob', totalAmount: 200, listChosen: 'Bride', status: 'approved', timestamp: '2026-01-02' }) }
+      { id: '1', data: () => ({ guestName: 'Alice', totalAmount: 100, listChosen: 'Groom', status: 'pending', timestamp: '2026-01-01', message: 'Parabéns!', isPublic: true }) },
+      { id: '2', data: () => ({ guestName: 'Bob', totalAmount: 200, listChosen: 'Bride', status: 'approved', timestamp: '2026-01-02', message: 'Sejam felizes!', isPublic: false }) }
     ];
     
     snapshotCallback(mockSnapshot);
@@ -210,6 +210,9 @@ describe('AdminApp', () => {
     expect(adminApp.transactions[0].guestName).toBe('Bob');
     expect(adminApp.tableBody.innerHTML).toContain('Bob');
     expect(adminApp.tableBody.innerHTML).toContain('Alice');
+    expect(adminApp.tableBody.innerHTML).toContain('Parabéns!');
+    expect(adminApp.tableBody.innerHTML).toContain('Sejam felizes!');
+    expect(adminApp.tableBody.innerHTML).toContain('(Privado)');
   });
 
   it('should handle fetch data errors', () => {

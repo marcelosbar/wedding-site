@@ -94,14 +94,14 @@ class AdminApp {
       });
     } catch (e) {
       console.warn("Firebase not initialized yet.", e);
-      this.tableBody.innerHTML = `<tr><td colspan="5" class="u-text-center">Firebase não configurado. Adicione a config em firebase.js</td></tr>`;
+      this.tableBody.innerHTML = `<tr><td colspan="6" class="u-text-center">Firebase não configurado. Adicione a config em firebase.js</td></tr>`;
     }
   }
 
   renderTable() {
     this.tableBody.innerHTML = '';
     if (this.transactions.length === 0) {
-      this.tableBody.innerHTML = `<tr><td colspan="5" class="u-text-center">Nenhuma transação encontrada.</td></tr>`;
+      this.tableBody.innerHTML = `<tr><td colspan="6" class="u-text-center">Nenhuma transação encontrada.</td></tr>`;
       return;
     }
 
@@ -123,6 +123,7 @@ class AdminApp {
         <td>${escapeHTML(t.guestName)}</td>
         <td>R$ ${t.totalAmount.toFixed(2)}</td>
         <td>${t.listChosen === 'Groom' ? 'Noivo' : 'Noiva'}</td>
+        <td>${t.message ? `<div class="admin-message-cell">${escapeHTML(t.message)}${t.isPublic ? '' : ' <span class="badge-private">(Privado)</span>'}</div>` : '<span class="u-text-muted">-</span>'}</td>
         <td><span class="status-badge ${statusClass}">${statusText}</span></td>
         <td class="action-cell"></td>
       `;

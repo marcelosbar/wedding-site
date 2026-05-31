@@ -5,8 +5,7 @@ import { escapeHTML } from './utils.js';
  */
 export class Cart {
   constructor(elements) {
-    this.items = []; // stores { name: itemName, price: unitPrice, quantity: q }
-    this.currentList = null; // 'Groom' or 'Bride'
+    this.items = []; // stores { name: itemName, price: unitPrice, quantity: q, list: listName }
     this.overlay = elements.overlay;
     this.cartView = elements.cartView;
     this.pixView = elements.pixView;
@@ -17,9 +16,23 @@ export class Cart {
     this.floatingCartBadge = elements.floatingCartBadge;
     this.navCartLink = elements.navCartLink;
     this.navCartBadge = elements.navCartBadge;
+    this.backToListBtn = elements.backToListBtn;
 
     this._initGiftControls();
+    this._initBackToListBtn();
+    this._initMessageCounter();
     this.renderCart();
+  }
+
+  get currentList() {
+    if (this.items.length === 0) return null;
+    const lists = [...new Set(this.items.map(item => item.list))];
+    if (lists.length === 1) return lists[0];
+    return 'mixed';
+  }
+
+  set currentList(val) {
+    // Dynamic getter takes precedence, setter is no-op to maintain backwards compatibility
   }
 
   _initGiftControls() {
@@ -47,7 +60,7 @@ export class Cart {
       btnMinus.className = `btn btn-sm gift-item-qty-btn btn-minus ${themeClass}`;
       btnMinus.innerHTML = '&minus;';
       btnMinus.dataset.item = itemName;
-      btnMinus.addEventListener('click', () => this.decrementCartItem(itemName));
+      btnMinus.addEventListener('click', () => this.decrementCartItem(itemName, listName));
 
       const qtyVal = document.createElement('span');
       qtyVal.className = 'gift-item-qty-val';
@@ -69,44 +82,64 @@ export class Cart {
     });
   }
 
-  addToCart(listName, itemName, price) {
-    if (this.currentList && this.currentList !== listName) {
-      alert('Você não pode misturar presentes do Noivo e da Noiva. Conclua a contribuição atual primeiro!');
-      return;
+  _initBackToListBtn() {
+    if (this.backToListBtn) {
+      this.backToListBtn.addEventListener('click', () => {
+        const targetModalId = this.backToListBtn.dataset.targetModal;
+        if (targetModalId) {
+          this.closeCart();
+          const overlay = document.getElementById(targetModalId);
+          if (overlay) {
+            overlay.classList.add('active');
+            overlay.setAttribute('aria-hidden', 'false');
+          }
+        }
+      });
     }
+  }
 
-    this.currentList = listName;
-    const existing = this.items.find(item => item.name === itemName);
+  _initMessageCounter() {
+    if (typeof document === 'undefined') return;
+    const messageEl = document.getElementById('guest-message');
+    const counterEl = document.getElementById('message-char-count');
+    if (messageEl && counterEl) {
+      messageEl.addEventListener('input', () => {
+        const count = messageEl.value.length;
+        counterEl.textContent = `${count} / 500`;
+      });
+    }
+  }
+
+  addToCart(listName, itemName, price) {
+    const existing = this.items.find(item => item.name === itemName && item.list === listName);
     if (existing) {
       existing.quantity += 1;
     } else {
-      this.items.push({ name: itemName, price, quantity: 1 });
+      this.items.push({ name: itemName, price, quantity: 1, list: listName });
     }
 
     this.renderCart();
   }
 
-  decrementCartItem(itemName) {
-    const existing = this.items.find(item => item.name === itemName);
+  decrementCartItem(itemName, listName) {
+    const existing = this.items.find(item => item.name === itemName && (!listName || item.list === listName));
     if (existing) {
       existing.quantity -= 1;
       if (existing.quantity <= 0) {
-        this.items = this.items.filter(item => item.name !== itemName);
+        this.items = this.items.filter(item => !(item.name === itemName && (!listName || item.list === listName)));
       }
     }
 
     if (this.items.length === 0) {
-      this.currentList = null;
       this.closeCart();
     }
 
     this.renderCart();
   }
 
-  removeFromCart(itemName) {
-    this.items = this.items.filter(item => item.name !== itemName);
+  removeFromCart(itemName, listName) {
+    this.items = this.items.filter(item => !(item.name === itemName && (!listName || item.list === listName)));
     if (this.items.length === 0) {
-      this.currentList = null;
       this.closeCart();
     }
     this.renderCart();
@@ -116,61 +149,75 @@ export class Cart {
     this.cartItemsContainer.innerHTML = '';
     let total = 0;
 
-    this.items.forEach(item => {
-      const itemTotal = item.price * item.quantity;
-      total += itemTotal;
+    const groups = {
+      Groom: this.items.filter(item => item.list === 'Groom'),
+      Bride: this.items.filter(item => item.list === 'Bride')
+    };
 
-      const el = document.createElement('div');
-      el.className = 'cart-item';
+    Object.entries(groups).forEach(([listName, listItems]) => {
+      if (listItems.length === 0) return;
 
-      // 1. Quantity controls
-      const qtyDiv = document.createElement('div');
-      qtyDiv.className = 'cart-item-qty-controls';
+      const header = document.createElement('div');
+      header.className = `cart-group-header ${listName.toLowerCase()}`;
+      header.textContent = listName === 'Groom' ? 'Time Noivo: Disney Paris' : "Time Noiva: Côte d'Azur";
+      this.cartItemsContainer.appendChild(header);
 
-      const btnMinus = document.createElement('button');
-      btnMinus.className = 'cart-qty-btn btn-minus';
-      btnMinus.innerHTML = '&minus;';
-      btnMinus.addEventListener('click', () => this.decrementCartItem(item.name));
+      listItems.forEach(item => {
+        const itemTotal = item.price * item.quantity;
+        total += itemTotal;
 
-      const qtyVal = document.createElement('span');
-      qtyVal.className = 'cart-qty-val';
-      qtyVal.textContent = item.quantity;
+        const el = document.createElement('div');
+        el.className = 'cart-item';
 
-      const btnPlus = document.createElement('button');
-      btnPlus.className = 'cart-qty-btn btn-plus';
-      btnPlus.innerHTML = '&plus;';
-      btnPlus.addEventListener('click', () => this.addToCart(this.currentList, item.name, item.price));
+        // 1. Quantity controls
+        const qtyDiv = document.createElement('div');
+        qtyDiv.className = 'cart-item-qty-controls';
 
-      qtyDiv.appendChild(btnMinus);
-      qtyDiv.appendChild(qtyVal);
-      qtyDiv.appendChild(btnPlus);
+        const btnMinus = document.createElement('button');
+        btnMinus.className = 'cart-qty-btn btn-minus';
+        btnMinus.innerHTML = '&minus;';
+        btnMinus.addEventListener('click', () => this.decrementCartItem(item.name, item.list));
 
-      // 2. Name
-      const nameSpan = document.createElement('span');
-      nameSpan.className = 'cart-item-name';
-      nameSpan.innerHTML = escapeHTML(item.name);
+        const qtyVal = document.createElement('span');
+        qtyVal.className = 'cart-qty-val';
+        qtyVal.textContent = item.quantity;
 
-      // 3. Right side (price + remove)
-      const rightDiv = document.createElement('div');
-      rightDiv.className = 'cart-item-right';
+        const btnPlus = document.createElement('button');
+        btnPlus.className = 'cart-qty-btn btn-plus';
+        btnPlus.innerHTML = '&plus;';
+        btnPlus.addEventListener('click', () => this.addToCart(item.list, item.name, item.price));
 
-      const priceSpan = document.createElement('span');
-      priceSpan.className = 'cart-item-price';
-      priceSpan.textContent = `R$ ${itemTotal.toFixed(2)}`;
+        qtyDiv.appendChild(btnMinus);
+        qtyDiv.appendChild(qtyVal);
+        qtyDiv.appendChild(btnPlus);
 
-      const removeBtn = document.createElement('button');
-      removeBtn.className = 'cart-item-remove-btn';
-      removeBtn.innerHTML = '&times;';
-      removeBtn.addEventListener('click', () => this.removeFromCart(item.name));
+        // 2. Name
+        const nameSpan = document.createElement('span');
+        nameSpan.className = 'cart-item-name';
+        nameSpan.innerHTML = escapeHTML(item.name);
 
-      rightDiv.appendChild(priceSpan);
-      rightDiv.appendChild(removeBtn);
+        // 3. Right side (price + remove)
+        const rightDiv = document.createElement('div');
+        rightDiv.className = 'cart-item-right';
 
-      el.appendChild(qtyDiv);
-      el.appendChild(nameSpan);
-      el.appendChild(rightDiv);
+        const priceSpan = document.createElement('span');
+        priceSpan.className = 'cart-item-price';
+        priceSpan.textContent = `R$ ${itemTotal.toFixed(2)}`;
 
-      this.cartItemsContainer.appendChild(el);
+        const removeBtn = document.createElement('button');
+        removeBtn.className = 'cart-item-remove-btn';
+        removeBtn.innerHTML = '&times;';
+        removeBtn.addEventListener('click', () => this.removeFromCart(item.name, item.list));
+
+        rightDiv.appendChild(priceSpan);
+        rightDiv.appendChild(removeBtn);
+
+        el.appendChild(qtyDiv);
+        el.appendChild(nameSpan);
+        el.appendChild(rightDiv);
+
+        this.cartItemsContainer.appendChild(el);
+      });
     });
 
     if (this.cartTotalValue) {
@@ -234,12 +281,37 @@ export class Cart {
     });
   }
 
-  openCart() {
+  openCart(previousModalId = null) {
     this.overlay.classList.add('active');
     this.cartView.style.display = 'block';
     this.cartView.classList.add('active');
     this.pixView.classList.remove('active');
     this.successView.classList.remove('active');
+
+    if (this.backToListBtn) {
+      this.backToListBtn.classList.remove('groom', 'bride');
+      if (previousModalId === 'groom-gifts-modal') {
+        this.backToListBtn.textContent = '← Voltar para Lista do Noivo';
+        this.backToListBtn.dataset.targetModal = 'groom-gifts-modal';
+        this.backToListBtn.classList.add('groom');
+        this.backToListBtn.classList.remove('u-hidden');
+      } else if (previousModalId === 'bride-gifts-modal') {
+        this.backToListBtn.textContent = '← Voltar para Lista da Noiva';
+        this.backToListBtn.dataset.targetModal = 'bride-gifts-modal';
+        this.backToListBtn.classList.add('bride');
+        this.backToListBtn.classList.remove('u-hidden');
+      } else {
+        this.backToListBtn.classList.add('u-hidden');
+        delete this.backToListBtn.dataset.targetModal;
+      }
+    }
+
+    if (typeof document !== 'undefined') {
+      const cartTitle = document.getElementById('cart-title');
+      if (cartTitle) {
+        cartTitle.focus();
+      }
+    }
   }
 
   closeCart() {

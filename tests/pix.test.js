@@ -26,9 +26,15 @@ vi.mock('qrcode', () => ({
 function setupDOM() {
   document.body.innerHTML = `
     <div id="cart-overlay"></div>
-    <div id="cart-view"></div>
-    <div id="pix-view"></div>
-    <div id="success-view"></div>
+    <div id="cart-view">
+      <h3 id="cart-title" tabindex="-1">Sua Contribuição</h3>
+    </div>
+    <div id="pix-view">
+      <h3 id="pix-title" tabindex="-1">Pagamento via PIX</h3>
+    </div>
+    <div id="success-view">
+      <h3 id="success-title" tabindex="-1">Muito Obrigado!</h3>
+    </div>
     <div id="cart-items-container"></div>
     <div id="cart-total-value"></div>
     <button id="floating-cart-btn"></button>
@@ -41,6 +47,9 @@ function setupDOM() {
     <div id="global-bride-fill" style="width: 50%"></div>
     <div id="global-progress-divider" style="left: 50%"></div>
     <input id="guest-name" value="" />
+    <textarea id="guest-message"></textarea>
+    <input type="checkbox" id="message-public" checked />
+    <div id="message-char-count">0 / 500</div>
     <input id="pix-payload" value="" />
     <canvas id="pix-qr-code"></canvas>
   `;
@@ -121,14 +130,32 @@ describe('PixCheckout', () => {
     alertMock.mockRestore();
   });
 
-  it('should reset cart and show success view on confirmTransfer', async () => {
+  it('should handle clipboard copy error gracefully', async () => {
+    const writeTextMock = vi.fn().mockRejectedValue(new Error('Clipboard blocked'));
+    Object.assign(navigator, { clipboard: { writeText: writeTextMock } });
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    document.getElementById('pix-payload').value = 'test-payload';
+    await pix.copyPixPayload();
+    expect(consoleSpy).toHaveBeenCalled();
+    consoleSpy.mockRestore();
+  });
+
+  it('should reset cart, show success view, and clear form fields including message fields on confirmTransfer', async () => {
     document.getElementById('guest-name').value = 'Maria';
+    document.getElementById('guest-message').value = 'Felicidades!';
+    document.getElementById('message-public').checked = false;
     cart.addToCart('Bride', 'Gift', 200);
+
     await pix.confirmTransfer();
+
     expect(cart.items.length).toBe(0);
     expect(cart.currentList).toBeNull();
     expect(document.getElementById('success-view').classList.contains('active')).toBe(true);
     expect(document.getElementById('cart-view').style.display).toBe('none');
+    expect(document.getElementById('guest-name').value).toBe('');
+    expect(document.getElementById('guest-message').value).toBe('');
+    expect(document.getElementById('message-public').checked).toBe(true);
+    expect(document.getElementById('message-char-count').textContent).toBe('0 / 500');
   });
 
   it('should fall back to local simulation when Firebase fails', async () => {
@@ -153,5 +180,36 @@ describe('PixCheckout', () => {
     await Promise.all([p1, p2]);
 
     expect(addDoc).toHaveBeenCalledTimes(1);
+  });
+
+  it('should create separate transactions for Groom and Bride on confirmTransfer including message', async () => {
+    const { addDoc } = await import('../src/js/firebase.js');
+    addDoc.mockClear();
+
+    document.getElementById('guest-name').value = 'Mixed Contributor';
+    document.getElementById('guest-message').value = 'Parabéns!';
+    document.getElementById('message-public').checked = true;
+
+    cart.addToCart('Groom', 'Groom Gift 1', 100);
+    cart.addToCart('Groom', 'Groom Gift 2', 150);
+    cart.addToCart('Bride', 'Bride Gift 1', 200);
+
+    await pix.confirmTransfer();
+
+    expect(addDoc).toHaveBeenCalledTimes(2);
+
+    const call1Args = addDoc.mock.calls[0][1];
+    expect(call1Args.listChosen).toBe('Groom');
+    expect(call1Args.totalAmount).toBe(250);
+    expect(call1Args.guestName).toBe('Mixed Contributor');
+    expect(call1Args.message).toBe('Parabéns!');
+    expect(call1Args.isPublic).toBe(true);
+
+    const call2Args = addDoc.mock.calls[1][1];
+    expect(call2Args.listChosen).toBe('Bride');
+    expect(call2Args.totalAmount).toBe(200);
+    expect(call2Args.guestName).toBe('Mixed Contributor');
+    expect(call2Args.message).toBe('Parabéns!');
+    expect(call2Args.isPublic).toBe(true);
   });
 });

@@ -51,9 +51,15 @@ vi.mock('../src/js/scoreboard.js', () => ({
 function setupDOM() {
   document.body.innerHTML = `
     <div id="cart-overlay"></div>
-    <div id="cart-view"></div>
-    <div id="pix-view"></div>
-    <div id="success-view"></div>
+    <div id="cart-view">
+      <h3 id="cart-title" tabindex="-1">Sua Contribuição</h3>
+    </div>
+    <div id="pix-view">
+      <h3 id="pix-title" tabindex="-1">Pagamento via PIX</h3>
+    </div>
+    <div id="success-view">
+      <h3 id="success-title" tabindex="-1">Muito Obrigado!</h3>
+    </div>
     <div id="cart-items-container"></div>
     <div id="cart-total-value"></div>
     <button id="floating-cart-btn"></button>
@@ -73,6 +79,7 @@ function setupDOM() {
     <button id="copy-pix-payload-btn"></button>
     <button id="confirm-transfer-btn"></button>
     <button id="back-to-site-btn"></button>
+    <button id="cart-back-to-list-btn" class="u-hidden"></button>
     <button class="gifts-modal-btn" data-modal="groom-gifts-modal">Ver Presentes</button>
     <button class="gifts-modal-btn" data-modal="bride-gifts-modal">Ver Presentes</button>
     <div id="groom-gifts-modal" class="gifts-modal-overlay" aria-hidden="true">
@@ -250,7 +257,7 @@ describe('WeddingApp Orchestrator', () => {
 
     expect(document.getElementById('groom-gifts-modal').classList.contains('active')).toBe(false);
     expect(document.getElementById('bride-gifts-modal').classList.contains('active')).toBe(false);
-    expect(mockCartOpenCart).toHaveBeenCalled();
+    expect(mockCartOpenCart).toHaveBeenCalledWith('groom-gifts-modal');
   });
 
   it('closeGiftsModals should set aria-hidden=true on closed overlays', () => {

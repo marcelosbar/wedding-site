@@ -115,6 +115,23 @@
     </div>
   </section>
 
+  <!-- Guest Messages Section -->
+  <section id="messages" class="container">
+    <h2 class="section-title">Mensagens dos Convidados</h2>
+    <div class="messages-carousel-container">
+      <div class="messages-carousel-track" id="messages-carousel-track">
+        <p class="u-text-center u-text-muted">Carregando mensagens de carinho...</p>
+      </div>
+
+      <!-- Controls -->
+      <button class="carousel-control prev" id="carousel-prev" aria-label="Mensagem anterior">&lsaquo;</button>
+      <button class="carousel-control next" id="carousel-next" aria-label="Próxima mensagem">&rsaquo;</button>
+
+      <!-- Dots indicator -->
+      <div class="carousel-dots" id="carousel-dots"></div>
+    </div>
+  </section>
+
   <!-- RSVP Section -->
   <section id="rsvp">
     <div class="container rsvp-content">
@@ -143,7 +160,7 @@
       <!-- Cart Items Section -->
       <div id="cart-view">
         <div class="cart-header">
-          <h3>Sua Contribuição</h3>
+          <h3 id="cart-title" tabindex="-1">Sua Contribuição</h3>
           <button class="close-btn close-cart-btn" aria-label="Fechar Carrinho">&times;</button>
         </div>
 
@@ -162,13 +179,28 @@
             class="u-input-text" required />
         </div>
 
+        <div class="u-mb-4">
+          <label for="guest-message" class="u-display-block u-mb-2 u-font-weight-500">Mensagem (Opcional):</label>
+          <textarea id="guest-message" placeholder="Deixe uma mensagem para os noivos!"
+            class="u-input-text" rows="3" maxlength="500"></textarea>
+          <div id="message-char-count" class="char-count">0 / 500</div>
+        </div>
+
+        <div class="u-mb-4 checkbox-wrapper">
+          <input type="checkbox" id="message-public" checked />
+          <label for="message-public" class="u-font-weight-500">Tornar mensagem pública no site</label>
+        </div>
+
         <button id="proceed-to-pix-btn" class="btn btn-secondary u-w-full">Finalizar com PIX</button>
+        <div class="cart-back-container u-text-center u-mt-4">
+          <button id="cart-back-to-list-btn" class="btn-link u-hidden">Voltar para a lista</button>
+        </div>
       </div>
 
       <!-- PIX Payment Section -->
       <div id="pix-view" class="pix-section">
         <div class="cart-header">
-          <h3>Pagamento via PIX</h3>
+          <h3 id="pix-title" tabindex="-1">Pagamento via PIX</h3>
           <button class="close-btn close-cart-btn" aria-label="Fechar Carrinho">&times;</button>
         </div>
         <p>Escaneie o QR Code abaixo com o aplicativo do seu banco:</p>
@@ -191,10 +223,10 @@
       <!-- Success Section -->
       <div id="success-view" class="pix-section">
         <div class="cart-header u-justify-center">
-          <h3 class="u-text-primary">Muito Obrigado! ❤️</h3>
+          <h3 id="success-title" class="u-text-primary" tabindex="-1">Muito Obrigado! ❤️</h3>
         </div>
         <p class="u-mb-6">
-          Sua contribuição foi registrada e os pontos já foram adicionados ao placar!
+          Sua contribuição foi registrada e os pontos já foram adicionados ao placar! Se você escreveu uma mensagem, ela será exibida no site após a nossa aprovação.
         </p>
         <button id="back-to-site-btn" class="btn btn-secondary u-w-full">Voltar para o site</button>
       </div>

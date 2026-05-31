@@ -35,6 +35,10 @@ export class PixCheckout {
 
       this.cartView.style.display = 'none';
       this.pixView.classList.add('active');
+      const pixTitle = document.getElementById('pix-title');
+      if (pixTitle) {
+        pixTitle.focus();
+      }
     } catch (err) {
       console.error(err);
       alert('Erro ao gerar QR Code');
@@ -56,34 +60,73 @@ export class PixCheckout {
     this.isProcessing = true;
 
     try {
-      const guestName = document.getElementById('guest-name').value.trim();
+      const guestName = document.getElementById('guest-name') ? document.getElementById('guest-name').value.trim() : '';
+      const messageEl = document.getElementById('guest-message');
+      const message = messageEl ? messageEl.value.trim() : '';
+      const publicEl = document.getElementById('message-public');
+      const isPublic = publicEl ? publicEl.checked : true;
+
       const total = this.cart.getTotal();
-      const list = this.cart.currentList;
 
       if (total <= 0) return;
 
-      const transactionData = {
-        guestName,
-        totalAmount: total,
-        listChosen: list,
-        status: 'pending',
-        timestamp: new Date().toISOString()
-      };
+      const groomItems = this.cart.items.filter(item => item.list === 'Groom');
+      const brideItems = this.cart.items.filter(item => item.list === 'Bride');
+
+      const promises = [];
+      const simulatedUpdates = [];
+
+      if (groomItems.length > 0) {
+        const groomTotal = groomItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        promises.push(addDoc(transactionsRef, {
+          guestName,
+          totalAmount: groomTotal,
+          listChosen: 'Groom',
+          status: 'pending',
+          timestamp: new Date().toISOString(),
+          message,
+          isPublic
+        }));
+        simulatedUpdates.push({ list: 'Groom', amount: groomTotal });
+      }
+
+      if (brideItems.length > 0) {
+        const brideTotal = brideItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        promises.push(addDoc(transactionsRef, {
+          guestName,
+          totalAmount: brideTotal,
+          listChosen: 'Bride',
+          status: 'pending',
+          timestamp: new Date().toISOString(),
+          message,
+          isPublic
+        }));
+        simulatedUpdates.push({ list: 'Bride', amount: brideTotal });
+      }
 
       try {
-        await addDoc(transactionsRef, transactionData);
+        await Promise.all(promises);
       } catch (e) {
         console.error('Firebase is not configured correctly yet or network error. Running local simulation.', e);
-        this.scoreboard.simulateLocalScoreboard(list, total);
+        simulatedUpdates.forEach(update => {
+          this.scoreboard.simulateLocalScoreboard(update.list, update.amount);
+        });
       }
 
       this.pixView.classList.remove('active');
       this.cartView.style.display = 'none';
       this.successView.classList.add('active');
+      const successTitle = document.getElementById('success-title');
+      if (successTitle) {
+        successTitle.focus();
+      }
 
       // Reset cart and form
       this.cart.reset();
-      document.getElementById('guest-name').value = '';
+      if (document.getElementById('guest-name')) document.getElementById('guest-name').value = '';
+      if (document.getElementById('guest-message')) document.getElementById('guest-message').value = '';
+      if (document.getElementById('message-public')) document.getElementById('message-public').checked = true;
+      if (document.getElementById('message-char-count')) document.getElementById('message-char-count').textContent = '0 / 500';
     } finally {
       this.isProcessing = false;
     }

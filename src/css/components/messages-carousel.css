@@ -1,0 +1,198 @@
+/* Guest Messages Carousel CSS */
+
+.messages-carousel-container {
+  position: relative;
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  padding: 3rem 4.5rem;
+  margin: 2rem auto 4rem auto;
+  max-width: 800px;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+}
+
+.messages-carousel-track {
+  position: relative;
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.carousel-slide {
+  width: 100%;
+  display: none;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
+}
+
+.carousel-slide.active {
+  display: block;
+  opacity: 1;
+}
+
+.message-text {
+  font-family: var(--font-heading);
+  font-style: italic;
+  color: var(--color-text-main);
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+  position: relative;
+  display: inline-block;
+  padding: 0 1.5rem;
+}
+
+.message-text.length-short {
+  font-size: 1.5rem;
+}
+
+.message-text.length-medium {
+  font-size: 1.25rem;
+}
+
+.message-text.length-long {
+  font-size: 1.1rem;
+}
+
+.message-text::before,
+.message-text::after {
+  font-family: var(--font-heading);
+  font-size: 2rem;
+  color: var(--color-accent);
+  position: absolute;
+  line-height: 1;
+  opacity: 0.6;
+}
+
+.message-text::before {
+  content: '“';
+  left: -0.5rem;
+  top: -0.5rem;
+}
+
+.message-text::after {
+  content: '”';
+  right: -0.5rem;
+  bottom: -1rem;
+}
+
+.message-author {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-secondary);
+}
+
+.carousel-control {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--color-surface);
+  border: 1px solid #cbd5e1;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.75rem;
+  color: var(--color-text-muted);
+  transition: all 0.3s ease;
+  z-index: 10;
+  box-shadow: var(--shadow-sm);
+  padding: 0;
+  line-height: 1;
+}
+
+.carousel-control:hover {
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+  border-color: var(--color-primary);
+  transform: translateY(-50%) scale(1.05);
+}
+
+.carousel-control:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.carousel-control.prev {
+  left: 1rem;
+}
+
+.carousel-control.next {
+  right: 1rem;
+}
+
+.carousel-dots {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+
+.carousel-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  background: #cbd5e1;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.3s ease;
+}
+
+.carousel-dot.active {
+  background: var(--color-primary);
+  transform: scale(1.35);
+}
+
+.carousel-dot:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Responsiveness */
+@media (max-width: 640px) {
+  .messages-carousel-container {
+    padding: 2.5rem 1.5rem;
+    margin: 1.5rem 1rem 3rem 1rem;
+  }
+
+  .messages-carousel-track {
+    min-height: 240px;
+  }
+
+  .carousel-control {
+    display: none; /* Hide next/prev arrows on mobile screens */
+  }
+
+  .message-text {
+    padding: 0 0.5rem;
+  }
+
+  .message-text.length-short {
+    font-size: 1.25rem;
+  }
+
+  .message-text.length-medium {
+    font-size: 1.1rem;
+  }
+
+  .message-text.length-long {
+    font-size: 0.95rem;
+  }
+
+  .message-text::before {
+    left: -0.8rem;
+  }
+
+  .message-text::after {
+    right: -0.8rem;
+  }
+}

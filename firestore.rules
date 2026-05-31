@@ -16,8 +16,7 @@ service cloud.firestore {
       // Anyone can read (for the scoreboard)
       allow read: if true;
       
-      // Only allow creation if data is valid and status is pending
-      allow create: if request.resource.data.keys().hasOnly(['guestName', 'totalAmount', 'listChosen', 'status', 'timestamp'])
+      allow create: if request.resource.data.keys().hasOnly(['guestName', 'totalAmount', 'listChosen', 'status', 'timestamp', 'message', 'isPublic'])
                     && request.resource.data.status == 'pending'
                     && request.resource.data.totalAmount is number
                     && request.resource.data.totalAmount > 0
@@ -26,7 +25,10 @@ service cloud.firestore {
                     && request.resource.data.guestName.size() > 0
                     && request.resource.data.guestName.size() < 100
                     && (request.resource.data.listChosen == 'Groom' || request.resource.data.listChosen == 'Bride')
-                    && request.resource.data.timestamp is string;
+                    && request.resource.data.timestamp is string
+                    && request.resource.data.message is string
+                    && request.resource.data.message.size() <= 500
+                    && request.resource.data.isPublic is bool;
       
       // Only the authorized admins can update
       allow update: if request.auth != null

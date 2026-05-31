@@ -45,4 +45,48 @@ describe('Security Configuration Regressions', () => {
       expect(inlineEventMatch).toBeNull();
     });
   });
+
+  it('should define CSP frame-ancestors and form-action directives (ZAP alert 10055)', () => {
+    const configPath = path.resolve(__dirname, '../firebase.json');
+    const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+    const headers = config.hosting.headers[0].headers;
+
+    const cspHeader = headers.find(h => h.key === 'Content-Security-Policy');
+    expect(cspHeader).toBeDefined();
+
+    const cspValue = cspHeader.value;
+    // frame-ancestors and form-action do NOT fall back to default-src,
+    // so they must be explicitly declared to prevent ZAP alert 10055.
+    expect(cspValue).toContain("frame-ancestors 'self'");
+    expect(cspValue).toContain("form-action 'self'");
+  });
+
+  it('should set Cross-Origin-Embedder-Policy to unsafe-none (intentional)', () => {
+    const configPath = path.resolve(__dirname, '../firebase.json');
+    const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+    const headers = config.hosting.headers[0].headers;
+
+    const coepHeader = headers.find(h => h.key === 'Cross-Origin-Embedder-Policy');
+    expect(coepHeader).toBeDefined();
+    // INTENTIONAL DEVIATION: ZAP flags anything other than 'require-corp' as invalid,
+    // but both 'credentialless' and 'require-corp' break Firebase Authentication.
+    // Firebase Auth injects a hidden cross-origin iframe (/__/auth/iframe) that loads
+    // with credentials from lorenaemarcelo2026.firebaseapp.com. COEP blocks it because
+    // that domain does not serve a Cross-Origin-Resource-Policy header.
+    // 'unsafe-none' is the only value compatible with Firebase Auth popup/iframe flow.
+    expect(coepHeader.value).toBe('unsafe-none');
+  });
+
+  it('should keep Cross-Origin-Opener-Policy as same-origin-allow-popups (intentional)', () => {
+    const configPath = path.resolve(__dirname, '../firebase.json');
+    const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+    const headers = config.hosting.headers[0].headers;
+
+    const coopHeader = headers.find(h => h.key === 'Cross-Origin-Opener-Policy');
+    expect(coopHeader).toBeDefined();
+    // INTENTIONAL DEVIATION: ZAP prefers 'same-origin', but we use 'same-origin-allow-popups'
+    // to preserve the Google Sign-In popup flow used by the admin panel.
+    // Changing this to 'same-origin' would silently break Firebase Authentication.
+    expect(coopHeader.value).toBe('same-origin-allow-popups');
+  });
 });

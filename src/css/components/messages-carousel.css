@@ -14,7 +14,7 @@
 
 .messages-carousel-track {
   position: relative;
-  min-height: 140px;
+  min-height: 200px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -35,7 +35,6 @@
 
 .message-text {
   font-family: var(--font-heading);
-  font-size: 1.5rem;
   font-style: italic;
   color: var(--color-text-main);
   line-height: 1.6;
@@ -43,6 +42,18 @@
   position: relative;
   display: inline-block;
   padding: 0 1.5rem;
+}
+
+.message-text.length-short {
+  font-size: 1.5rem;
+}
+
+.message-text.length-medium {
+  font-size: 1.25rem;
+}
+
+.message-text.length-long {
+  font-size: 1.1rem;
 }
 
 .message-text::before,
@@ -153,13 +164,28 @@
     margin: 1.5rem 1rem 3rem 1rem;
   }
 
+  .messages-carousel-track {
+    min-height: 240px;
+  }
+
   .carousel-control {
     display: none; /* Hide next/prev arrows on mobile screens */
   }
 
   .message-text {
-    font-size: 1.25rem;
     padding: 0 0.5rem;
+  }
+
+  .message-text.length-short {
+    font-size: 1.25rem;
+  }
+
+  .message-text.length-medium {
+    font-size: 1.1rem;
+  }
+
+  .message-text.length-long {
+    font-size: 0.95rem;
   }
 
   .message-text::before {

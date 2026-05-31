@@ -231,4 +231,18 @@ describe('MessagesCarousel', () => {
     elements.nextBtn.click();
     expect(resetSpy).toHaveBeenCalled();
   });
+
+  it('should assign correct font size classes based on message length', () => {
+    carousel.messages = [
+      { guestName: 'Short', message: 'Hello!', timestamp: '2026-05-31T12:00:00Z' },
+      { guestName: 'Medium', message: 'A'.repeat(150), timestamp: '2026-05-31T12:01:00Z' },
+      { guestName: 'Long', message: 'B'.repeat(300), timestamp: '2026-05-31T12:02:00Z' }
+    ];
+    carousel.render();
+
+    const slides = elements.trackEl.querySelectorAll('.carousel-slide');
+    expect(slides[0].querySelector('.message-text').classList.contains('length-short')).toBe(true);
+    expect(slides[1].querySelector('.message-text').classList.contains('length-medium')).toBe(true);
+    expect(slides[2].querySelector('.message-text').classList.contains('length-long')).toBe(true);
+  });
 });

@@ -146,7 +146,14 @@ export class MessagesCarousel {
       slide.className = `carousel-slide${idx === 0 ? ' active' : ''}`;
       
       const textEl = document.createElement('p');
-      textEl.className = 'message-text';
+      const msgLen = msg.message.length;
+      let lengthClass = 'length-short';
+      if (msgLen > 280) {
+        lengthClass = 'length-long';
+      } else if (msgLen > 120) {
+        lengthClass = 'length-medium';
+      }
+      textEl.className = `message-text ${lengthClass}`;
       textEl.textContent = msg.message;
       
       const authorEl = document.createElement('p');

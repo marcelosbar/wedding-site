@@ -35,6 +35,10 @@ export class PixCheckout {
 
       this.cartView.style.display = 'none';
       this.pixView.classList.add('active');
+      const pixTitle = document.getElementById('pix-title');
+      if (pixTitle) {
+        pixTitle.focus();
+      }
     } catch (err) {
       console.error(err);
       alert('Erro ao gerar QR Code');
@@ -112,6 +116,10 @@ export class PixCheckout {
       this.pixView.classList.remove('active');
       this.cartView.style.display = 'none';
       this.successView.classList.add('active');
+      const successTitle = document.getElementById('success-title');
+      if (successTitle) {
+        successTitle.focus();
+      }
 
       // Reset cart and form
       this.cart.reset();

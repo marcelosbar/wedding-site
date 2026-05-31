@@ -305,6 +305,13 @@ export class Cart {
         delete this.backToListBtn.dataset.targetModal;
       }
     }
+
+    if (typeof document !== 'undefined') {
+      const cartTitle = document.getElementById('cart-title');
+      if (cartTitle) {
+        cartTitle.focus();
+      }
+    }
   }
 
   closeCart() {

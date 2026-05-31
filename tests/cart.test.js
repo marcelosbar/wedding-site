@@ -17,6 +17,8 @@ function createMockElements() {
     <button id="nav-cart-link" style="display: none;"></button>
     <span id="nav-cart-badge"></span>
     <button id="cart-back-to-list-btn" class="u-hidden"></button>
+    <textarea id="guest-message"></textarea>
+    <div id="message-char-count">0 / 500</div>
     
     <div id="groom-gifts-modal" class="gifts-modal-overlay">
       <div class="gift-item" id="groom-item-1">

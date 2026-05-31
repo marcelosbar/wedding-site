@@ -43,6 +43,7 @@ function setupDOM() {
     <input id="guest-name" value="" />
     <textarea id="guest-message"></textarea>
     <input type="checkbox" id="message-public" checked />
+    <div id="message-char-count">0 / 500</div>
     <input id="pix-payload" value="" />
     <canvas id="pix-qr-code"></canvas>
   `;
@@ -138,6 +139,7 @@ describe('PixCheckout', () => {
     expect(document.getElementById('guest-name').value).toBe('');
     expect(document.getElementById('guest-message').value).toBe('');
     expect(document.getElementById('message-public').checked).toBe(true);
+    expect(document.getElementById('message-char-count').textContent).toBe('0 / 500');
   });
 
   it('should fall back to local simulation when Firebase fails', async () => {

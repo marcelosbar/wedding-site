@@ -175,3 +175,10 @@
   cursor: pointer;
   accent-color: var(--color-primary);
 }
+
+.char-count {
+  text-align: right;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  margin-top: 0.25rem;
+}

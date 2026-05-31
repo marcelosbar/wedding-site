@@ -118,6 +118,7 @@ export class PixCheckout {
       if (document.getElementById('guest-name')) document.getElementById('guest-name').value = '';
       if (document.getElementById('guest-message')) document.getElementById('guest-message').value = '';
       if (document.getElementById('message-public')) document.getElementById('message-public').checked = true;
+      if (document.getElementById('message-char-count')) document.getElementById('message-char-count').textContent = '0 / 500';
     } finally {
       this.isProcessing = false;
     }

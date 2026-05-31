@@ -20,6 +20,7 @@ export class Cart {
 
     this._initGiftControls();
     this._initBackToListBtn();
+    this._initMessageCounter();
     this.renderCart();
   }
 
@@ -93,6 +94,18 @@ export class Cart {
             overlay.setAttribute('aria-hidden', 'false');
           }
         }
+      });
+    }
+  }
+
+  _initMessageCounter() {
+    if (typeof document === 'undefined') return;
+    const messageEl = document.getElementById('guest-message');
+    const counterEl = document.getElementById('message-char-count');
+    if (messageEl && counterEl) {
+      messageEl.addEventListener('input', () => {
+        const count = messageEl.value.length;
+        counterEl.textContent = `${count} / 500`;
       });
     }
   }

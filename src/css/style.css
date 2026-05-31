@@ -412,6 +412,10 @@ section {
   margin-bottom: 1.5rem;
 }
 
+.cart-header h3 {
+  margin: 0;
+}
+
 .close-btn {
   background: none;
   border: none;
@@ -1072,5 +1076,20 @@ body.admin-body {
 .gifts-modal-btn {
   width: 100%;
   margin-top: 0.5rem;
+}
+
+.gifts-modal-footer {
+  padding: 1.25rem 2rem;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: flex-end;
+  background: var(--color-surface);
+  flex-shrink: 0;
+}
+
+.view-cart-modal-btn {
+  width: auto;
+  font-weight: 600;
+  padding: 0.6rem 1.5rem;
 }
 

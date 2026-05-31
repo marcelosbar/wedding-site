@@ -121,6 +121,11 @@ export class WeddingApp {
         });
       }
     });
+
+    // 8. View cart button inside gifts modal
+    document.querySelectorAll('.view-cart-modal-btn').forEach(btn => {
+      btn.addEventListener('click', () => this.openCart());
+    });
   }
 
   // --- Delegate Cart methods ---

@@ -181,6 +181,20 @@ export class Cart {
     if (this.floatingCartBadge) this.floatingCartBadge.textContent = count;
     if (this.navCartBadge) this.navCartBadge.textContent = count;
 
+    if (typeof document !== 'undefined') {
+      document.querySelectorAll('.view-cart-modal-btn .modal-cart-count').forEach(badge => {
+        badge.textContent = count;
+      });
+
+      document.querySelectorAll('.gifts-modal-footer').forEach(footer => {
+        if (count > 0) {
+          footer.classList.remove('u-hidden');
+        } else {
+          footer.classList.add('u-hidden');
+        }
+      });
+    }
+
     if (count > 0) {
       if (this.floatingCartBtn) this.floatingCartBtn.classList.add('visible');
       if (this.navCartLink) this.navCartLink.style.display = 'inline-block';

@@ -77,9 +77,15 @@ function setupDOM() {
     <button class="gifts-modal-btn" data-modal="bride-gifts-modal">Ver Presentes</button>
     <div id="groom-gifts-modal" class="gifts-modal-overlay" aria-hidden="true">
       <button class="gifts-modal-close">x</button>
+      <div class="gifts-modal-footer u-hidden">
+        <button class="btn btn-accent view-cart-modal-btn">Ver Carrinho (<span class="modal-cart-count">0</span>)</button>
+      </div>
     </div>
     <div id="bride-gifts-modal" class="gifts-modal-overlay" aria-hidden="true">
       <button class="gifts-modal-close">x</button>
+      <div class="gifts-modal-footer u-hidden">
+        <button class="btn btn-accent view-cart-modal-btn">Ver Carrinho (<span class="modal-cart-count">0</span>)</button>
+      </div>
     </div>
   `;
 }
@@ -256,5 +262,15 @@ describe('WeddingApp Orchestrator', () => {
 
     expect(overlay.classList.contains('active')).toBe(false);
     expect(overlay.getAttribute('aria-hidden')).toBe('true');
+  });
+
+  it('should call openCart when the view cart button in the gifts modal is clicked', () => {
+    const btn = document.querySelector('.view-cart-modal-btn');
+    const openCartSpy = vi.spyOn(app, 'openCart').mockImplementation(() => {});
+
+    btn.click();
+
+    expect(openCartSpy).toHaveBeenCalled();
+    openCartSpy.mockRestore();
   });
 });

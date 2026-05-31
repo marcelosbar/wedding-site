@@ -887,18 +887,31 @@ body.admin-body {
   text-align: center;
 }
 
-/* Add-to-cart visual feedback */
-@keyframes btn-added-pulse {
-  0%   { transform: scale(1); }
-  40%  { transform: scale(1.08); }
-  100% { transform: scale(1); }
+/* Gift item badge indicating quantity in cart */
+.gift-item {
+  position: relative;
 }
 
-.btn-added {
-  background-color: #16a34a !important;
-  color: white !important;
-  animation: btn-added-pulse 0.4s ease;
-  pointer-events: none;
+.gift-qty-badge {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+#groom-gifts-modal .gift-qty-badge {
+  background-color: #dbeafe; /* Light blue matching groom theme */
+  color: #1e40af;
+}
+
+#bride-gifts-modal .gift-qty-badge {
+  background-color: #ffedd5; /* Light orange matching bride theme */
+  color: #c2410c;
 }
 
 /* Gifts Modal */

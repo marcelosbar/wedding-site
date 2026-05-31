@@ -16,6 +16,19 @@ function createMockElements() {
     <span id="floating-cart-badge"></span>
     <button id="nav-cart-link" style="display: none;"></button>
     <span id="nav-cart-badge"></span>
+    
+    <div id="groom-gifts-modal">
+      <div class="gift-item" id="groom-item-1">
+        <h4>Orelhinhas de Noivos</h4>
+        <button class="add-to-cart-btn" data-item="Orelhinhas de Noivos" data-list="Groom" data-price="80">Adicionar</button>
+      </div>
+    </div>
+    <div id="bride-gifts-modal">
+      <div class="gift-item" id="bride-item-1">
+        <h4>Taça de Vinho Rosé</h4>
+        <button class="add-to-cart-btn" data-item="Taça de Vinho Rosé" data-list="Bride" data-price="60">Adicionar</button>
+      </div>
+    </div>
   `;
   return {
     overlay: document.getElementById('cart-overlay'),
@@ -139,5 +152,37 @@ describe('Cart', () => {
     // removeFromCart triggers renderCart automatically
     expect(cart.floatingCartBtn.classList.contains('visible')).toBe(false);
     expect(cart.navCartLink.style.display).toBe('none');
+  });
+
+  it('should sync gift quantities badges correctly and not auto-open cart when adding items', () => {
+    // 1. Initial state: no badge
+    const itemEl = document.getElementById('groom-item-1');
+    expect(itemEl.querySelector('.gift-qty-badge')).toBeNull();
+
+    // 2. Add one item (should NOT auto-open cart)
+    cart.addToCart('Groom', 'Orelhinhas de Noivos', 80);
+    expect(cart.items.length).toBe(1);
+    expect(cart.overlay.classList.contains('active')).toBe(false); // verification that it didn't open the cart!
+
+    // Badge should exist and show "1 no carrinho"
+    let badge = itemEl.querySelector('.gift-qty-badge');
+    expect(badge).not.toBeNull();
+    expect(badge.textContent).toBe('1 no carrinho');
+
+    // 3. Add same item again (quantity is 2)
+    cart.addToCart('Groom', 'Orelhinhas de Noivos', 80);
+    badge = itemEl.querySelector('.gift-qty-badge');
+    expect(badge).not.toBeNull();
+    expect(badge.textContent).toBe('2 no carrinho');
+
+    // 4. Remove one item
+    cart.removeFromCart(cart.items[0].id);
+    badge = itemEl.querySelector('.gift-qty-badge');
+    expect(badge).not.toBeNull();
+    expect(badge.textContent).toBe('1 no carrinho');
+
+    // 5. Remove the last item
+    cart.removeFromCart(cart.items[0].id);
+    expect(itemEl.querySelector('.gift-qty-badge')).toBeNull();
   });
 });

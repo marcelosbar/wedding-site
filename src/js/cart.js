@@ -30,7 +30,6 @@ export class Cart {
     this.items.push({ id: this._nextId++, name: itemName, price });
 
     this.renderCart();
-    this.openCart();
   }
 
   removeFromCart(id) {
@@ -90,6 +89,38 @@ export class Cart {
       if (this.floatingCartBtn) this.floatingCartBtn.classList.remove('visible');
       if (this.navCartLink) this.navCartLink.style.display = 'none';
     }
+
+    this._syncGiftQuantities();
+  }
+
+  /**
+   * Update quantity badges on gift-item cards to reflect how many
+   * of each item are currently in the cart.
+   */
+  _syncGiftQuantities() {
+    const counts = {};
+    this.items.forEach(item => {
+      counts[item.name] = (counts[item.name] || 0) + 1;
+    });
+
+    document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
+      const itemName = btn.dataset.item;
+      const count = counts[itemName] || 0;
+      const giftItem = btn.closest('.gift-item');
+      if (!giftItem) return;
+
+      let badge = giftItem.querySelector('.gift-qty-badge');
+      if (count > 0) {
+        if (!badge) {
+          badge = document.createElement('span');
+          badge.className = 'gift-qty-badge';
+          giftItem.appendChild(badge);
+        }
+        badge.textContent = count === 1 ? '1 no carrinho' : `${count} no carrinho`;
+      } else if (badge) {
+        badge.remove();
+      }
+    });
   }
 
   openCart() {

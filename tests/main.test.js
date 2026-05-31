@@ -234,21 +234,6 @@ describe('WeddingApp Orchestrator', () => {
     expect(overlay.getAttribute('aria-hidden')).toBe('false');
   });
 
-  it('should show visual feedback on add-to-cart button click', () => {
-    vi.useFakeTimers();
-    const btn = document.querySelector('.add-to-cart-btn');
-    btn.textContent = 'Adicionar';
-
-    btn.click();
-
-    expect(btn.textContent).toBe('\u2713 Adicionado!');
-    expect(btn.classList.contains('btn-added')).toBe(true);
-
-    vi.advanceTimersByTime(1500);
-    expect(btn.textContent).toBe('Adicionar');
-    expect(btn.classList.contains('btn-added')).toBe(false);
-    vi.useRealTimers();
-  });
 
   it('should close all active gifts modals when openCart is called', () => {
     // Open both modals

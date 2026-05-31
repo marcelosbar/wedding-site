@@ -64,7 +64,6 @@ export class WeddingApp {
         const item = currentBtn.dataset.item;
         const price = Number.parseFloat(currentBtn.dataset.price);
         this.addToCart(list, item, price);
-        this.showAddedFeedback(currentBtn);
       });
     });
 
@@ -143,19 +142,7 @@ export class WeddingApp {
 
   closeCart() { this.cart.closeCart(); }
 
-  /**
-   * Briefly apply a green "✓ Adicionado!" state to an add-to-cart button.
-   * @param {HTMLElement} btn
-   */
-  showAddedFeedback(btn) {
-    const originalText = btn.textContent;
-    btn.textContent = '\u2713 Adicionado!';
-    btn.classList.add('btn-added');
-    globalThis.setTimeout(() => {
-      btn.textContent = originalText;
-      btn.classList.remove('btn-added');
-    }, 1500);
-  }
+
 
   // --- Delegate PIX methods ---
   proceedToPix() { return this.pix.proceedToPix(); }

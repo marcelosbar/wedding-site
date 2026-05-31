@@ -233,4 +233,43 @@ describe('WeddingApp Orchestrator', () => {
     expect(overlay.classList.contains('active')).toBe(true);
     expect(overlay.getAttribute('aria-hidden')).toBe('false');
   });
+
+  it('should show visual feedback on add-to-cart button click', () => {
+    vi.useFakeTimers();
+    const btn = document.querySelector('.add-to-cart-btn');
+    btn.textContent = 'Adicionar';
+
+    btn.click();
+
+    expect(btn.textContent).toBe('\u2713 Adicionado!');
+    expect(btn.classList.contains('btn-added')).toBe(true);
+
+    vi.advanceTimersByTime(1500);
+    expect(btn.textContent).toBe('Adicionar');
+    expect(btn.classList.contains('btn-added')).toBe(false);
+    vi.useRealTimers();
+  });
+
+  it('should close all active gifts modals when openCart is called', () => {
+    // Open both modals
+    document.getElementById('groom-gifts-modal').classList.add('active');
+    document.getElementById('bride-gifts-modal').classList.add('active');
+
+    app.openCart();
+
+    expect(document.getElementById('groom-gifts-modal').classList.contains('active')).toBe(false);
+    expect(document.getElementById('bride-gifts-modal').classList.contains('active')).toBe(false);
+    expect(mockCartOpenCart).toHaveBeenCalled();
+  });
+
+  it('closeGiftsModals should set aria-hidden=true on closed overlays', () => {
+    const overlay = document.getElementById('groom-gifts-modal');
+    overlay.classList.add('active');
+    overlay.setAttribute('aria-hidden', 'false');
+
+    app.closeGiftsModals();
+
+    expect(overlay.classList.contains('active')).toBe(false);
+    expect(overlay.getAttribute('aria-hidden')).toBe('true');
+  });
 });

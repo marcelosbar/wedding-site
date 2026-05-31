@@ -7,6 +7,7 @@ export class Cart {
   constructor(elements) {
     this.items = [];
     this.currentList = null; // 'Groom' or 'Bride'
+    this._nextId = 1;
     this.overlay = elements.overlay;
     this.cartView = elements.cartView;
     this.pixView = elements.pixView;
@@ -26,7 +27,7 @@ export class Cart {
     }
 
     this.currentList = listName;
-    this.items.push({ id: Date.now(), name: itemName, price });
+    this.items.push({ id: this._nextId++, name: itemName, price });
 
     this.renderCart();
     this.openCart();

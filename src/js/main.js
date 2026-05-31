@@ -59,10 +59,12 @@ export class WeddingApp {
     // 3. Add to cart buttons
     document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
-        const list = e.currentTarget.dataset.list;
-        const item = e.currentTarget.dataset.item;
-        const price = Number.parseFloat(e.currentTarget.dataset.price);
+        const currentBtn = e.currentTarget;
+        const list = currentBtn.dataset.list;
+        const item = currentBtn.dataset.item;
+        const price = Number.parseFloat(currentBtn.dataset.price);
         this.addToCart(list, item, price);
+        this.showAddedFeedback(currentBtn);
       });
     });
 
@@ -125,8 +127,35 @@ export class WeddingApp {
   // --- Delegate Cart methods ---
   addToCart(listName, itemName, price) { this.cart.addToCart(listName, itemName, price); }
   removeFromCart(id) { this.cart.removeFromCart(id); }
-  openCart() { this.cart.openCart(); }
+
+  /** Close any open gifts modal overlay before opening the cart (fix #2: no double backdrops). */
+  closeGiftsModals() {
+    document.querySelectorAll('.gifts-modal-overlay.active').forEach(overlay => {
+      overlay.classList.remove('active');
+      overlay.setAttribute('aria-hidden', 'true');
+    });
+  }
+
+  openCart() {
+    this.closeGiftsModals();
+    this.cart.openCart();
+  }
+
   closeCart() { this.cart.closeCart(); }
+
+  /**
+   * Briefly apply a green "✓ Adicionado!" state to an add-to-cart button.
+   * @param {HTMLElement} btn
+   */
+  showAddedFeedback(btn) {
+    const originalText = btn.textContent;
+    btn.textContent = '\u2713 Adicionado!';
+    btn.classList.add('btn-added');
+    globalThis.setTimeout(() => {
+      btn.textContent = originalText;
+      btn.classList.remove('btn-added');
+    }, 1500);
+  }
 
   // --- Delegate PIX methods ---
   proceedToPix() { return this.pix.proceedToPix(); }

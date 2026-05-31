@@ -383,7 +383,7 @@ section {
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: 1200;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.3s ease;
@@ -622,7 +622,7 @@ footer {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  z-index: 900;
+  z-index: 1150;
   transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
   opacity: 0;
   pointer-events: none;
@@ -885,6 +885,20 @@ body.admin-body {
 
 .u-text-center {
   text-align: center;
+}
+
+/* Add-to-cart visual feedback */
+@keyframes btn-added-pulse {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+
+.btn-added {
+  background-color: #16a34a !important;
+  color: white !important;
+  animation: btn-added-pulse 0.4s ease;
+  pointer-events: none;
 }
 
 /* Gifts Modal */

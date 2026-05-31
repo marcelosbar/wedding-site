@@ -1,0 +1,90 @@
+.u-text-center {
+  text-align: center;
+}
+
+/* Gift item quantity controls wrapper */
+.gift-control-wrapper {
+  margin-top: 0.75rem;
+  width: 100%;
+}
+
+.gift-control-wrapper .add-to-cart-btn {
+  width: 100%;
+}
+
+.gift-qty-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin: 0 auto;
+}
+
+.gift-item-qty-btn {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border-radius: 50%;
+}
+
+.gift-item-qty-val {
+  font-size: 1rem;
+  font-weight: 700;
+  min-width: 20px;
+  text-align: center;
+}
+
+/* Cart Item Grouped Layout and Quantity Controls */
+.cart-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.cart-item-qty-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.cart-qty-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  color: var(--color-text-main);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.cart-qty-btn:hover {
+  background: #e2e8f0;
+}
+
+.cart-qty-val {
+  font-weight: 600;
+  font-size: 0.9rem;
+  min-width: 14px;
+  text-align: center;
+}
+
+.cart-item-name {
+  flex: 1;
+  font-size: 0.95rem;
+  font-weight: 500;
+  text-align: left;
+}

@@ -1,0 +1,34 @@
+/* PIX Section */
+.pix-section {
+  text-align: center;
+  display: none; /* hidden by default */
+}
+
+.pix-section.active {
+  display: block;
+}
+
+.qr-code-container {
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background: #f8fafc;
+  border-radius: var(--radius-md);
+  display: inline-block;
+}
+
+.copy-paste-container {
+  display: flex;
+  margin-bottom: 1.5rem;
+}
+
+.copy-input {
+  flex: 1;
+  padding: 0.75rem;
+  border: 1px solid #cbd5e1;
+  border-radius: var(--radius-md) 0 0 var(--radius-md);
+  font-size: 0.875rem;
+}
+
+.copy-btn {
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+}

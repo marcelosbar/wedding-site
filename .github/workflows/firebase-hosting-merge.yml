@@ -39,7 +39,6 @@ jobs:
           command: monitor
       - name: Snyk Code Analysis
         uses: snyk/actions/node@8e119fbb6c251787721d34ba683ed48eba792766 # master @ 2026-05-27
-        continue-on-error: true # Non-blocking until SAST baseline is reviewed
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:

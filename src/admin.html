@@ -52,6 +52,29 @@
       </div>
     </div>
 
+    <!-- Modal for showing full message detail -->
+    <div id="message-modal" class="modal u-hidden">
+      <div class="modal-overlay" id="modal-overlay"></div>
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title">Detalhes da Mensagem</h3>
+          <button type="button" class="modal-close" id="modal-close-btn" aria-label="Fechar">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="modal-meta">
+            <p><strong>Convidado:</strong> <span id="modal-guest-name"></span></p>
+            <p><strong>Valor:</strong> <span id="modal-amount"></span></p>
+            <p><strong>Lista:</strong> <span id="modal-list"></span></p>
+            <p><strong>Visibilidade:</strong> <span id="modal-privacy"></span></p>
+          </div>
+          <div class="modal-message-container">
+            <p><strong>Mensagem:</strong></p>
+            <blockquote id="modal-message-text" class="modal-message-text"></blockquote>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <script type="module" src="./js/admin.js"></script>
   </body>
 </html>

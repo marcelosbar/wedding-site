@@ -26,6 +26,33 @@ class AdminApp {
     this.dashboardScreen = document.getElementById('dashboard-screen');
     this.tableBody = document.getElementById('admin-table-body');
 
+    this.messageModal = document.getElementById('message-modal');
+    this.modalOverlay = document.getElementById('modal-overlay');
+    this.modalCloseBtn = document.getElementById('modal-close-btn');
+
+    if (this.modalCloseBtn) {
+      this.modalCloseBtn.addEventListener('click', () => this.closeModal());
+    }
+    if (this.modalOverlay) {
+      this.modalOverlay.addEventListener('click', () => this.closeModal());
+    }
+
+    if (this.tableBody) {
+      this.tableBody.addEventListener('click', (e) => {
+        const target = e.target;
+        if (target.classList.contains('js-btn-view-modal') || target.closest('.js-cell-view-modal')) {
+          const tr = target.closest('tr');
+          if (tr) {
+            const transactionId = tr.dataset.id;
+            const transaction = this.transactions.find(t => t.id === transactionId);
+            if (transaction) {
+              this.showModal(transaction);
+            }
+          }
+        }
+      });
+    }
+
     const loginBtn = document.getElementById('admin-login-btn');
     if (loginBtn) {
       loginBtn.addEventListener('click', () => this.login());
@@ -37,29 +64,37 @@ class AdminApp {
     }
 
     // Mudar UI automaticamente quando o login mudar
-    onAuthStateChanged(auth, async (user) => {
-      if (user && await this.isAdmin(user.email)) {
-        this.loggedIn = true;
-        this.loginScreen.classList.add('u-hidden');
-        this.loginScreen.style.display = 'none';
-        this.dashboardScreen.classList.remove('u-hidden');
-        this.dashboardScreen.style.display = 'block';
-        this.fetchData();
-      } else {
-        if (user) {
-          alert('Acesso negado. Este e-mail não tem permissão de administrador.');
-          signOut(auth);
+    if (auth) {
+      onAuthStateChanged(auth, async (user) => {
+        if (user && await this.isAdmin(user.email)) {
+          this.loggedIn = true;
+          this.loginScreen.classList.add('u-hidden');
+          this.loginScreen.style.display = 'none';
+          this.dashboardScreen.classList.remove('u-hidden');
+          this.dashboardScreen.style.display = 'block';
+          this.fetchData();
+        } else {
+          if (user) {
+            alert('Acesso negado. Este e-mail não tem permissão de administrador.');
+            signOut(auth);
+          }
+          this.loggedIn = false;
+          this.loginScreen.classList.remove('u-hidden');
+          this.loginScreen.style.display = 'flex';
+          this.dashboardScreen.classList.add('u-hidden');
+          this.dashboardScreen.style.display = 'none';
         }
-        this.loggedIn = false;
-        this.loginScreen.classList.remove('u-hidden');
-        this.loginScreen.style.display = 'flex';
-        this.dashboardScreen.classList.add('u-hidden');
-        this.dashboardScreen.style.display = 'none';
-      }
-    });
+      });
+    } else {
+      console.warn("Firebase Auth desabilitado ou não configurado.");
+    }
   }
 
   async login() {
+    if (!auth) {
+      alert("Firebase Auth não está configurado localmente. Adicione as chaves no arquivo .env.");
+      return;
+    }
     try {
       await setPersistence(auth, browserSessionPersistence);
       await signInWithPopup(auth, googleProvider);
@@ -70,6 +105,7 @@ class AdminApp {
   }
 
   async logout() {
+    if (!auth) return;
     try {
       await signOut(auth);
     } catch (error) {
@@ -98,6 +134,30 @@ class AdminApp {
     }
   }
 
+  showModal(transaction) {
+    if (!this.messageModal) return;
+
+    const guestNameEl = document.getElementById('modal-guest-name');
+    const amountEl = document.getElementById('modal-amount');
+    const listEl = document.getElementById('modal-list');
+    const privacyEl = document.getElementById('modal-privacy');
+    const textEl = document.getElementById('modal-message-text');
+
+    if (guestNameEl) guestNameEl.innerText = transaction.guestName;
+    if (amountEl) amountEl.innerText = `R$ ${transaction.totalAmount.toFixed(2)}`;
+    if (listEl) listEl.innerText = transaction.listChosen === 'Groom' ? 'Noivo' : 'Noiva';
+    if (privacyEl) privacyEl.innerText = transaction.isPublic ? 'Pública' : 'Privada';
+    if (textEl) textEl.innerText = transaction.message || '';
+
+    this.messageModal.classList.remove('u-hidden');
+  }
+
+  closeModal() {
+    if (this.messageModal) {
+      this.messageModal.classList.add('u-hidden');
+    }
+  }
+
   renderTable() {
     this.tableBody.innerHTML = '';
     if (this.transactions.length === 0) {
@@ -107,6 +167,7 @@ class AdminApp {
 
     this.transactions.forEach(t => {
       const tr = document.createElement('tr');
+      tr.dataset.id = t.id;
       
       let statusClass = 'status-pending';
       let statusText = 'Pendente';
@@ -119,11 +180,34 @@ class AdminApp {
         statusText = 'Rejeitado';
       }
 
+      let messageHTML = '<span class="u-text-muted">-</span>';
+      if (t.message) {
+        const messageText = t.message;
+        const privacyBadge = t.isPublic ? '' : ' <span class="badge-private">(Privado)</span>';
+        
+        if (messageText.length > 60) {
+          messageHTML = `
+            <div class="admin-message-cell js-cell-view-modal clickable">
+              ${escapeHTML(messageText.substring(0, 60))}...
+              <button type="button" class="admin-message-link js-btn-view-modal">Ver mais</button>
+              ${privacyBadge}
+            </div>
+          `;
+        } else {
+          messageHTML = `
+            <div class="admin-message-cell">
+              ${escapeHTML(messageText)}
+              ${privacyBadge}
+            </div>
+          `;
+        }
+      }
+
       tr.innerHTML = `
         <td>${escapeHTML(t.guestName)}</td>
         <td>R$ ${t.totalAmount.toFixed(2)}</td>
         <td>${t.listChosen === 'Groom' ? 'Noivo' : 'Noiva'}</td>
-        <td>${t.message ? `<div class="admin-message-cell">${escapeHTML(t.message)}${t.isPublic ? '' : ' <span class="badge-private">(Privado)</span>'}</div>` : '<span class="u-text-muted">-</span>'}</td>
+        <td>${messageHTML}</td>
         <td><span class="status-badge ${statusClass}">${statusText}</span></td>
         <td class="action-cell"></td>
       `;

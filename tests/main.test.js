@@ -74,6 +74,10 @@ function setupDOM() {
     <button id="hamburger-btn"></button>
     <div class="nav-links"></div>
     <button class="add-to-cart-btn" data-list="Groom" data-item="Gift" data-price="100"></button>
+    <div class="gift-item">
+      <input class="gift-custom-price-input" value="150" />
+      <button class="add-custom-to-cart-btn" data-list="Groom"></button>
+    </div>
     <button class="close-cart-btn"></button>
     <button id="proceed-to-pix-btn"></button>
     <button id="copy-pix-payload-btn"></button>
@@ -279,5 +283,35 @@ describe('WeddingApp Orchestrator', () => {
 
     expect(openCartSpy).toHaveBeenCalled();
     openCartSpy.mockRestore();
+  });
+
+  it('should handle custom contribution additions with valid input', () => {
+    const input = document.querySelector('.gift-custom-price-input');
+    const btn = document.querySelector('.add-custom-to-cart-btn');
+
+    input.value = '150';
+    btn.click();
+
+    expect(mockCartAddToCart).toHaveBeenCalledWith('Groom', 'Contribuição Livre (R$ 150,00)', 150);
+    expect(input.value).toBe('');
+  });
+
+  it('should alert on invalid custom contribution', () => {
+    const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {});
+    const input = document.querySelector('.gift-custom-price-input');
+    const btn = document.querySelector('.add-custom-to-cart-btn');
+
+    input.value = 'abc';
+    btn.click();
+
+    expect(alertSpy).toHaveBeenCalledWith('Por favor, insira um valor válido maior que zero.');
+    expect(mockCartAddToCart).not.toHaveBeenCalled();
+
+    input.value = '-50';
+    btn.click();
+    expect(alertSpy).toHaveBeenCalledTimes(2);
+    expect(mockCartAddToCart).not.toHaveBeenCalled();
+
+    alertSpy.mockRestore();
   });
 });

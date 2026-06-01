@@ -29,7 +29,7 @@ function createMockElements() {
     <div id="groom-gifts-modal" class="gifts-modal-overlay">
       <div class="gift-item" id="groom-item-1">
         <h4>Orelhinhas de Noivos</h4>
-        <button class="add-to-cart-btn" data-item="Orelhinhas de Noivos" data-list="Groom" data-price="80">Adicionar</button>
+        <button class="add-to-cart-btn" data-item="Orelhinhas de Noivos" data-list="Groom" data-price="150">Adicionar</button>
       </div>
     </div>
     <div id="bride-gifts-modal" class="gifts-modal-overlay">
@@ -192,7 +192,7 @@ describe('Cart', () => {
     expect(controls.classList.contains('u-hidden')).toBe(true);
 
     // 2. Add one item (should NOT auto-open cart)
-    cart.addToCart('Groom', 'Orelhinhas de Noivos', 80);
+    cart.addToCart('Groom', 'Orelhinhas de Noivos', 150);
     expect(cart.items.length).toBe(1);
     expect(cart.overlay.classList.contains('active')).toBe(false); // didn't open cart!
 
@@ -202,7 +202,7 @@ describe('Cart', () => {
     expect(qtyVal.textContent).toBe('1');
 
     // 3. Add same item again (quantity is 2)
-    cart.addToCart('Groom', 'Orelhinhas de Noivos', 80);
+    cart.addToCart('Groom', 'Orelhinhas de Noivos', 150);
     expect(qtyVal.textContent).toBe('2');
 
     // 4. Decrement quantity (using decrementCartItem)
@@ -216,9 +216,9 @@ describe('Cart', () => {
   });
 
   it('should group identical items and allow modifying quantity from the cart view', () => {
-    cart.addToCart('Groom', 'Orelhinhas de Noivos', 80);
-    cart.addToCart('Groom', 'Orelhinhas de Noivos', 80);
-    cart.addToCart('Groom', 'Café da Manhã no Hotel Disney', 120);
+    cart.addToCart('Groom', 'Orelhinhas de Noivos', 150);
+    cart.addToCart('Groom', 'Orelhinhas de Noivos', 150);
+    cart.addToCart('Groom', 'Café da Manhã no Hotel Disney', 250);
 
     cart.renderCart();
 
@@ -230,7 +230,7 @@ describe('Cart', () => {
     let firstRow = container.children[1];
     expect(firstRow.querySelector('.cart-item-name').textContent).toBe('Orelhinhas de Noivos');
     expect(firstRow.querySelector('.cart-qty-val').textContent).toBe('2');
-    expect(firstRow.querySelector('.cart-item-price').textContent).toBe('R$ 160.00');
+    expect(firstRow.querySelector('.cart-item-price').textContent).toBe('R$ 300.00');
 
     // Test plus button inside the cart row
     const btnPlus = firstRow.querySelector('.cart-qty-btn.btn-plus');
@@ -239,7 +239,7 @@ describe('Cart', () => {
     // Re-query after click because DOM is re-rendered
     firstRow = container.children[1];
     expect(firstRow.querySelector('.cart-qty-val').textContent).toBe('3');
-    expect(firstRow.querySelector('.cart-item-price').textContent).toBe('R$ 240.00');
+    expect(firstRow.querySelector('.cart-item-price').textContent).toBe('R$ 450.00');
 
     // Test minus button inside the cart row
     const btnMinus = firstRow.querySelector('.cart-qty-btn.btn-minus');
@@ -248,7 +248,7 @@ describe('Cart', () => {
     // Re-query after click because DOM is re-rendered
     firstRow = container.children[1];
     expect(firstRow.querySelector('.cart-qty-val').textContent).toBe('2');
-    expect(firstRow.querySelector('.cart-item-price').textContent).toBe('R$ 160.00');
+    expect(firstRow.querySelector('.cart-item-price').textContent).toBe('R$ 300.00');
 
     // Test remove button inside the cart row
     const removeBtn = firstRow.querySelector('.cart-item-remove-btn');

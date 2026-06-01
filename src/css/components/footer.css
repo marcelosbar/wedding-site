@@ -5,3 +5,13 @@ footer {
   text-align: center;
   padding: 2rem 0;
 }
+
+.footer-disclaimer {
+  font-size: 0.75rem;
+  color: #64748b;
+  margin-top: 1rem;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.4;
+}

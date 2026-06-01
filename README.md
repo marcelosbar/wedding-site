@@ -57,6 +57,8 @@ This project is configured to be hosted on **Firebase Hosting**.
    firebase deploy
    ```
 
-## License
+## License & Disclaimer
 
-This project was built exclusively for Lorena and Marcelo's wedding.
+This project is a personal, strictly non-commercial wedding website built exclusively for Lorena and Marcelo's private wedding celebration.
+
+**Disclaimer:** This project is not affiliated, associated, authorized, endorsed by, or in any way officially connected with The Walt Disney Company, Disney Enterprises, Inc., or any of their subsidiaries or affiliates. All Disney-related names, marks, emblems, and images are registered trademarks of their respective owners. The use of any trademarks or copyrighted materials is purely symbolic, for personal demonstration, and private celebration purposes.

@@ -79,13 +79,28 @@
   border-radius: var(--radius-md);
   text-align: center;
   border: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
 }
 
 .gift-item h4 {
   font-size: 1rem;
   color: var(--color-text-main);
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.25rem;
+  font-weight: 600;
 }
+
+.gift-description {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  margin-bottom: 0.75rem;
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1.3;
+}
+
 
 .gift-price {
   font-weight: 600;
@@ -98,4 +113,21 @@
 
 #bride-card .gift-price {
   color: var(--color-secondary);
+}
+
+.gift-custom-price-wrapper {
+  margin-bottom: 1rem;
+}
+
+.gift-custom-price-input {
+  text-align: center;
+  font-weight: 600;
+}
+
+.gift-image {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  border-radius: var(--radius-md);
+  margin-bottom: 0.75rem;
 }

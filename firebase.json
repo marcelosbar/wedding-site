@@ -15,6 +15,10 @@
             "value": "default-src 'self'; object-src 'none'; base-uri 'self'; script-src 'self' https://apis.google.com https://www.gstatic.com; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://firebasestorage.googleapis.com; connect-src 'self' https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com wss://*.firebaseio.com; frame-src 'self' https://lorenaemarcelo2026.firebaseapp.com; frame-ancestors 'self'; form-action 'self'"
           },
           {
+            "key": "X-Robots-Tag",
+            "value": "noindex, nofollow"
+          },
+          {
             "key": "Strict-Transport-Security",
             "value": "max-age=31536000; includeSubDomains"
           },
@@ -81,15 +85,6 @@
       },
       {
         "source": "/robots.txt",
-        "headers": [
-          {
-            "key": "Cache-Control",
-            "value": "no-cache"
-          }
-        ]
-      },
-      {
-        "source": "/sitemap.xml",
         "headers": [
           {
             "key": "Cache-Control",

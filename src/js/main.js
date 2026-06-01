@@ -76,6 +76,33 @@ export class WeddingApp {
       });
     });
 
+    // 3.5. Add custom contribution to cart
+    document.querySelectorAll('.add-custom-to-cart-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const currentBtn = e.currentTarget;
+        const list = currentBtn.dataset.list;
+        const parent = currentBtn.closest('.gift-item');
+        const input = parent ? parent.querySelector('.gift-custom-price-input') : null;
+        if (!input) return;
+
+        const priceVal = Number.parseFloat(input.value);
+
+        if (Number.isNaN(priceVal) || priceVal <= 0) {
+          alert('Por favor, insira um valor válido maior que zero.');
+          return;
+        }
+
+        // Add to cart with price in the name to keep it distinct
+        const formattedPrice = priceVal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        const itemName = `Contribuição Livre (R$ ${formattedPrice})`;
+        
+        this.addToCart(list, itemName, priceVal);
+        
+        // Reset input
+        input.value = '';
+      });
+    });
+
     // 4. Close cart buttons
     document.querySelectorAll('.close-cart-btn').forEach(btn => {
       btn.addEventListener('click', () => this.closeCart());

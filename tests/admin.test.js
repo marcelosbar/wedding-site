@@ -7,11 +7,14 @@ import { describe, it, expect, beforeEach, vi, afterEach, beforeAll } from 'vite
 vi.mock('../src/js/firebase.js', () => {
   globalThis.__mockOnSnapshot = globalThis.__mockOnSnapshot || vi.fn();
   globalThis.__mockQuery = globalThis.__mockQuery || vi.fn();
+  globalThis.__mockAuth = globalThis.__mockAuth !== undefined ? globalThis.__mockAuth : {};
   return {
     db: {},
     onSnapshot: globalThis.__mockOnSnapshot,
     query: globalThis.__mockQuery,
-    auth: {},
+    get auth() {
+      return globalThis.__mockAuth;
+    },
     googleProvider: {}
   };
 });
@@ -64,6 +67,17 @@ describe('AdminApp', () => {
       <table>
         <tbody id="admin-table-body"></tbody>
       </table>
+
+      <!-- Modal for showing full message detail -->
+      <div id="message-modal" class="modal u-hidden">
+        <div id="modal-overlay"></div>
+        <button id="modal-close-btn">&times;</button>
+        <span id="modal-guest-name"></span>
+        <span id="modal-amount"></span>
+        <span id="modal-list"></span>
+        <span id="modal-privacy"></span>
+        <span id="modal-message-text"></span>
+      </div>
     `;
     await import('../src/js/admin.js');
   });
@@ -265,5 +279,95 @@ describe('AdminApp', () => {
 
     adminApp.fetchData();
     expect(adminApp.tableBody.innerHTML).toContain('Firebase não configurado');
+  });
+
+  it('should handle long messages truncation and view toggling in modal mode', () => {
+    const longMsg = 'Esta é uma mensagem muito longa com mais de sessenta caracteres para testar o comportamento de truncamento do painel de administração.';
+    adminApp.transactions = [
+      { id: 't1', guestName: 'Daniel', totalAmount: 150, listChosen: 'Groom', status: 'approved', timestamp: '2026-01-03', message: longMsg, isPublic: true }
+    ];
+    adminApp.renderTable();
+
+    // Check it truncated
+    const truncatedText = longMsg.substring(0, 60);
+    expect(adminApp.tableBody.innerHTML).toContain(truncatedText);
+    expect(adminApp.tableBody.innerHTML).not.toContain(longMsg);
+    expect(adminApp.tableBody.innerHTML).toContain('js-btn-view-modal');
+
+    // Click to view modal
+    const viewBtn = adminApp.tableBody.querySelector('.js-btn-view-modal');
+    expect(viewBtn).toBeDefined();
+    viewBtn.click();
+
+    // Verify modal is open and populated
+    expect(adminApp.messageModal.classList.contains('u-hidden')).toBe(false);
+    expect(document.getElementById('modal-guest-name').innerText).toBe('Daniel');
+    expect(document.getElementById('modal-amount').innerText).toBe('R$ 150.00');
+    expect(document.getElementById('modal-list').innerText).toBe('Noivo');
+    expect(document.getElementById('modal-privacy').innerText).toBe('Pública');
+    expect(document.getElementById('modal-message-text').innerText).toBe(longMsg);
+
+    // Close modal
+    adminApp.modalCloseBtn.click();
+    expect(adminApp.messageModal.classList.contains('u-hidden')).toBe(true);
+  });
+
+  it('should handle missing DOM elements in constructor and showModal without throwing (null-branches)', () => {
+    const originalHTML = document.body.innerHTML;
+    document.body.innerHTML = ''; // Empty DOM
+    
+    let tempApp;
+    expect(() => {
+      tempApp = new adminApp.constructor();
+    }).not.toThrow();
+
+    // Verify it handles missing messageModal in showModal
+    expect(() => {
+      tempApp.showModal({ guestName: 'Daniel', totalAmount: 100, listChosen: 'Groom', isPublic: true, message: 'Hi' });
+    }).not.toThrow();
+
+    // Make messageModal look present to test inner element missing checks in showModal
+    tempApp.messageModal = {
+      classList: {
+        remove: vi.fn(),
+        add: vi.fn()
+      }
+    };
+    expect(() => {
+      tempApp.showModal({ guestName: 'Daniel', totalAmount: 100, listChosen: 'Groom', isPublic: true, message: 'Hi' });
+    }).not.toThrow();
+
+    // Verify it handles messageModal in closeModal when present
+    expect(() => {
+      tempApp.closeModal();
+    }).not.toThrow();
+
+    // Verify it handles missing messageModal in closeModal
+    tempApp.messageModal = null;
+    expect(() => {
+      tempApp.closeModal();
+    }).not.toThrow();
+    
+    document.body.innerHTML = originalHTML; // Restore DOM
+  });
+
+  it('should handle missing Firebase Auth gracefully (auth-else and auth-null guards)', async () => {
+    globalThis.__mockAuth = null; // Disable auth
+
+    const appWithoutAuth = new adminApp.constructor();
+    expect(appWithoutAuth.loggedIn).toBe(false);
+
+    // Test login guard with null auth
+    const alertSpy = vi.spyOn(globalThis, 'alert').mockImplementation(() => {});
+    await appWithoutAuth.login();
+    expect(alertSpy).toHaveBeenCalledWith(expect.stringContaining('Firebase Auth não está configurado localmente'));
+    alertSpy.mockRestore();
+
+    // Test logout guard with null auth
+    expect(async () => {
+      await appWithoutAuth.logout();
+    }).not.toThrow();
+
+    globalThis.__mockAuth = {}; // Restore auth
   });
 });

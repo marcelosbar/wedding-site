@@ -1,7 +1,7 @@
 /**
  * @vitest-environment jsdom
  */
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { PixCheckout } from '../src/js/pix.js';
 import { Cart } from '../src/js/cart.js';
 import { Scoreboard } from '../src/js/scoreboard.js';
@@ -14,6 +14,16 @@ vi.mock('../src/js/firebase.js', () => {
     addDoc: vi.fn(),
     onSnapshot: globalThis.__mockOnSnapshot,
     query: globalThis.__mockQuery
+  };
+});
+
+vi.mock('../src/js/utils.js', () => {
+  globalThis.__mockShowToast = globalThis.__mockShowToast || vi.fn();
+  globalThis.__mockShowConfirm = globalThis.__mockShowConfirm || vi.fn().mockResolvedValue(true);
+  return {
+    escapeHTML: (str) => str,
+    showToast: globalThis.__mockShowToast,
+    showConfirm: globalThis.__mockShowConfirm
   };
 });
 
@@ -47,10 +57,12 @@ function setupDOM() {
     <div id="global-bride-fill" style="width: 50%"></div>
     <div id="global-progress-divider" style="left: 50%"></div>
     <input id="guest-name" value="" />
+    <span id="guest-name-error" class="field-error u-hidden">Error</span>
     <textarea id="guest-message"></textarea>
     <input type="checkbox" id="message-public" checked />
     <div id="message-char-count">0 / 500</div>
     <input id="pix-payload" value="" />
+    <button id="copy-pix-payload-btn">Copiar</button>
     <canvas id="pix-qr-code"></canvas>
   `;
 }
@@ -83,20 +95,30 @@ function createInstances() {
 
 describe('PixCheckout', () => {
   let pix, cart;
+  const mockShowToast = globalThis.__mockShowToast;
+  const mockShowConfirm = globalThis.__mockShowConfirm;
 
   beforeEach(() => {
     setupDOM();
     const instances = createInstances();
     pix = instances.pix;
     cart = instances.cart;
+    mockShowToast.mockClear();
+    mockShowConfirm.mockReset().mockResolvedValue(true);
+  });
+
+  afterEach(() => {
+    vi.clearAllMocks();
   });
 
   it('should alert if guest name is empty', async () => {
-    const alertMock = vi.spyOn(globalThis, 'alert').mockImplementation(() => {});
+    const nameError = document.getElementById('guest-name-error');
+    expect(nameError.classList.contains('u-hidden')).toBe(true);
+
     document.getElementById('guest-name').value = '';
     await pix.proceedToPix();
-    expect(alertMock).toHaveBeenCalledWith('Por favor, preencha o seu nome para sabermos quem está nos presenteando!');
-    alertMock.mockRestore();
+
+    expect(nameError.classList.contains('u-hidden')).toBe(false);
   });
 
   it('should generate QR code and switch to PIX view', async () => {
@@ -111,23 +133,32 @@ describe('PixCheckout', () => {
   it('should handle QR code error gracefully', async () => {
     const QRCode = (await import('qrcode')).default;
     QRCode.toCanvas.mockRejectedValueOnce(new Error('QR Error'));
-    const alertMock = vi.spyOn(globalThis, 'alert').mockImplementation(() => {});
     document.getElementById('guest-name').value = 'João';
     cart.addToCart('Groom', 'Gift', 100);
     await pix.proceedToPix();
-    expect(alertMock).toHaveBeenCalledWith('Erro ao gerar QR Code');
-    alertMock.mockRestore();
+    expect(mockShowToast).toHaveBeenCalledWith('Erro ao gerar QR Code');
   });
 
   it('should copy PIX payload to clipboard', async () => {
+    vi.useFakeTimers();
     const writeTextMock = vi.fn().mockResolvedValue();
     Object.assign(navigator, { clipboard: { writeText: writeTextMock } });
-    const alertMock = vi.spyOn(globalThis, 'alert').mockImplementation(() => {});
+    const btn = document.getElementById('copy-pix-payload-btn');
+    btn.textContent = 'Copiar';
     document.getElementById('pix-payload').value = 'test-payload';
+
     await pix.copyPixPayload();
+
     expect(writeTextMock).toHaveBeenCalledWith('test-payload');
-    expect(alertMock).toHaveBeenCalledWith('Código PIX copiado!');
-    alertMock.mockRestore();
+    expect(btn.textContent).toBe('Copiado! ✓');
+    expect(btn.classList.contains('btn-success')).toBe(true);
+
+    // Revert after 2 seconds
+    vi.advanceTimersByTime(2000);
+
+    expect(btn.textContent).toBe('Copiar');
+    expect(btn.classList.contains('btn-success')).toBe(false);
+    vi.useRealTimers();
   });
 
   it('should handle clipboard copy error gracefully', async () => {
@@ -211,5 +242,21 @@ describe('PixCheckout', () => {
     expect(call2Args.guestName).toBe('Mixed Contributor');
     expect(call2Args.message).toBe('Parabéns!');
     expect(call2Args.isPublic).toBe(true);
+  });
+
+  it('should NOT proceed on confirmTransfer if user cancels the confirmation dialog', async () => {
+    mockShowConfirm.mockResolvedValueOnce(false);
+    const { addDoc } = await import('../src/js/firebase.js');
+    addDoc.mockClear();
+
+    document.getElementById('guest-name').value = 'Cancel User';
+    cart.addToCart('Groom', 'Gift', 100);
+
+    await pix.confirmTransfer();
+
+    expect(mockShowConfirm).toHaveBeenCalledWith('Você está finalizando a sua contribuição. Tem certeza de que já realizou a transferência?');
+    expect(addDoc).not.toHaveBeenCalled();
+    expect(document.getElementById('success-view').classList.contains('active')).toBe(false);
+    expect(cart.items.length).toBe(1); // Cart is not reset
   });
 });

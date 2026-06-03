@@ -59,3 +59,12 @@
 .u-mb-6 {
   margin-bottom: 1.5rem;
 }
+
+.field-error {
+  display: block;
+  color: #dc2626;
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+  font-weight: 500;
+  font-family: var(--font-body);
+}

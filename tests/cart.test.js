@@ -7,6 +7,7 @@ import { Cart } from '../src/js/cart.js';
 function createMockElements() {
   document.body.innerHTML = `
     <div id="cart-overlay"></div>
+    <span id="guest-name-error" class="field-error u-hidden">Error</span>
     <div id="cart-view">
       <h3 id="cart-title" tabindex="-1">Sua Contribuição</h3>
     </div>
@@ -126,10 +127,13 @@ describe('Cart', () => {
     expect(cart.cartView.classList.contains('active')).toBe(true);
   });
 
-  it('should remove active class on closeCart', () => {
+  it('should remove active class on closeCart and hide guest name error', () => {
+    const errorEl = document.getElementById('guest-name-error');
+    errorEl.classList.remove('u-hidden');
     cart.openCart();
     cart.closeCart();
     expect(cart.overlay.classList.contains('active')).toBe(false);
+    expect(errorEl.classList.contains('u-hidden')).toBe(true);
   });
 
   it('should reset inner views when openCart is called', () => {

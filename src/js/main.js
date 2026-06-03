@@ -86,10 +86,17 @@ export class WeddingApp {
         if (!input) return;
 
         const priceVal = Number.parseFloat(input.value);
+        const errorEl = parent ? parent.querySelector('.gift-custom-error') : null;
 
         if (Number.isNaN(priceVal) || priceVal <= 0) {
-          alert('Por favor, insira um valor válido maior que zero.');
+          if (errorEl) {
+            errorEl.classList.remove('u-hidden');
+          }
           return;
+        }
+
+        if (errorEl) {
+          errorEl.classList.add('u-hidden');
         }
 
         // Add to cart with price in the name to keep it distinct
@@ -102,6 +109,28 @@ export class WeddingApp {
         input.value = '';
       });
     });
+
+    // Clear custom contribution error on input
+    document.querySelectorAll('.gift-custom-price-input').forEach(input => {
+      input.addEventListener('input', (e) => {
+        const parent = e.target.closest('.gift-item');
+        const errorEl = parent ? parent.querySelector('.gift-custom-error') : null;
+        if (errorEl) {
+          errorEl.classList.add('u-hidden');
+        }
+      });
+    });
+
+    // Clear guest name error on input
+    const guestNameInput = document.getElementById('guest-name');
+    if (guestNameInput) {
+      guestNameInput.addEventListener('input', () => {
+        const nameError = document.getElementById('guest-name-error');
+        if (nameError) {
+          nameError.classList.add('u-hidden');
+        }
+      });
+    }
 
     // 4. Close cart buttons
     document.querySelectorAll('.close-cart-btn').forEach(btn => {

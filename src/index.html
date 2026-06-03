@@ -309,6 +309,7 @@
           <label for="guest-name" class="u-display-block u-mb-2 u-font-weight-500">Seu Nome:</label>
           <input type="text" id="guest-name" placeholder="Como devemos agradecer?"
             class="u-input-text" required />
+          <span id="guest-name-error" class="field-error u-hidden">Por favor, preencha o seu nome.</span>
         </div>
 
         <div class="u-mb-4">
@@ -358,7 +359,7 @@
           <h3 id="success-title" class="u-text-primary" tabindex="-1">Muito Obrigado! ❤️</h3>
         </div>
         <p class="u-mb-6">
-          Sua contribuição foi registrada e os pontos já foram adicionados ao placar! Se você escreveu uma mensagem, ela será exibida no site após a nossa aprovação.
+          Sua contribuição foi registrada e os pontos já foram adicionados ao placar! Se você escreveu uma mensagem pública, ela será exibida no site após a nossa aprovação.
         </p>
         <button id="back-to-site-btn" class="btn btn-secondary u-w-full">Voltar para o site</button>
       </div>
@@ -514,6 +515,7 @@
             <p class="gift-description">Escolha o valor com o qual deseja contribuir para a nossa lua de mel dos sonhos.</p>
             <div class="gift-custom-price-wrapper">
               <input type="number" class="u-input-text gift-custom-price-input" min="1" max="5000" placeholder="Valor (R$)" data-list="Groom" />
+              <span class="gift-custom-error field-error u-hidden">Por favor, insira um valor válido maior que zero.</span>
             </div>
             <button class="btn btn-primary btn-sm add-custom-to-cart-btn"
               data-list="Groom" data-item="Contribuição Livre">Adicionar</button>
@@ -588,6 +590,7 @@
             <p class="gift-description">Escolha o valor com o qual deseja contribuir para a nossa lua de mel dos sonhos.</p>
             <div class="gift-custom-price-wrapper">
               <input type="number" class="u-input-text gift-custom-price-input" min="1" max="5000" placeholder="Valor (R$)" data-list="Bride" />
+              <span class="gift-custom-error field-error u-hidden">Por favor, insira um valor válido maior que zero.</span>
             </div>
             <button class="btn btn-secondary btn-sm add-custom-to-cart-btn"
               data-list="Bride" data-item="Contribuição Livre">Adicionar</button>
@@ -599,6 +602,21 @@
       </div>
     </dialog>
   </div>
+
+  <!-- Custom Confirm Modal -->
+  <div id="confirm-modal" class="confirm-modal-overlay" aria-hidden="true">
+    <div class="confirm-modal-box">
+      <h4 id="confirm-modal-title">Confirmação</h4>
+      <p id="confirm-modal-message">Tem certeza?</p>
+      <div class="confirm-modal-actions">
+        <button id="confirm-modal-cancel" class="btn btn-secondary btn-sm">Cancelar</button>
+        <button id="confirm-modal-ok" class="btn btn-accent btn-sm">Confirmar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toast-container" class="toast-container"></div>
 
   <script type="module" src="./js/main.js"></script>
 </body>

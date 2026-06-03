@@ -1,5 +1,6 @@
 import QRCode from 'qrcode';
 import { transactionsRef, addDoc } from './firebase.js';
+import { showToast, showConfirm } from './utils.js';
 
 /**
  * PIX Checkout module — handles QR code generation, payload copy, and transfer confirmation.
@@ -16,9 +17,16 @@ export class PixCheckout {
 
   async proceedToPix() {
     const guestName = document.getElementById('guest-name').value.trim();
+    const nameError = document.getElementById('guest-name-error');
     if (!guestName) {
-      alert('Por favor, preencha o seu nome para sabermos quem está nos presenteando!');
+      if (nameError) {
+        nameError.classList.remove('u-hidden');
+      }
       return;
+    }
+
+    if (nameError) {
+      nameError.classList.add('u-hidden');
     }
 
     const total = this.cart.getTotal();
@@ -41,15 +49,24 @@ export class PixCheckout {
       }
     } catch (err) {
       console.error(err);
-      alert('Erro ao gerar QR Code');
+      showToast('Erro ao gerar QR Code');
     }
   }
 
   async copyPixPayload() {
     const input = document.getElementById('pix-payload');
+    const btn = document.getElementById('copy-pix-payload-btn');
     try {
       await navigator.clipboard.writeText(input.value);
-      alert('Código PIX copiado!');
+      if (btn) {
+        const originalText = btn.textContent;
+        btn.textContent = 'Copiado! ✓';
+        btn.classList.add('btn-success');
+        setTimeout(() => {
+          btn.textContent = originalText;
+          btn.classList.remove('btn-success');
+        }, 2000);
+      }
     } catch (err) {
       console.error('Falha ao copiar o código PIX', err);
     }
@@ -60,6 +77,10 @@ export class PixCheckout {
     this.isProcessing = true;
 
     try {
+      const confirmed = await showConfirm('Você está finalizando a sua contribuição. Tem certeza de que já realizou a transferência?');
+      if (!confirmed) {
+        return;
+      }
       const guestName = document.getElementById('guest-name') ? document.getElementById('guest-name').value.trim() : '';
       const messageEl = document.getElementById('guest-message');
       const message = messageEl ? messageEl.value.trim() : '';

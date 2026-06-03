@@ -48,6 +48,15 @@ vi.mock('../src/js/scoreboard.js', () => ({
   })
 }));
 
+const mockShowToast = vi.fn();
+const mockShowConfirm = vi.fn();
+
+vi.mock('../src/js/utils.js', () => ({
+  escapeHTML: (str) => str,
+  showToast: mockShowToast,
+  showConfirm: mockShowConfirm
+}));
+
 function setupDOM() {
   document.body.innerHTML = `
     <div id="cart-overlay"></div>
@@ -76,6 +85,7 @@ function setupDOM() {
     <button class="add-to-cart-btn" data-list="Groom" data-item="Gift" data-price="100"></button>
     <div class="gift-item">
       <input class="gift-custom-price-input" value="150" />
+      <span class="gift-custom-error u-hidden">Error</span>
       <button class="add-custom-to-cart-btn" data-list="Groom"></button>
     </div>
     <button class="close-cart-btn"></button>
@@ -84,6 +94,8 @@ function setupDOM() {
     <button id="confirm-transfer-btn"></button>
     <button id="back-to-site-btn"></button>
     <button id="cart-back-to-list-btn" class="u-hidden"></button>
+    <input id="guest-name" value="" />
+    <span id="guest-name-error" class="field-error u-hidden">Error</span>
     <button class="gifts-modal-btn" data-modal="groom-gifts-modal">Ver Presentes</button>
     <button class="gifts-modal-btn" data-modal="bride-gifts-modal">Ver Presentes</button>
     <div id="groom-gifts-modal" class="gifts-modal-overlay" aria-hidden="true">
@@ -297,21 +309,37 @@ describe('WeddingApp Orchestrator', () => {
   });
 
   it('should alert on invalid custom contribution', () => {
-    const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {});
     const input = document.querySelector('.gift-custom-price-input');
     const btn = document.querySelector('.add-custom-to-cart-btn');
+    const errorEl = document.querySelector('.gift-custom-error');
+
+    expect(errorEl.classList.contains('u-hidden')).toBe(true);
 
     input.value = 'abc';
     btn.click();
 
-    expect(alertSpy).toHaveBeenCalledWith('Por favor, insira um valor válido maior que zero.');
+    expect(errorEl.classList.contains('u-hidden')).toBe(false);
     expect(mockCartAddToCart).not.toHaveBeenCalled();
+
+    // Type to clear error
+    input.value = '100';
+    input.dispatchEvent(new Event('input'));
+    expect(errorEl.classList.contains('u-hidden')).toBe(true);
 
     input.value = '-50';
     btn.click();
-    expect(alertSpy).toHaveBeenCalledTimes(2);
+    expect(errorEl.classList.contains('u-hidden')).toBe(false);
     expect(mockCartAddToCart).not.toHaveBeenCalled();
+  });
 
-    alertSpy.mockRestore();
+  it('should clear guest name error when user types', () => {
+    const input = document.getElementById('guest-name');
+    const errorEl = document.getElementById('guest-name-error');
+
+    errorEl.classList.remove('u-hidden');
+    input.value = 'a';
+    input.dispatchEvent(new Event('input'));
+
+    expect(errorEl.classList.contains('u-hidden')).toBe(true);
   });
 });

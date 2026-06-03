@@ -39,7 +39,7 @@ export function showToast(message) {
   container.appendChild(toast);
 
   // Force reflow to trigger transition
-  toast.offsetHeight;
+  void toast.offsetHeight;
   toast.classList.add('show');
 
   setTimeout(() => {

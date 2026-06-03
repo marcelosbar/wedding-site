@@ -2,7 +2,6 @@ import { Cart } from './cart.js';
 import { PixCheckout } from './pix.js';
 import { Scoreboard } from './scoreboard.js';
 import { MessagesCarousel } from './messages.js';
-import { showToast } from './utils.js';
 
 
 /**

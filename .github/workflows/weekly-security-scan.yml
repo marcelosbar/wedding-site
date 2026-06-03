@@ -55,4 +55,5 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           target: ${{ github.event.inputs.target || vars.PRODUCTION_URL }}
+          rules_file_name: '.zap/rules.tsv'
           fail_action: false # Do not fail the GitHub Actions runner itself, just create issues

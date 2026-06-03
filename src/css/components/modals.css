@@ -91,3 +91,65 @@
   font-weight: 600;
   padding: 0.6rem 1.5rem;
 }
+
+/* Confirm Modal Overlay */
+.confirm-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1300; /* Higher than cart-overlay (1200) */
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.confirm-modal-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.confirm-modal-box {
+  background: var(--color-surface);
+  width: 90%;
+  max-width: 400px;
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  text-align: center;
+  transform: scale(0.9);
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.confirm-modal-overlay.active .confirm-modal-box {
+  transform: scale(1);
+}
+
+.confirm-modal-box h4 {
+  margin: 0 0 1rem;
+  font-size: 1.25rem;
+  color: var(--color-text-main);
+  font-family: var(--font-heading);
+  font-weight: 700;
+}
+
+.confirm-modal-box p {
+  margin: 0 0 1.75rem;
+  font-size: 0.95rem;
+  color: var(--color-text-muted);
+  line-height: 1.6;
+  font-family: var(--font-body);
+}
+
+.confirm-modal-actions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+

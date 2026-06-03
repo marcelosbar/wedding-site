@@ -316,6 +316,12 @@ export class Cart {
 
   closeCart() {
     this.overlay.classList.remove('active');
+    if (typeof document !== 'undefined') {
+      const nameError = document.getElementById('guest-name-error');
+      if (nameError) {
+        nameError.classList.add('u-hidden');
+      }
+    }
   }
 
   getTotal() {

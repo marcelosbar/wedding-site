@@ -71,3 +71,9 @@
 .btn-link.bride:hover {
   color: #c2410c;
 }
+
+.btn-success {
+  background-color: #16a34a !important;
+  color: var(--color-text-inverse) !important;
+  pointer-events: none;
+}

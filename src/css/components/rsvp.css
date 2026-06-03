@@ -3,6 +3,8 @@
   background-color: var(--color-primary);
   color: var(--color-text-inverse);
   text-align: center;
+  padding-top: 2.5rem;
+  padding-bottom: 2.5rem;
 }
 
 #rsvp .section-title, #rsvp .section-title::after {

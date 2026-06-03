@@ -1,7 +1,13 @@
 /* Sections Base */
 section {
-  padding: 6rem 0;
+  padding-top: 2.5rem;
+  padding-bottom: 0;
   scroll-margin-top: 70px;
+}
+
+section.container {
+  padding-top: 2.5rem;
+  padding-bottom: 0;
 }
 
 .section-title {

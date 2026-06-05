@@ -124,37 +124,30 @@ export class MessagesCarousel {
     return dot;
   }
 
-  render() {
-    if (!this.trackEl) return;
-
+  _toggleSectionVisibility(show) {
     const messagesSection = document.getElementById('messages');
     const competitionSection = document.getElementById('competition');
 
-    if (this.messages.length === 0) {
+    if (show) {
+      if (messagesSection) {
+        messagesSection.classList.remove('u-hidden');
+      }
+      if (competitionSection) {
+        competitionSection.classList.remove('messages-hidden');
+      }
+    } else {
       if (messagesSection) {
         messagesSection.classList.add('u-hidden');
       }
       if (competitionSection) {
         competitionSection.classList.add('messages-hidden');
       }
-      this.trackEl.innerHTML = '';
-      this.stopAutoplay();
-      return;
     }
+  }
 
-    if (messagesSection) {
-      messagesSection.classList.remove('u-hidden');
-    }
-    if (competitionSection) {
-      competitionSection.classList.remove('messages-hidden');
-    }
-
+  _renderSlidesAndDots(showControls) {
     this.trackEl.innerHTML = '';
     if (this.dotsEl) this.dotsEl.innerHTML = '';
-
-    const showControls = this.messages.length > 1;
-    if (this.prevBtn) this.prevBtn.style.display = showControls ? 'flex' : 'none';
-    if (this.nextBtn) this.nextBtn.style.display = showControls ? 'flex' : 'none';
 
     this.messages.forEach((msg, idx) => {
       const slide = this._createSlideElement(msg, idx);
@@ -166,6 +159,26 @@ export class MessagesCarousel {
         this.dotsEl.appendChild(dot);
       }
     });
+  }
+
+  render() {
+    if (!this.trackEl) return;
+
+    if (this.messages.length === 0) {
+      this._toggleSectionVisibility(false);
+      this.trackEl.innerHTML = '';
+      this.stopAutoplay();
+      return;
+    }
+
+    this._toggleSectionVisibility(true);
+
+    const showControls = this.messages.length > 1;
+    const displayVal = showControls ? 'flex' : 'none';
+    if (this.prevBtn) this.prevBtn.style.display = displayVal;
+    if (this.nextBtn) this.nextBtn.style.display = displayVal;
+
+    this._renderSlidesAndDots(showControls);
 
     this.currentIndex = 0;
     

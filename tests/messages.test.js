@@ -19,6 +19,7 @@ import { onSnapshot } from '../src/js/firebase.js';
 
 function createMockElements() {
   document.body.innerHTML = `
+    <section id="competition"></section>
     <section id="messages">
       <div id="messages-carousel-track">
         <p class="u-text-center u-text-muted">Carregando...</p>
@@ -135,6 +136,7 @@ describe('MessagesCarousel', () => {
     expect(carousel.messages.length).toBe(2);
     expect(carousel.messages[0].guestName).toBe('Fernanda');
     expect(carousel.messages[1].guestName).toBe('Jose');
+    expect(document.getElementById('competition').classList.contains('messages-hidden')).toBe(false);
 
     // Verify DOM rendering
     const slides = elements.trackEl.querySelectorAll('.carousel-slide');
@@ -152,21 +154,25 @@ describe('MessagesCarousel', () => {
     expect(dots[0].classList.contains('active')).toBe(true);
   });
 
-  it('should fall back to mock messages if snapshot empty or error occurs', () => {
+  it('should clear messages and hide section if snapshot is empty or error occurs', () => {
     carousel.init();
 
     const snapshotCallback = onSnapshot.mock.calls[0][1];
     snapshotCallback([]); // empty list
 
-    expect(carousel.messages.length).toBe(3); // mock messages fallback
-    expect(carousel.messages[0].guestName).toBe('Mariana e Thiago');
+    expect(carousel.messages.length).toBe(0);
+    const section = document.getElementById('messages');
+    expect(section.classList.contains('u-hidden')).toBe(true);
+    expect(document.getElementById('competition').classList.contains('messages-hidden')).toBe(true);
 
     // Test error callback
     const errorCallback = onSnapshot.mock.calls[0][2];
     const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
     errorCallback(new Error('Firebase Error'));
     expect(warnSpy).toHaveBeenCalled();
-    expect(carousel.messages.length).toBe(3);
+    expect(carousel.messages.length).toBe(0);
+    expect(section.classList.contains('u-hidden')).toBe(true);
+    expect(document.getElementById('competition').classList.contains('messages-hidden')).toBe(true);
     warnSpy.mockRestore();
   });
 
@@ -248,15 +254,13 @@ describe('MessagesCarousel', () => {
     expect(slides[2].querySelector('.message-text').classList.contains('length-long')).toBe(true);
   });
 
-  it('should hide the messages section in production if no approved messages exist', () => {
-    vi.spyOn(carousel, 'isLocalDev').mockReturnValue(false);
-
+  it('should hide the messages section if no approved messages exist', () => {
     carousel.init();
 
     const snapshotCallback = onSnapshot.mock.calls[0][1];
     snapshotCallback([]); // empty list
 
-    expect(carousel.messages.length).toBe(0); // no mock messages fallback
+    expect(carousel.messages.length).toBe(0);
     
     // The messages section should have class 'u-hidden'
     const section = document.getElementById('messages');

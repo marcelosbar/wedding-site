@@ -27,19 +27,7 @@ export class MessagesCarousel {
   }
 
   /**
-   * Helper to check if running in local development mode.
-   */
-  isLocalDev() {
-    return (
-      globalThis.location &&
-      (globalThis.location.hostname === 'localhost' ||
-       globalThis.location.hostname === '127.0.0.1' ||
-       globalThis.location.hostname === '')
-    );
-  }
-
-  /**
-   * Subscribes to transaction collection snapshots or falls back to mock data.
+   * Subscribes to transaction collection snapshots.
    */
   loadMessages() {
     try {
@@ -69,28 +57,16 @@ export class MessagesCarousel {
         // Sort by timestamp (newest first)
         this.messages.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 
-        if (this.messages.length === 0 && this.isLocalDev()) {
-          this.renderMockMessages();
-        } else {
-          this.render();
-        }
+        this.render();
       }, (error) => {
         console.warn('Firebase error fetching messages.', error);
-        if (this.isLocalDev()) {
-          this.renderMockMessages();
-        } else {
-          this.messages = [];
-          this.render();
-        }
+        this.messages = [];
+        this.render();
       });
     } catch (e) {
       console.warn('Firebase not configured.', e);
-      if (this.isLocalDev()) {
-        this.renderMockMessages();
-      } else {
-        this.messages = [];
-        this.render();
-      }
+      this.messages = [];
+      this.render();
     }
   }
 
@@ -114,44 +90,20 @@ export class MessagesCarousel {
   }
 
   /**
-   * Renders fallback mock messages for local testing.
-   */
-  getMockMessages() {
-    return [
-      {
-        guestName: 'Mariana e Thiago',
-        message: 'Parabéns, Lorena e Marcelo! Que a jornada de vocês seja repleta de amor, cumplicidade e muitas risadas. Vocês merecem toda a felicidade do mundo!',
-        timestamp: new Date().toISOString()
-      },
-      {
-        guestName: 'Tio Carlos e Tia Márcia',
-        message: 'Que alegria poder celebrar esse momento tão especial com vocês! Que Deus abençoe grandemente essa união e encha a casa de vocês de paz.',
-        timestamp: new Date().toISOString()
-      },
-      {
-        guestName: 'Beatriz e Lucas',
-        message: 'Lore e Celinho, estamos muito felizes por vocês! Que a vida de casados seja ainda mais linda do que o namoro. Um abraço bem forte!',
-        timestamp: new Date().toISOString()
-      }
-    ];
-  }
-
-  renderMockMessages() {
-    this.messages = this.getMockMessages();
-    this.render();
-  }
-
-  /**
    * Dynamic rendering of slides and dots in the carousel container.
    */
   render() {
     if (!this.trackEl) return;
 
     const messagesSection = document.getElementById('messages');
+    const competitionSection = document.getElementById('competition');
 
     if (this.messages.length === 0) {
       if (messagesSection) {
         messagesSection.classList.add('u-hidden');
+      }
+      if (competitionSection) {
+        competitionSection.classList.add('messages-hidden');
       }
       this.trackEl.innerHTML = '';
       this.stopAutoplay();
@@ -160,6 +112,9 @@ export class MessagesCarousel {
 
     if (messagesSection) {
       messagesSection.classList.remove('u-hidden');
+    }
+    if (competitionSection) {
+      competitionSection.classList.remove('messages-hidden');
     }
 
     this.trackEl.innerHTML = '';

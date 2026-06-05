@@ -58,14 +58,33 @@ export function showToast(message) {
  */
 export function showConfirm(message) {
   return new Promise((resolve) => {
-    const modal = document.getElementById('confirm-modal');
-    const msgEl = document.getElementById('confirm-modal-message');
-    const okBtn = document.getElementById('confirm-modal-ok');
-    const cancelBtn = document.getElementById('confirm-modal-cancel');
+    let modal = document.getElementById('confirm-modal');
+    let msgEl = document.getElementById('confirm-modal-message');
+    let okBtn = document.getElementById('confirm-modal-ok');
+    let cancelBtn = document.getElementById('confirm-modal-cancel');
 
     if (!modal || !msgEl || !okBtn || !cancelBtn) {
-      resolve(globalThis.confirm(message));
-      return;
+      if (modal) {
+        modal.remove();
+      }
+      modal = document.createElement('div');
+      modal.id = 'confirm-modal';
+      modal.className = 'confirm-modal-overlay';
+      modal.setAttribute('aria-hidden', 'true');
+      modal.innerHTML = `
+        <div class="confirm-modal-box">
+          <h4 id="confirm-modal-title">Confirmação</h4>
+          <p id="confirm-modal-message">Tem certeza?</p>
+          <div class="confirm-modal-actions">
+            <button id="confirm-modal-cancel" class="btn btn-secondary btn-sm">Cancelar</button>
+            <button id="confirm-modal-ok" class="btn btn-accent btn-sm">Confirmar</button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(modal);
+      msgEl = document.getElementById('confirm-modal-message');
+      okBtn = document.getElementById('confirm-modal-ok');
+      cancelBtn = document.getElementById('confirm-modal-cancel');
     }
 
     msgEl.textContent = message;
@@ -90,5 +109,58 @@ export function showConfirm(message) {
 
     okBtn.addEventListener('click', onOk);
     cancelBtn.addEventListener('click', onCancel);
+  });
+}
+
+/**
+ * Displays a custom alert modal dialog.
+ * Falls back to dynamic creation if elements are missing.
+ * @param {string} message - The message to show.
+ * @returns {Promise<void>} Resolves when the user clicks OK.
+ */
+export function showAlert(message) {
+  return new Promise((resolve) => {
+    let modal = document.getElementById('alert-modal');
+    let msgEl = document.getElementById('alert-modal-message');
+    let okBtn = document.getElementById('alert-modal-ok');
+
+    if (!modal || !msgEl || !okBtn) {
+      if (modal) {
+        modal.remove();
+      }
+      modal = document.createElement('div');
+      modal.id = 'alert-modal';
+      modal.className = 'confirm-modal-overlay';
+      modal.setAttribute('aria-hidden', 'true');
+      modal.innerHTML = `
+        <div class="confirm-modal-box">
+          <h4 id="alert-modal-title">Aviso</h4>
+          <p id="alert-modal-message">Houve um problema.</p>
+          <div class="confirm-modal-actions">
+            <button id="alert-modal-ok" class="btn btn-accent btn-sm">Entendido</button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(modal);
+      msgEl = document.getElementById('alert-modal-message');
+      okBtn = document.getElementById('alert-modal-ok');
+    }
+
+    msgEl.textContent = message;
+    modal.classList.add('active');
+    modal.setAttribute('aria-hidden', 'false');
+
+    const cleanup = () => {
+      modal.classList.remove('active');
+      modal.setAttribute('aria-hidden', 'true');
+      okBtn.removeEventListener('click', onOk);
+      resolve();
+    };
+
+    function onOk() {
+      cleanup();
+    }
+
+    okBtn.addEventListener('click', onOk);
   });
 }

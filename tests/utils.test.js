@@ -2,7 +2,7 @@
  * @vitest-environment jsdom
  */
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { escapeHTML, showToast, showConfirm } from '../src/js/utils.js';
+import { escapeHTML, showToast, showConfirm, showAlert } from '../src/js/utils.js';
 
 describe('escapeHTML', () => {
   it('should escape ampersands', () => {
@@ -68,12 +68,23 @@ describe('showConfirm', () => {
     document.body.innerHTML = '';
   });
 
-  it('should fall back to globalThis.confirm if elements are missing', async () => {
-    const confirmSpy = vi.spyOn(globalThis, 'confirm').mockImplementation(() => true);
-    const result = await showConfirm('Are you sure?');
-    expect(confirmSpy).toHaveBeenCalledWith('Are you sure?');
+  it('should dynamically create confirm modal elements if they are missing', async () => {
+    expect(document.getElementById('confirm-modal')).toBeNull();
+
+    const promise = showConfirm('Dynamic confirm?');
+
+    const modal = document.getElementById('confirm-modal');
+    const msg = document.getElementById('confirm-modal-message');
+    const okBtn = document.getElementById('confirm-modal-ok');
+
+    expect(modal).not.toBeNull();
+    expect(msg.textContent).toBe('Dynamic confirm?');
+    expect(modal.classList.contains('active')).toBe(true);
+
+    okBtn.click();
+    const result = await promise;
     expect(result).toBe(true);
-    confirmSpy.mockRestore();
+    expect(modal.classList.contains('active')).toBe(false);
   });
 
   it('should show custom confirm modal and resolve true when ok is clicked', async () => {
@@ -120,6 +131,52 @@ describe('showConfirm', () => {
 
     const result = await promise;
     expect(result).toBe(false);
+    expect(modal.classList.contains('active')).toBe(false);
+  });
+});
+
+describe('showAlert', () => {
+  beforeEach(() => {
+    document.body.innerHTML = '';
+  });
+
+  it('should dynamically create alert modal elements if they are missing', async () => {
+    expect(document.getElementById('alert-modal')).toBeNull();
+
+    const promise = showAlert('Dynamic alert!');
+
+    const modal = document.getElementById('alert-modal');
+    const msg = document.getElementById('alert-modal-message');
+    const okBtn = document.getElementById('alert-modal-ok');
+
+    expect(modal).not.toBeNull();
+    expect(msg.textContent).toBe('Dynamic alert!');
+    expect(modal.classList.contains('active')).toBe(true);
+
+    okBtn.click();
+    await promise;
+    expect(modal.classList.contains('active')).toBe(false);
+  });
+
+  it('should use existing alert modal elements if they are present', async () => {
+    document.body.innerHTML = `
+      <div id="alert-modal" class="confirm-modal-overlay">
+        <p id="alert-modal-message"></p>
+        <button id="alert-modal-ok"></button>
+      </div>
+    `;
+
+    const modal = document.getElementById('alert-modal');
+    const msg = document.getElementById('alert-modal-message');
+    const okBtn = document.getElementById('alert-modal-ok');
+
+    const promise = showAlert('Existing alert!');
+
+    expect(msg.textContent).toBe('Existing alert!');
+    expect(modal.classList.contains('active')).toBe(true);
+
+    okBtn.click();
+    await promise;
     expect(modal.classList.contains('active')).toBe(false);
   });
 });

@@ -6,9 +6,11 @@ service cloud.firestore {
     match /config/admins {
       allow read: if request.auth != null
                    && request.auth.token.email_verified == true
+                   && resource != null
                    && request.auth.token.email in resource.data.emails;
       allow write: if !exists(/databases/$(database)/documents/config/admins) || (request.auth != null
                     && request.auth.token.email_verified == true
+                    && resource != null
                     && request.auth.token.email in resource.data.emails);
     }
 

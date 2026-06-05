@@ -76,6 +76,9 @@ describe('AdminApp', () => {
         <span id="modal-amount"></span>
         <span id="modal-list"></span>
         <span id="modal-privacy"></span>
+        <div id="modal-gifts-wrapper">
+          <ul id="modal-gifts-list"></ul>
+        </div>
         <span id="modal-message-text"></span>
       </div>
     `;
@@ -312,6 +315,45 @@ describe('AdminApp', () => {
     expect(adminApp.messageModal.classList.contains('u-hidden')).toBe(true);
   });
 
+  it('should render selected gifts in the modal, and handle empty items list gracefully', () => {
+    adminApp.transactions = [
+      { 
+        id: 't2', 
+        guestName: 'Elisa', 
+        totalAmount: 120, 
+        listChosen: 'Bride', 
+        status: 'pending', 
+        timestamp: '2026-01-04', 
+        message: 'Felicidades!', 
+        isPublic: true,
+        items: [
+          { name: 'Snack da Disney', price: 60, quantity: 2 }
+        ]
+      },
+      {
+        id: 't3',
+        guestName: 'Fabio',
+        totalAmount: 50,
+        listChosen: 'Groom',
+        status: 'pending',
+        timestamp: '2026-01-05',
+        message: 'Aproveitem!',
+        isPublic: true
+      }
+    ];
+    adminApp.renderTable();
+
+    // 1. Check with items present
+    adminApp.showModal(adminApp.transactions[0]);
+    const giftsListEl = document.getElementById('modal-gifts-list');
+    expect(giftsListEl).toBeDefined();
+    expect(giftsListEl.innerHTML).toContain('2x Snack da Disney (R$ 60.00 cada)');
+
+    // 2. Check fallback (no items)
+    adminApp.showModal(adminApp.transactions[1]);
+    expect(giftsListEl.innerHTML).toBe('');
+  });
+
   it('should handle missing DOM elements in constructor and showModal without throwing (null-branches)', () => {
     const originalHTML = document.body.innerHTML;
     document.body.innerHTML = ''; // Empty DOM
@@ -370,4 +412,5 @@ describe('AdminApp', () => {
 
     globalThis.__mockAuth = {}; // Restore auth
   });
+
 });

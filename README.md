@@ -22,8 +22,13 @@ Welcome to the source code of Lorena and Marcelo's wedding website. This is a fa
 
 To run this project locally, follow these steps:
 
-1. **Install Dependencies**
-   Ensure you have Node.js installed, then run:
+1. **Prerequisites**
+   Ensure you have the following installed on your machine:
+   - **Node.js** (v18 or higher recommended)
+   - **Java (JDK or JRE)** (Java 8 or higher). This is required to execute the Firebase Local Emulator Suite (Auth & Firestore).
+
+2. **Install Dependencies**
+   Run the following command to install the project dependencies:
    ```bash
    npm install
    ```
@@ -31,12 +36,25 @@ To run this project locally, follow these steps:
 2. **Firebase Configuration**
    Open `firebase.js` and replace the placeholder `firebaseConfig` with your actual Firebase credentials.
 
-3. **Start the Dev Server**
+3. **Start the Dev Server with Emulators**
    ```bash
    npm run dev
    ```
-   The site will be available at `http://localhost:5173/`.
-   The admin panel will be available at `http://localhost:5173/admin.html` (Default test password: `casamento2026`).
+   This spins up the Vite dev server (port 5173) and the Firebase Emulators (Auth on port 9099, Firestore on port 8080) concurrently.
+   - The site will be available at `http://localhost:5173/`.
+   - The admin panel will be available at `http://localhost:5173/admin.html`.
+
+4. **Local Admin Authentication**
+   - Click the "Entrar com o Google" button on the Admin page.
+   - The Firebase Auth Emulator pop-up will appear. Enter `admin@test.com` to log in.
+   - The database is automatically seeded with a `/config/admins` document to grant admin permissions to `admin@test.com` on startup.
+
+5. **Security & CSP Verification**
+   To test the production build with strict security headers (Content Security Policy, HSTS, etc.) configured in `firebase.json`:
+   ```bash
+   npm run preview:secure
+   ```
+   This builds the site and starts the full Firebase Emulator suite (including the Hosting emulator on port 5000). Visit `http://localhost:5000/admin.html` to verify security compliance.
 
 ## Deployment
 

@@ -26,7 +26,7 @@ export class Cart {
   }
 
   _loadCart() {
-    if (typeof window !== 'undefined' && window.localStorage) {
+    if (globalThis.window !== undefined && globalThis.localStorage) {
       try {
         const data = localStorage.getItem('wedding_cart');
         return data ? JSON.parse(data) : [];
@@ -38,7 +38,7 @@ export class Cart {
   }
 
   _saveCart() {
-    if (typeof window !== 'undefined' && window.localStorage) {
+    if (globalThis.window !== undefined && globalThis.localStorage) {
       try {
         localStorage.setItem('wedding_cart', JSON.stringify(this.items));
       } catch (e) {
@@ -412,7 +412,7 @@ export class Cart {
   reset() {
     this.items = [];
     this.currentList = null;
-    if (typeof window !== 'undefined' && window.localStorage) {
+    if (globalThis.window !== undefined && globalThis.localStorage) {
       localStorage.removeItem('wedding_guest_name');
       localStorage.removeItem('wedding_guest_message');
       localStorage.removeItem('wedding_message_public');

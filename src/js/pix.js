@@ -72,6 +72,67 @@ export class PixCheckout {
     }
   }
 
+  _createTransactionPromises(guestName, message, isPublic) {
+    const groomItems = this.cart.items.filter(item => item.list === 'Groom');
+    const brideItems = this.cart.items.filter(item => item.list === 'Bride');
+    const promises = [];
+
+    if (groomItems.length > 0) {
+      const groomTotal = groomItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      promises.push(addDoc(transactionsRef, {
+        guestName,
+        totalAmount: groomTotal,
+        listChosen: 'Groom',
+        status: 'pending',
+        timestamp: new Date().toISOString(),
+        message,
+        isPublic,
+        items: groomItems.map(item => ({
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity
+        }))
+      }));
+    }
+
+    if (brideItems.length > 0) {
+      const brideTotal = brideItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      promises.push(addDoc(transactionsRef, {
+        guestName,
+        totalAmount: brideTotal,
+        listChosen: 'Bride',
+        status: 'pending',
+        timestamp: new Date().toISOString(),
+        message,
+        isPublic,
+        items: brideItems.map(item => ({
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity
+        }))
+      }));
+    }
+
+    return promises;
+  }
+
+  _resetFormAndUI() {
+    this.pixView.classList.remove('active');
+    this.cartView.style.display = 'none';
+    this.successView.classList.add('active');
+    const successTitle = document.getElementById('success-title');
+    if (successTitle) {
+      successTitle.focus();
+    }
+
+    // Reset cart and form
+    this.cart.reset();
+    if (document.getElementById('guest-name')) document.getElementById('guest-name').value = '';
+    if (document.getElementById('guest-message')) document.getElementById('guest-message').value = '';
+    if (document.getElementById('message-public')) document.getElementById('message-public').checked = true;
+    if (document.getElementById('message-char-count')) document.getElementById('message-char-count').textContent = '0 / 500';
+  }
+
   async confirmTransfer() {
     if (this.isProcessing) return;
     this.isProcessing = true;
@@ -99,48 +160,7 @@ export class PixCheckout {
 
       if (total <= 0) return;
 
-      const groomItems = this.cart.items.filter(item => item.list === 'Groom');
-      const brideItems = this.cart.items.filter(item => item.list === 'Bride');
-
-      const promises = [];
-
-      if (groomItems.length > 0) {
-        const groomTotal = groomItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-        promises.push(addDoc(transactionsRef, {
-          guestName,
-          totalAmount: groomTotal,
-          listChosen: 'Groom',
-          status: 'pending',
-          timestamp: new Date().toISOString(),
-          message,
-          isPublic,
-          items: groomItems.map(item => ({
-            name: item.name,
-            price: item.price,
-            quantity: item.quantity
-          }))
-        }));
-      }
-
-
-      if (brideItems.length > 0) {
-        const brideTotal = brideItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-        promises.push(addDoc(transactionsRef, {
-          guestName,
-          totalAmount: brideTotal,
-          listChosen: 'Bride',
-          status: 'pending',
-          timestamp: new Date().toISOString(),
-          message,
-          isPublic,
-          items: brideItems.map(item => ({
-            name: item.name,
-            price: item.price,
-            quantity: item.quantity
-          }))
-        }));
-      }
-
+      const promises = this._createTransactionPromises(guestName, message, isPublic);
 
       try {
         // Wait for database write or timeout after 4 seconds (forces error if offline/unreachable)
@@ -154,20 +174,7 @@ export class PixCheckout {
         return;
       }
 
-      this.pixView.classList.remove('active');
-      this.cartView.style.display = 'none';
-      this.successView.classList.add('active');
-      const successTitle = document.getElementById('success-title');
-      if (successTitle) {
-        successTitle.focus();
-      }
-
-      // Reset cart and form
-      this.cart.reset();
-      if (document.getElementById('guest-name')) document.getElementById('guest-name').value = '';
-      if (document.getElementById('guest-message')) document.getElementById('guest-message').value = '';
-      if (document.getElementById('message-public')) document.getElementById('message-public').checked = true;
-      if (document.getElementById('message-char-count')) document.getElementById('message-char-count').textContent = '0 / 500';
+      this._resetFormAndUI();
     } finally {
       this.isProcessing = false;
       if (confirmBtn) {

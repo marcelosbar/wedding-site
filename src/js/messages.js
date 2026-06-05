@@ -89,9 +89,41 @@ export class MessagesCarousel {
     return unique;
   }
 
-  /**
-   * Dynamic rendering of slides and dots in the carousel container.
-   */
+  _createSlideElement(msg, idx) {
+    const slide = document.createElement('div');
+    slide.className = `carousel-slide${idx === 0 ? ' active' : ''}`;
+    
+    const textEl = document.createElement('p');
+    const msgLen = msg.message.length;
+    let lengthClass = 'length-short';
+    if (msgLen > 280) {
+      lengthClass = 'length-long';
+    } else if (msgLen > 120) {
+      lengthClass = 'length-medium';
+    }
+    textEl.className = `message-text ${lengthClass}`;
+    textEl.textContent = msg.message;
+    
+    const authorEl = document.createElement('p');
+    authorEl.className = 'message-author';
+    authorEl.textContent = msg.guestName;
+
+    slide.appendChild(textEl);
+    slide.appendChild(authorEl);
+    return slide;
+  }
+
+  _createDotElement(idx) {
+    const dot = document.createElement('button');
+    dot.className = `carousel-dot${idx === 0 ? ' active' : ''}`;
+    dot.setAttribute('aria-label', `Ir para slide ${idx + 1}`);
+    dot.addEventListener('click', () => {
+      this.goToSlide(idx);
+      this.resetAutoplay();
+    });
+    return dot;
+  }
+
   render() {
     if (!this.trackEl) return;
 
@@ -125,38 +157,12 @@ export class MessagesCarousel {
     if (this.nextBtn) this.nextBtn.style.display = showControls ? 'flex' : 'none';
 
     this.messages.forEach((msg, idx) => {
-      // Create slide elements
-      const slide = document.createElement('div');
-      slide.className = `carousel-slide${idx === 0 ? ' active' : ''}`;
-      
-      const textEl = document.createElement('p');
-      const msgLen = msg.message.length;
-      let lengthClass = 'length-short';
-      if (msgLen > 280) {
-        lengthClass = 'length-long';
-      } else if (msgLen > 120) {
-        lengthClass = 'length-medium';
-      }
-      textEl.className = `message-text ${lengthClass}`;
-      textEl.textContent = msg.message;
-      
-      const authorEl = document.createElement('p');
-      authorEl.className = 'message-author';
-      authorEl.textContent = msg.guestName;
-
-      slide.appendChild(textEl);
-      slide.appendChild(authorEl);
+      const slide = this._createSlideElement(msg, idx);
       this.trackEl.appendChild(slide);
 
       // Create dots
       if (this.dotsEl && showControls) {
-        const dot = document.createElement('button');
-        dot.className = `carousel-dot${idx === 0 ? ' active' : ''}`;
-        dot.setAttribute('aria-label', `Ir para slide ${idx + 1}`);
-        dot.addEventListener('click', () => {
-          this.goToSlide(idx);
-          this.resetAutoplay();
-        });
+        const dot = this._createDotElement(idx);
         this.dotsEl.appendChild(dot);
       }
     });

@@ -20,10 +20,12 @@ vi.mock('../src/js/firebase.js', () => {
 vi.mock('../src/js/utils.js', () => {
   globalThis.__mockShowToast = globalThis.__mockShowToast || vi.fn();
   globalThis.__mockShowConfirm = globalThis.__mockShowConfirm || vi.fn().mockResolvedValue(true);
+  globalThis.__mockShowAlert = globalThis.__mockShowAlert || vi.fn().mockResolvedValue();
   return {
     escapeHTML: (str) => str,
     showToast: globalThis.__mockShowToast,
-    showConfirm: globalThis.__mockShowConfirm
+    showConfirm: globalThis.__mockShowConfirm,
+    showAlert: globalThis.__mockShowAlert
   };
 });
 
@@ -64,6 +66,7 @@ function setupDOM() {
     <input id="pix-payload" value="" />
     <button id="copy-pix-payload-btn">Copiar</button>
     <canvas id="pix-qr-code"></canvas>
+    <button id="confirm-transfer-btn">Já fiz a transferência!</button>
   `;
 }
 
@@ -97,14 +100,17 @@ describe('PixCheckout', () => {
   let pix, cart;
   const mockShowToast = globalThis.__mockShowToast;
   const mockShowConfirm = globalThis.__mockShowConfirm;
+  const mockShowAlert = globalThis.__mockShowAlert;
 
   beforeEach(() => {
+    localStorage.clear();
     setupDOM();
     const instances = createInstances();
     pix = instances.pix;
     cart = instances.cart;
     mockShowToast.mockClear();
     mockShowConfirm.mockReset().mockResolvedValue(true);
+    mockShowAlert.mockReset().mockResolvedValue();
   });
 
   afterEach(() => {
@@ -177,6 +183,10 @@ describe('PixCheckout', () => {
     document.getElementById('message-public').checked = false;
     cart.addToCart('Bride', 'Gift', 200);
 
+    const btn = document.getElementById('confirm-transfer-btn');
+    expect(btn.disabled).toBe(false);
+    expect(btn.classList.contains('is-loading')).toBe(false);
+
     await pix.confirmTransfer();
 
     expect(cart.items.length).toBe(0);
@@ -187,30 +197,59 @@ describe('PixCheckout', () => {
     expect(document.getElementById('guest-message').value).toBe('');
     expect(document.getElementById('message-public').checked).toBe(true);
     expect(document.getElementById('message-char-count').textContent).toBe('0 / 500');
+
+    expect(btn.disabled).toBe(false);
+    expect(btn.classList.contains('is-loading')).toBe(false);
+    expect(btn.textContent).toBe('Já fiz a transferência!');
   });
 
-  it('should fall back to local simulation when Firebase fails', async () => {
+  it('should show alert and abort transition when Firebase write fails', async () => {
     const { addDoc } = await import('../src/js/firebase.js');
     addDoc.mockRejectedValueOnce(new Error('Firebase offline'));
     document.getElementById('guest-name').value = 'Carlos';
     cart.addToCart('Groom', 'Gift', 300);
-    const simulateSpy = vi.spyOn(pix.scoreboard, 'simulateLocalScoreboard');
+    
     await pix.confirmTransfer();
-    expect(simulateSpy).toHaveBeenCalledWith('Groom', 300);
-    simulateSpy.mockRestore();
+    
+    expect(mockShowAlert).toHaveBeenCalledWith('Houve um problema de conexão ao salvar a sua contribuição. Por favor, tente confirmar novamente. Se o problema persistir, avise os noivos!');
+    expect(document.getElementById('success-view').classList.contains('active')).toBe(false);
+    expect(cart.items.length).toBe(1); // Cart remains intact
   });
 
-  it('should prevent double submission on confirmTransfer', async () => {
+  it('should prevent double submission on confirmTransfer and show loading state', async () => {
     const { addDoc } = await import('../src/js/firebase.js');
     addDoc.mockClear();
+    
+    let resolveAddDoc;
+    const addDocPromise = new Promise((resolve) => {
+      resolveAddDoc = resolve;
+    });
+    addDoc.mockReturnValueOnce(addDocPromise);
+
     document.getElementById('guest-name').value = 'Double Clicker';
     cart.addToCart('Bride', 'Gift', 200);
 
+    const btn = document.getElementById('confirm-transfer-btn');
+
     const p1 = pix.confirmTransfer();
+    
+    // Allow the microtask queue to run so the code after await showConfirm executes
+    await Promise.resolve();
+    
+    expect(btn.disabled).toBe(true);
+    expect(btn.classList.contains('is-loading')).toBe(true);
+    expect(btn.textContent).toBe('Processando...');
+
     const p2 = pix.confirmTransfer();
+
+    resolveAddDoc();
     await Promise.all([p1, p2]);
 
     expect(addDoc).toHaveBeenCalledTimes(1);
+    
+    expect(btn.disabled).toBe(false);
+    expect(btn.classList.contains('is-loading')).toBe(false);
+    expect(btn.textContent).toBe('Já fiz a transferência!');
   });
 
   it('should create separate transactions for Groom and Bride on confirmTransfer including message', async () => {
@@ -235,6 +274,10 @@ describe('PixCheckout', () => {
     expect(call1Args.guestName).toBe('Mixed Contributor');
     expect(call1Args.message).toBe('Parabéns!');
     expect(call1Args.isPublic).toBe(true);
+    expect(call1Args.items).toEqual([
+      { name: 'Groom Gift 1', price: 100, quantity: 1 },
+      { name: 'Groom Gift 2', price: 150, quantity: 1 }
+    ]);
 
     const call2Args = addDoc.mock.calls[1][1];
     expect(call2Args.listChosen).toBe('Bride');
@@ -242,6 +285,48 @@ describe('PixCheckout', () => {
     expect(call2Args.guestName).toBe('Mixed Contributor');
     expect(call2Args.message).toBe('Parabéns!');
     expect(call2Args.isPublic).toBe(true);
+    expect(call2Args.items).toEqual([
+      { name: 'Bride Gift 1', price: 200, quantity: 1 }
+    ]);
+  });
+
+  it('should return early on confirmTransfer if cart total is 0', async () => {
+    const { addDoc } = await import('../src/js/firebase.js');
+    addDoc.mockClear();
+    cart.reset();
+    await pix.confirmTransfer();
+    expect(addDoc).not.toHaveBeenCalled();
+  });
+
+  it('should handle missing DOM elements on confirmTransfer gracefully', async () => {
+    const nameEl = document.getElementById('guest-name');
+    const msgEl = document.getElementById('guest-message');
+    const pubEl = document.getElementById('message-public');
+    if (nameEl) nameEl.remove();
+    if (msgEl) msgEl.remove();
+    if (pubEl) pubEl.remove();
+
+    cart.addToCart('Groom', 'Gift', 100);
+
+    const { addDoc } = await import('../src/js/firebase.js');
+    addDoc.mockClear();
+
+    await pix.confirmTransfer();
+
+    expect(addDoc).toHaveBeenCalled();
+    const callArgs = addDoc.mock.calls[0][1];
+    expect(callArgs.guestName).toBe('');
+    expect(callArgs.message).toBe('');
+    expect(callArgs.isPublic).toBe(true);
+  });
+
+  it('should proceed to PIX even if pix-title element is missing', async () => {
+    const titleEl = document.getElementById('pix-title');
+    if (titleEl) titleEl.remove();
+    document.getElementById('guest-name').value = 'João';
+    cart.addToCart('Groom', 'Gift', 100);
+    await pix.proceedToPix();
+    expect(document.getElementById('pix-view').classList.contains('active')).toBe(true);
   });
 
   it('should NOT proceed on confirmTransfer if user cancels the confirmation dialog', async () => {
@@ -258,5 +343,27 @@ describe('PixCheckout', () => {
     expect(addDoc).not.toHaveBeenCalled();
     expect(document.getElementById('success-view').classList.contains('active')).toBe(false);
     expect(cart.items.length).toBe(1); // Cart is not reset
+  });
+
+  it('should trigger alert and abort transition on checkout database timeout', async () => {
+    const { addDoc } = await import('../src/js/firebase.js');
+    addDoc.mockReturnValueOnce(new Promise(() => {}));
+    
+    vi.useFakeTimers();
+    
+    document.getElementById('guest-name').value = 'Hanging User';
+    cart.addToCart('Groom', 'Gift', 100);
+    
+    const p = pix.confirmTransfer();
+    
+    await vi.advanceTimersByTimeAsync(4000);
+    
+    await p;
+    
+    expect(mockShowAlert).toHaveBeenCalledWith('Houve um problema de conexão ao salvar a sua contribuição. Por favor, tente confirmar novamente. Se o problema persistir, avise os noivos!');
+    expect(document.getElementById('success-view').classList.contains('active')).toBe(false);
+    expect(cart.items.length).toBe(1); // Cart remains intact
+    
+    vi.useRealTimers();
   });
 });

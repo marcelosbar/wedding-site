@@ -1,6 +1,6 @@
 import QRCode from 'qrcode';
 import { transactionsRef, addDoc } from './firebase.js';
-import { showToast, showConfirm } from './utils.js';
+import { showToast, showConfirm, showAlert } from './utils.js';
 
 /**
  * PIX Checkout module — handles QR code generation, payload copy, and transfer confirmation.
@@ -76,10 +76,18 @@ export class PixCheckout {
     if (this.isProcessing) return;
     this.isProcessing = true;
 
+    const confirmBtn = document.getElementById('confirm-transfer-btn');
+
     try {
       const confirmed = await showConfirm('Você está finalizando a sua contribuição. Tem certeza de que já realizou a transferência?');
       if (!confirmed) {
         return;
+      }
+
+      if (confirmBtn) {
+        confirmBtn.disabled = true;
+        confirmBtn.classList.add('is-loading');
+        confirmBtn.textContent = 'Processando...';
       }
       const guestName = document.getElementById('guest-name') ? document.getElementById('guest-name').value.trim() : '';
       const messageEl = document.getElementById('guest-message');
@@ -106,7 +114,12 @@ export class PixCheckout {
           status: 'pending',
           timestamp: new Date().toISOString(),
           message,
-          isPublic
+          isPublic,
+          items: groomItems.map(item => ({
+            name: item.name,
+            price: item.price,
+            quantity: item.quantity
+          }))
         }));
         simulatedUpdates.push({ list: 'Groom', amount: groomTotal });
       }
@@ -120,18 +133,26 @@ export class PixCheckout {
           status: 'pending',
           timestamp: new Date().toISOString(),
           message,
-          isPublic
+          isPublic,
+          items: brideItems.map(item => ({
+            name: item.name,
+            price: item.price,
+            quantity: item.quantity
+          }))
         }));
         simulatedUpdates.push({ list: 'Bride', amount: brideTotal });
       }
 
       try {
-        await Promise.all(promises);
+        // Wait for database write or timeout after 4 seconds (forces error if offline/unreachable)
+        await Promise.race([
+          Promise.all(promises),
+          new Promise((_, reject) => setTimeout(() => reject(new Error('Firebase Timeout')), 4000))
+        ]);
       } catch (e) {
-        console.error('Firebase is not configured correctly yet or network error. Running local simulation.', e);
-        simulatedUpdates.forEach(update => {
-          this.scoreboard.simulateLocalScoreboard(update.list, update.amount);
-        });
+        console.error('Firebase save error:', e);
+        await showAlert('Houve um problema de conexão ao salvar a sua contribuição. Por favor, tente confirmar novamente. Se o problema persistir, avise os noivos!');
+        return;
       }
 
       this.pixView.classList.remove('active');
@@ -150,6 +171,11 @@ export class PixCheckout {
       if (document.getElementById('message-char-count')) document.getElementById('message-char-count').textContent = '0 / 500';
     } finally {
       this.isProcessing = false;
+      if (confirmBtn) {
+        confirmBtn.disabled = false;
+        confirmBtn.classList.remove('is-loading');
+        confirmBtn.textContent = 'Já fiz a transferência!';
+      }
     }
   }
 }

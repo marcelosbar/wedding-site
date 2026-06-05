@@ -31,12 +31,12 @@ try {
   console.warn("Firebase Auth desabilitado: Chave de API inválida ou ausente.", e.message);
 }
 
-// Connect to Emulators locally in development mode
+// Connect to Emulators locally in development or preview mode
 const isLocalhost = globalThis.window !== undefined && 
   (globalThis.window.location.hostname === 'localhost' || globalThis.window.location.hostname === '127.0.0.1');
 const isTest = import.meta.env.MODE === 'test';
 
-if (import.meta.env.DEV && isLocalhost && !isTest) {
+if (isLocalhost && !isTest) {
   try {
     connectFirestoreEmulator(db, 'localhost', 8080);
     console.log("Conectado ao Emulador do Firestore (porta 8080)");

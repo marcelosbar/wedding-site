@@ -103,7 +103,6 @@ export class PixCheckout {
       const brideItems = this.cart.items.filter(item => item.list === 'Bride');
 
       const promises = [];
-      const simulatedUpdates = [];
 
       if (groomItems.length > 0) {
         const groomTotal = groomItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
@@ -121,8 +120,8 @@ export class PixCheckout {
             quantity: item.quantity
           }))
         }));
-        simulatedUpdates.push({ list: 'Groom', amount: groomTotal });
       }
+
 
       if (brideItems.length > 0) {
         const brideTotal = brideItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
@@ -140,8 +139,8 @@ export class PixCheckout {
             quantity: item.quantity
           }))
         }));
-        simulatedUpdates.push({ list: 'Bride', amount: brideTotal });
       }
+
 
       try {
         // Wait for database write or timeout after 4 seconds (forces error if offline/unreachable)

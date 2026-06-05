@@ -129,6 +129,7 @@ describe('WeddingApp Orchestrator', () => {
   });
 
   beforeEach(() => {
+    localStorage.clear();
     setupDOM();
     vi.clearAllMocks();
     app = new WeddingApp();

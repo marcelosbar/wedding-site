@@ -142,12 +142,26 @@ class AdminApp {
     const listEl = document.getElementById('modal-list');
     const privacyEl = document.getElementById('modal-privacy');
     const textEl = document.getElementById('modal-message-text');
+    const giftsListEl = document.getElementById('modal-gifts-list');
 
     if (guestNameEl) guestNameEl.innerText = transaction.guestName;
     if (amountEl) amountEl.innerText = `R$ ${transaction.totalAmount.toFixed(2)}`;
     if (listEl) listEl.innerText = transaction.listChosen === 'Groom' ? 'Noivo' : 'Noiva';
     if (privacyEl) privacyEl.innerText = transaction.isPublic ? 'Pública' : 'Privada';
     if (textEl) textEl.innerText = transaction.message || '';
+
+    if (giftsListEl) {
+      giftsListEl.innerHTML = '';
+      if (transaction.items && transaction.items.length > 0) {
+        transaction.items.forEach(item => {
+          const li = document.createElement('li');
+          const priceText = item.price ? `R$ ${item.price.toFixed(2)} cada` : '';
+          const suffix = priceText ? ` (${priceText})` : '';
+          li.textContent = `${item.quantity}x ${item.name}${suffix}`;
+          giftsListEl.appendChild(li);
+        });
+      }
+    }
 
     this.messageModal.classList.remove('u-hidden');
   }
@@ -204,7 +218,11 @@ class AdminApp {
       }
 
       tr.innerHTML = `
-        <td>${escapeHTML(t.guestName)}</td>
+        <td>
+          <button type="button" class="admin-detail-link js-btn-view-modal" title="Ver detalhes">
+            ${escapeHTML(t.guestName)}
+          </button>
+        </td>
         <td>R$ ${t.totalAmount.toFixed(2)}</td>
         <td>${t.listChosen === 'Groom' ? 'Noivo' : 'Noiva'}</td>
         <td>${messageHTML}</td>

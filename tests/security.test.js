@@ -89,4 +89,27 @@ describe('Security Configuration Regressions', () => {
     // Changing this to 'same-origin' would silently break Firebase Authentication.
     expect(coopHeader.value).toBe('same-origin-allow-popups');
   });
+
+  it('should enforce strict read security rules on config/admins in firestore.rules', () => {
+    const rulesPath = path.resolve(__dirname, '../firestore.rules');
+    const content = fs.readFileSync(rulesPath, 'utf-8');
+    
+    // Find the match /config/admins block
+    const adminsMatchRegex = /match\s+\/config\/admins\s*\{([\s\S]*?)\}/;
+    const matchBlock = content.match(adminsMatchRegex);
+    
+    expect(matchBlock).not.toBeNull();
+    const rulesBlock = matchBlock[1];
+    
+    // Assert that read rule requires authentication and does not allow open read (if true)
+    const readRuleRegex = /allow\s+read:\s*if\s*([\s\S]*?);/;
+    const readRule = rulesBlock.match(readRuleRegex);
+    
+    expect(readRule).not.toBeNull();
+    const readCondition = readRule[1];
+    
+    // Enforce that the read rule checks request.auth and doesn't just return true
+    expect(readCondition).toContain('request.auth != null');
+    expect(readCondition).not.toBe('true');
+  });
 });

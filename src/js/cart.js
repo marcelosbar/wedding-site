@@ -5,7 +5,7 @@ import { escapeHTML } from './utils.js';
  */
 export class Cart {
   constructor(elements) {
-    this.items = []; // stores { name: itemName, price: unitPrice, quantity: q, list: listName }
+    this.items = this._loadCart(); // Load items from localStorage
     this.overlay = elements.overlay;
     this.cartView = elements.cartView;
     this.pixView = elements.pixView;
@@ -21,7 +21,30 @@ export class Cart {
     this._initGiftControls();
     this._initBackToListBtn();
     this._initMessageCounter();
+    this._initFormPersistence();
     this.renderCart();
+  }
+
+  _loadCart() {
+    if (globalThis.window !== undefined && globalThis.localStorage) {
+      try {
+        const data = localStorage.getItem('wedding_cart');
+        return data ? JSON.parse(data) : [];
+      } catch (e) {
+        console.error('Failed to load cart from localStorage', e);
+      }
+    }
+    return [];
+  }
+
+  _saveCart() {
+    if (globalThis.window !== undefined && globalThis.localStorage) {
+      try {
+        localStorage.setItem('wedding_cart', JSON.stringify(this.items));
+      } catch (e) {
+        console.error('Failed to save cart to localStorage', e);
+      }
+    }
   }
 
   get currentList() {
@@ -106,6 +129,63 @@ export class Cart {
       messageEl.addEventListener('input', () => {
         const count = messageEl.value.length;
         counterEl.textContent = `${count} / 500`;
+      });
+    }
+  }
+
+  _initFormPersistence() {
+    if (typeof document === 'undefined') return;
+    
+    const nameEl = document.getElementById('guest-name');
+    const messageEl = document.getElementById('guest-message');
+    const publicEl = document.getElementById('message-public');
+    const counterEl = document.getElementById('message-char-count');
+    
+    // Restore values from localStorage
+    try {
+      if (nameEl) nameEl.value = localStorage.getItem('wedding_guest_name') || '';
+      if (messageEl) {
+        messageEl.value = localStorage.getItem('wedding_guest_message') || '';
+        if (counterEl) {
+          counterEl.textContent = `${messageEl.value.length} / 500`;
+        }
+      }
+      if (publicEl) {
+        const storedPublic = localStorage.getItem('wedding_message_public');
+        if (storedPublic !== null) {
+          publicEl.checked = storedPublic === 'true';
+        }
+      }
+    } catch (e) {
+      console.error('Failed to restore form values from localStorage', e);
+    }
+    
+    // Listen for inputs to save values
+    if (nameEl) {
+      nameEl.addEventListener('input', () => {
+        try {
+          localStorage.setItem('wedding_guest_name', nameEl.value);
+        } catch (e) {
+          console.error('Failed to save guest name to localStorage', e);
+        }
+      });
+    }
+    if (messageEl) {
+      messageEl.addEventListener('input', () => {
+        try {
+          localStorage.setItem('wedding_guest_message', messageEl.value);
+        } catch (e) {
+          console.error('Failed to save guest message to localStorage', e);
+        }
+      });
+    }
+    if (publicEl) {
+      publicEl.addEventListener('change', () => {
+        try {
+          localStorage.setItem('wedding_message_public', String(publicEl.checked));
+        } catch (e) {
+          console.error('Failed to save message public setting to localStorage', e);
+        }
       });
     }
   }
@@ -251,6 +331,7 @@ export class Cart {
     }
 
     this._syncGiftQuantities();
+    this._saveCart();
   }
 
   _syncGiftQuantities() {
@@ -331,6 +412,11 @@ export class Cart {
   reset() {
     this.items = [];
     this.currentList = null;
+    if (globalThis.window !== undefined && globalThis.localStorage) {
+      localStorage.removeItem('wedding_guest_name');
+      localStorage.removeItem('wedding_guest_message');
+      localStorage.removeItem('wedding_message_public');
+    }
     this.renderCart();
   }
 }

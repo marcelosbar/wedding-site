@@ -24,7 +24,9 @@ function createMockElements() {
     <button id="nav-cart-link" style="display: none;"></button>
     <span id="nav-cart-badge"></span>
     <button id="cart-back-to-list-btn" class="u-hidden"></button>
+    <input id="guest-name" value="" />
     <textarea id="guest-message"></textarea>
+    <input type="checkbox" id="message-public" checked />
     <div id="message-char-count">0 / 500</div>
     
     <div id="groom-gifts-modal" class="gifts-modal-overlay">
@@ -59,6 +61,7 @@ describe('Cart', () => {
   let cart;
 
   beforeEach(() => {
+    localStorage.clear();
     cart = new Cart(createMockElements());
   });
 
@@ -259,5 +262,157 @@ describe('Cart', () => {
     removeBtn.click();
     // Only Group header + coffee = 2 children remains
     expect(container.children.length).toBe(2); 
+  });
+
+  it('should update char count on guest-message input', () => {
+    const messageEl = document.getElementById('guest-message');
+    const counterEl = document.getElementById('message-char-count');
+    
+    // Simulate typing
+    messageEl.value = 'Hello World';
+    messageEl.dispatchEvent(new Event('input'));
+    
+    expect(counterEl.textContent).toBe('11 / 500');
+  });
+
+  it('should toggle modal footers visibility and modal-cart-count badges when items change', () => {
+    const viewCartBtn = document.createElement('button');
+    viewCartBtn.className = 'view-cart-modal-btn';
+    const badge = document.createElement('span');
+    badge.className = 'modal-cart-count';
+    viewCartBtn.appendChild(badge);
+    document.body.appendChild(viewCartBtn);
+
+    const footer = document.createElement('div');
+    footer.className = 'gifts-modal-footer u-hidden';
+    document.body.appendChild(footer);
+
+    cart.renderCart();
+    expect(badge.textContent).toBe('0');
+    expect(footer.classList.contains('u-hidden')).toBe(true);
+
+    cart.addToCart('Groom', 'Gift', 100);
+    expect(badge.textContent).toBe('1');
+    expect(footer.classList.contains('u-hidden')).toBe(false);
+
+    cart.removeFromCart('Gift');
+    expect(badge.textContent).toBe('0');
+    expect(footer.classList.contains('u-hidden')).toBe(true);
+
+    viewCartBtn.remove();
+    footer.remove();
+  });
+
+  it('should persist and load cart items to/from localStorage', () => {
+    cart.addToCart('Groom', 'Persisted Gift', 120);
+    
+    const stored = JSON.parse(localStorage.getItem('wedding_cart'));
+    expect(stored).toEqual([
+      { name: 'Persisted Gift', price: 120, quantity: 1, list: 'Groom' }
+    ]);
+    
+    const newCart = new Cart(createMockElements());
+    expect(newCart.items).toEqual([
+      { name: 'Persisted Gift', price: 120, quantity: 1, list: 'Groom' }
+    ]);
+  });
+
+  it('should persist and restore guest name and message fields to/from localStorage', () => {
+    const nameEl = document.getElementById('guest-name');
+    const messageEl = document.getElementById('guest-message');
+    
+    nameEl.value = 'John Doe';
+    nameEl.dispatchEvent(new Event('input'));
+    
+    messageEl.value = 'Felicidades!';
+    messageEl.dispatchEvent(new Event('input'));
+    
+    expect(localStorage.getItem('wedding_guest_name')).toBe('John Doe');
+    expect(localStorage.getItem('wedding_guest_message')).toBe('Felicidades!');
+    
+    const newCart = new Cart(createMockElements());
+    const newNameEl = document.getElementById('guest-name');
+    const newMessageEl = document.getElementById('guest-message');
+    const newCountEl = document.getElementById('message-char-count');
+    
+    expect(newNameEl.value).toBe('John Doe');
+    expect(newMessageEl.value).toBe('Felicidades!');
+    expect(newCountEl.textContent).toBe('12 / 500');
+    
+    newCart.reset();
+    expect(localStorage.getItem('wedding_guest_name')).toBeNull();
+    expect(localStorage.getItem('wedding_guest_message')).toBeNull();
+  });
+
+  it('should cover cart edge cases, error handling, and back to list btn', () => {
+    // 1. Back to list button click handling
+    {
+      const backBtn = document.getElementById('cart-back-to-list-btn');
+      backBtn.dataset.targetModal = 'groom-gifts-modal';
+      
+      const closeSpy = vi.spyOn(cart, 'closeCart');
+      backBtn.click();
+      
+      expect(closeSpy).toHaveBeenCalled();
+      const targetModal = document.getElementById('groom-gifts-modal');
+      expect(targetModal.classList.contains('active')).toBe(true);
+
+      // Click when target modal doesn't exist
+      backBtn.dataset.targetModal = 'non-existent';
+      expect(() => backBtn.click()).not.toThrow();
+    }
+
+    // 2. localStorage throwing errors in load and save
+    {
+      const localGetSpy = vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
+        throw new Error('Get Error');
+      });
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      
+      const badCart = new Cart(createMockElements());
+      expect(badCart.items).toEqual([]);
+      expect(errorSpy).toHaveBeenCalled();
+
+      localGetSpy.mockRestore();
+
+      const localSetSpy = vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+        throw new Error('Set Error');
+      });
+      
+      cart.addToCart('Groom', 'Gift', 10);
+      expect(errorSpy).toHaveBeenCalled();
+
+      // Trigger form input events to hit the respective catch blocks
+      const nameEl = document.getElementById('guest-name');
+      const messageEl = document.getElementById('guest-message');
+      const publicEl = document.getElementById('message-public');
+      if (nameEl) {
+        nameEl.value = 'John';
+        nameEl.dispatchEvent(new Event('input'));
+      }
+      if (messageEl) {
+        messageEl.value = 'Msg';
+        messageEl.dispatchEvent(new Event('input'));
+      }
+      if (publicEl) {
+        publicEl.checked = false;
+        publicEl.dispatchEvent(new Event('change'));
+      }
+
+      localSetSpy.mockRestore();
+      errorSpy.mockRestore();
+    }
+
+    // 3. Form persistence storedPublic is 'false' and change event on checkbox
+    {
+      localStorage.setItem('wedding_message_public', 'false');
+      const anotherCart = new Cart(createMockElements());
+      const publicEl = document.getElementById('message-public');
+      expect(publicEl.checked).toBe(false);
+
+      publicEl.checked = true;
+      publicEl.dispatchEvent(new Event('change'));
+      expect(localStorage.getItem('wedding_message_public')).toBe('true');
+    }
   });
 });

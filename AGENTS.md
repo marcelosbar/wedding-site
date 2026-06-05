@@ -20,6 +20,7 @@ This is a wedding website for Lorena and Marcelo. The primary goal is to provide
    - Never write inline event handlers (`onclick`, `onload`, etc.) or inline styling attributes/blocks. All events must be dynamically attached using `addEventListener` in JS modules.
    - A regression test suite exists in `tests/security.test.js` to enforce these HTML and CSP constraints; ensure this test passes.
    - Firestore security rules (`firestore.rules`) enforce a cap of `totalAmount <= 5000` to prevent scoreboard manipulation, restrict transaction updates strictly to the `status` field, and require `email_verified == true` for admin authentication.
+9. **Git & Branch Strategy**: Always create new branches or worktrees based on the most up-to-date version of `main` from origin (`origin/main`). Always fetch remote changes (`git fetch origin`) before branching to ensure a clean, current baseline.
 
 ## Current State
 - The UI is complete and tested.

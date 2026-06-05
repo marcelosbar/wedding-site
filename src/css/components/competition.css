@@ -131,3 +131,8 @@
   border-radius: var(--radius-md);
   margin-bottom: 0.75rem;
 }
+
+#competition.messages-hidden {
+  padding-bottom: 2.5rem;
+}
+

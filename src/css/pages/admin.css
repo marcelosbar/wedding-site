@@ -286,3 +286,44 @@ body.admin-body {
   background-color: rgba(226, 232, 240, 0.4);
 }
 
+/* Modal gifts container and list */
+.modal-gifts-container {
+  margin-bottom: 1.25rem;
+}
+
+.modal-gifts-container p {
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: var(--color-text-main);
+}
+
+.modal-gifts-list {
+  margin: 0;
+  padding-left: 1.25rem;
+  font-size: 0.9rem;
+  color: var(--color-text-main);
+  line-height: 1.4;
+}
+
+.modal-gifts-list li {
+  margin-bottom: 0.25rem;
+}
+
+.admin-detail-link {
+  color: var(--color-primary);
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+  text-align: left;
+  transition: color 0.2s;
+}
+
+.admin-detail-link:hover {
+  color: var(--color-secondary);
+}
+

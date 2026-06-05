@@ -15,7 +15,7 @@ vi.mock('../src/js/firebase.js', () => {
   };
 });
 
-import { onSnapshot } from '../src/js/firebase.js';
+import { onSnapshot, query } from '../src/js/firebase.js';
 
 function createMockElements() {
   document.body.innerHTML = `
@@ -265,5 +265,75 @@ describe('MessagesCarousel', () => {
     // The messages section should have class 'u-hidden'
     const section = document.getElementById('messages');
     expect(section.classList.contains('u-hidden')).toBe(true);
+  });
+
+  it('should handle synchronous database errors during initialization', () => {
+    query.mockImplementationOnce(() => {
+      throw new Error('Sync Query Error');
+    });
+
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    
+    carousel.init();
+
+    expect(carousel.messages.length).toBe(0);
+    const section = document.getElementById('messages');
+    expect(section.classList.contains('u-hidden')).toBe(true);
+    expect(document.getElementById('competition').classList.contains('messages-hidden')).toBe(true);
+
+    warnSpy.mockRestore();
+  });
+
+  it('should render correctly and disable controls if there is only 1 message', () => {
+    carousel.messages = [
+      { guestName: 'Single', message: 'One message', timestamp: '2026-05-31T12:00:00Z' }
+    ];
+    carousel.render();
+
+    expect(carousel.currentIndex).toBe(0);
+    const slides = elements.trackEl.querySelectorAll('.carousel-slide');
+    expect(slides.length).toBe(1);
+
+    expect(elements.prevBtn.style.display).toBe('none');
+    expect(elements.nextBtn.style.display).toBe('none');
+    const dots = elements.dotsEl.querySelectorAll('.carousel-dot');
+    expect(dots.length).toBe(0);
+  });
+
+  it('should handle edge cases and missing elements gracefully', () => {
+    // 1. Missing elements
+    const emptyCarousel = new MessagesCarousel();
+    expect(() => emptyCarousel.init()).not.toThrow();
+    expect(() => emptyCarousel.render()).not.toThrow();
+    expect(() => emptyCarousel.setupListeners()).not.toThrow();
+
+    // 2. goToSlide, prevSlide, nextSlide, startAutoplay with <= 1 messages
+    const singleCarousel = new MessagesCarousel(elements);
+    singleCarousel.messages = [{ guestName: 'A', message: 'Msg', timestamp: '2026-05-31T12:00:00Z' }];
+    expect(() => singleCarousel.prevSlide()).not.toThrow();
+    expect(() => singleCarousel.nextSlide()).not.toThrow();
+    expect(() => singleCarousel.goToSlide(0)).not.toThrow();
+    expect(() => singleCarousel.goToSlide(1)).not.toThrow();
+    expect(() => singleCarousel.goToSlide(-1)).not.toThrow();
+    expect(() => singleCarousel.startAutoplay()).not.toThrow();
+
+    // 3. Carousel with multiple messages but invalid index in goToSlide
+    carousel.messages = [
+      { guestName: 'A', message: 'Msg A', timestamp: '2026-05-31T12:00:00Z' },
+      { guestName: 'B', message: 'Msg B', timestamp: '2026-05-31T12:01:00Z' }
+    ];
+    carousel.render();
+    carousel.goToSlide(-1);
+    expect(carousel.currentIndex).toBe(0);
+    carousel.goToSlide(2);
+    expect(carousel.currentIndex).toBe(0);
+
+    // 4. Missing optional DOM nodes like competition or messages section
+    const msgSec = document.getElementById('messages');
+    const compSec = document.getElementById('competition');
+    if (msgSec) msgSec.remove();
+    if (compSec) compSec.remove();
+    carousel.messages = [];
+    expect(() => carousel.render()).not.toThrow();
   });
 });

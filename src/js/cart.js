@@ -142,34 +142,50 @@ export class Cart {
     const counterEl = document.getElementById('message-char-count');
     
     // Restore values from localStorage
-    if (nameEl) nameEl.value = localStorage.getItem('wedding_guest_name') || '';
-    if (messageEl) {
-      messageEl.value = localStorage.getItem('wedding_guest_message') || '';
-      if (counterEl) {
-        counterEl.textContent = `${messageEl.value.length} / 500`;
+    try {
+      if (nameEl) nameEl.value = localStorage.getItem('wedding_guest_name') || '';
+      if (messageEl) {
+        messageEl.value = localStorage.getItem('wedding_guest_message') || '';
+        if (counterEl) {
+          counterEl.textContent = `${messageEl.value.length} / 500`;
+        }
       }
-    }
-    if (publicEl) {
-      const storedPublic = localStorage.getItem('wedding_message_public');
-      if (storedPublic !== null) {
-        publicEl.checked = storedPublic === 'true';
+      if (publicEl) {
+        const storedPublic = localStorage.getItem('wedding_message_public');
+        if (storedPublic !== null) {
+          publicEl.checked = storedPublic === 'true';
+        }
       }
+    } catch (e) {
+      console.error('Failed to restore form values from localStorage', e);
     }
     
     // Listen for inputs to save values
     if (nameEl) {
       nameEl.addEventListener('input', () => {
-        localStorage.setItem('wedding_guest_name', nameEl.value);
+        try {
+          localStorage.setItem('wedding_guest_name', nameEl.value);
+        } catch (e) {
+          console.error('Failed to save guest name to localStorage', e);
+        }
       });
     }
     if (messageEl) {
       messageEl.addEventListener('input', () => {
-        localStorage.setItem('wedding_guest_message', messageEl.value);
+        try {
+          localStorage.setItem('wedding_guest_message', messageEl.value);
+        } catch (e) {
+          console.error('Failed to save guest message to localStorage', e);
+        }
       });
     }
     if (publicEl) {
       publicEl.addEventListener('change', () => {
-        localStorage.setItem('wedding_message_public', String(publicEl.checked));
+        try {
+          localStorage.setItem('wedding_message_public', String(publicEl.checked));
+        } catch (e) {
+          console.error('Failed to save message public setting to localStorage', e);
+        }
       });
     }
   }

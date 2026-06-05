@@ -343,4 +343,76 @@ describe('Cart', () => {
     expect(localStorage.getItem('wedding_guest_name')).toBeNull();
     expect(localStorage.getItem('wedding_guest_message')).toBeNull();
   });
+
+  it('should cover cart edge cases, error handling, and back to list btn', () => {
+    // 1. Back to list button click handling
+    {
+      const backBtn = document.getElementById('cart-back-to-list-btn');
+      backBtn.dataset.targetModal = 'groom-gifts-modal';
+      
+      const closeSpy = vi.spyOn(cart, 'closeCart');
+      backBtn.click();
+      
+      expect(closeSpy).toHaveBeenCalled();
+      const targetModal = document.getElementById('groom-gifts-modal');
+      expect(targetModal.classList.contains('active')).toBe(true);
+
+      // Click when target modal doesn't exist
+      backBtn.dataset.targetModal = 'non-existent';
+      expect(() => backBtn.click()).not.toThrow();
+    }
+
+    // 2. localStorage throwing errors in load and save
+    {
+      const localGetSpy = vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
+        throw new Error('Get Error');
+      });
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      
+      const badCart = new Cart(createMockElements());
+      expect(badCart.items).toEqual([]);
+      expect(errorSpy).toHaveBeenCalled();
+
+      localGetSpy.mockRestore();
+
+      const localSetSpy = vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+        throw new Error('Set Error');
+      });
+      
+      cart.addToCart('Groom', 'Gift', 10);
+      expect(errorSpy).toHaveBeenCalled();
+
+      // Trigger form input events to hit the respective catch blocks
+      const nameEl = document.getElementById('guest-name');
+      const messageEl = document.getElementById('guest-message');
+      const publicEl = document.getElementById('message-public');
+      if (nameEl) {
+        nameEl.value = 'John';
+        nameEl.dispatchEvent(new Event('input'));
+      }
+      if (messageEl) {
+        messageEl.value = 'Msg';
+        messageEl.dispatchEvent(new Event('input'));
+      }
+      if (publicEl) {
+        publicEl.checked = false;
+        publicEl.dispatchEvent(new Event('change'));
+      }
+
+      localSetSpy.mockRestore();
+      errorSpy.mockRestore();
+    }
+
+    // 3. Form persistence storedPublic is 'false' and change event on checkbox
+    {
+      localStorage.setItem('wedding_message_public', 'false');
+      const anotherCart = new Cart(createMockElements());
+      const publicEl = document.getElementById('message-public');
+      expect(publicEl.checked).toBe(false);
+
+      publicEl.checked = true;
+      publicEl.dispatchEvent(new Event('change'));
+      expect(localStorage.getItem('wedding_message_public')).toBe('true');
+    }
+  });
 });

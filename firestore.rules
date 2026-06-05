@@ -4,10 +4,10 @@ service cloud.firestore {
 
     // Admin config document — only admins can read/write, or anyone if the doc doesn't exist yet (allows local auto-seeding)
     match /config/admins {
-      allow read: if resource == null || (request.auth != null
+      allow read: if !exists(/databases/$(database)/documents/config/admins) || (request.auth != null
                    && request.auth.token.email_verified == true
                    && request.auth.token.email in resource.data.emails);
-      allow write: if resource == null || (request.auth != null
+      allow write: if !exists(/databases/$(database)/documents/config/admins) || (request.auth != null
                     && request.auth.token.email_verified == true
                     && request.auth.token.email in resource.data.emails);
     }

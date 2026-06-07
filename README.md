@@ -6,6 +6,7 @@ Welcome to the source code of Lorena and Marcelo's wedding website. This is a fa
 
 - **Responsive Design**: Looks great on both desktop and mobile devices.
 - **Modern Aesthetics**: Features glassmorphism, smooth micro-animations, and a curated color palette (Blue, Orange, Yellow, White).
+- **Countdown Timer**: A beautiful glassmorphic countdown timer on the hero section showing the days, hours, minutes, and seconds left until the big day, with a custom post-event state.
 - **Honeymoon Competition**: A built-in cart and points system where guests can "vote" on the honeymoon destination by choosing gifts.
 - **PIX Integration**: Generates a dynamic PIX QR Code for easy payments.
 - **Hidden Admin Panel**: A secure area to review and validate guest contributions.

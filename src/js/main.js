@@ -2,6 +2,7 @@ import { Cart } from './cart.js';
 import { PixCheckout } from './pix.js';
 import { Scoreboard } from './scoreboard.js';
 import { MessagesCarousel } from './messages.js';
+import { Countdown } from './countdown.js';
 
 
 /**
@@ -31,6 +32,13 @@ export class WeddingApp {
       prevBtn: document.getElementById('carousel-prev'),
       nextBtn: document.getElementById('carousel-next'),
       dotsEl: document.getElementById('carousel-dots'),
+      countdownContainer: document.getElementById('countdown-timer'),
+      countdownGrid: document.querySelector('.countdown-grid'),
+      countdownDays: document.getElementById('countdown-days'),
+      countdownHours: document.getElementById('countdown-hours'),
+      countdownMinutes: document.getElementById('countdown-minutes'),
+      countdownSeconds: document.getElementById('countdown-seconds'),
+      countdownExpiredMsg: document.getElementById('countdown-expired-msg'),
     };
 
     // Initialize modules
@@ -38,9 +46,19 @@ export class WeddingApp {
     this.scoreboard = new Scoreboard(elements);
     this.pix = new PixCheckout(this.cart, this.scoreboard, elements);
     this.messagesCarousel = new MessagesCarousel(elements);
+    this.countdown = new Countdown('2026-08-30T15:00:00-03:00', {
+      container: elements.countdownContainer,
+      grid: elements.countdownGrid,
+      days: elements.countdownDays,
+      hours: elements.countdownHours,
+      minutes: elements.countdownMinutes,
+      seconds: elements.countdownSeconds,
+      expiredMessage: elements.countdownExpiredMsg
+    });
 
     this.scoreboard.initRealtimeScoreboard();
     this.messagesCarousel.init();
+    this.countdown.init();
     this.initEvents();
   }
 

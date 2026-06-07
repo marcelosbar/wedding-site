@@ -47,14 +47,15 @@ if (isLocalhost && !isTest) {
 
     // Auto-seed admin document for local testing
     const adminDocRef = doc(db, 'config', 'admins');
-    try {
-      await setDoc(adminDocRef, { emails: ['admin@test.com'] });
-      console.log('Banco local auto-semeado com admin@test.com');
-    } catch (err) {
-      if (err.code !== 'permission-denied') {
-        console.warn('Erro ao auto-semear documento de admin no banco local:', err);
-      }
-    }
+    setDoc(adminDocRef, { emails: ['admin@test.com'] })
+      .then(() => {
+        console.log('Banco local auto-semeado com admin@test.com');
+      })
+      .catch((err) => {
+        if (err.code !== 'permission-denied') {
+          console.warn('Erro ao auto-semear documento de admin no banco local:', err);
+        }
+      });
 
   } catch (err) {
     console.warn("Falha ao conectar aos emuladores do Firebase:", err);

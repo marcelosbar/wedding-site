@@ -22,6 +22,8 @@ This is a wedding website for Lorena and Marcelo. The primary goal is to provide
    - Firestore security rules (`firestore.rules`) enforce a cap of `totalAmount <= 5000` to prevent scoreboard manipulation, restrict transaction updates strictly to the `status` field, and require `email_verified == true` for admin authentication.
 9. **Git & Branch Strategy**: Always create new branches or worktrees based on the most up-to-date version of `main` from origin (`origin/main`). Always fetch remote changes (`git fetch origin`) before branching to ensure a clean, current baseline.
 10. **Static Assets (ImageKit CDN)**: All high-resolution images for gifts and destinations are hosted on the **ImageKit.io** CDN (ID: `vfxvr8vqa`) under the `wedding-site/` folder to avoid Firebase Hosting bandwidth limits. Never upload raw images directly to the `public/images/` repository folder. If you need to add new images, upload them to the ImageKit dashboard and use their CDN URLs in the HTML.
+11. **Documentation Maintenance**: At the end of any feature implementation, configuration change, or script update, always review and update the project documentation (such as `README.md`) to ensure setup, testing, and deployment instructions are kept fully up to date.
+12. **Continuous Improvement of Guidelines**: Proactively propose updates to this `AGENTS.md` file whenever you discover new repository quirks, security gotchas, emulator requirements, or testing best practices during your task. Focus updates on high-leverage guidelines that cannot be easily enforced by automated tests or linters to prevent documentation clutter.
 
 ## Current State
 - The UI is complete and tested.

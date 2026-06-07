@@ -35,7 +35,12 @@ To run this project locally, follow these steps:
    ```
 
 2. **Firebase Configuration**
-   Open `firebase.js` and replace the placeholder `firebaseConfig` with your actual Firebase credentials.
+   For local development with the Firebase Emulator Suite, **no configuration is required** out of the box (it uses the `demo-wedding-site` project ID and mock credentials automatically).
+   
+   If you need to connect to your live production/cloud database from your local machine:
+   - Copy the `.env.example` file to a new file named `.env`.
+   - Replace the placeholders with your actual Firebase credentials.
+   - Do *not* edit `firebase.js` directly or commit `.env` to Git (it is already ignored).
 
 3. **Start the Dev Server with Emulators**
    ```bash
@@ -56,6 +61,17 @@ To run this project locally, follow these steps:
    npm run preview:secure
    ```
    This builds the site and starts the full Firebase Emulator suite (including the Hosting emulator on port 5000). Visit `http://localhost:5000/admin.html` to verify security compliance.
+
+## Running Tests
+
+This project uses **Vitest** with **JSDOM** and **v8** for code coverage. To run the tests locally:
+```bash
+npm run test
+```
+This runs the full test suite and outputs the code coverage report. To run tests in interactive watch mode, use:
+```bash
+npm run test:watch
+```
 
 ## Deployment
 

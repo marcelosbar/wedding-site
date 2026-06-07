@@ -21,6 +21,7 @@ This is a wedding website for Lorena and Marcelo. The primary goal is to provide
    - A regression test suite exists in `tests/security.test.js` to enforce these HTML and CSP constraints; ensure this test passes.
    - Firestore security rules (`firestore.rules`) enforce a cap of `totalAmount <= 5000` to prevent scoreboard manipulation, restrict transaction updates strictly to the `status` field, and require `email_verified == true` for admin authentication.
 9. **Git & Branch Strategy**: Always create new branches or worktrees based on the most up-to-date version of `main` from origin (`origin/main`). Always fetch remote changes (`git fetch origin`) before branching to ensure a clean, current baseline.
+10. **Static Assets (ImageKit CDN)**: All high-resolution images for gifts and destinations are hosted on the **ImageKit.io** CDN (ID: `vfxvr8vqa`) under the `wedding-site/` folder to avoid Firebase Hosting bandwidth limits. Never upload raw images directly to the `public/images/` repository folder. If you need to add new images, upload them to the ImageKit dashboard and use their CDN URLs in the HTML.
 
 ## Current State
 - The UI is complete and tested.
@@ -28,7 +29,8 @@ This is a wedding website for Lorena and Marcelo. The primary goal is to provide
 - Firebase credentials are injected via environment variables (`.env` locally, GitHub Secrets in CI).
 - Admin panel is located at `admin.html`, protected by Google Sign-In with an email allowlist stored in Firestore (`/config/admins`).
 - CI/CD pipeline runs Vitest + SonarCloud before deploying to Firebase Hosting.
-- Security headers (CSP, HSTS, X-Frame-Options) are configured in `firebase.json`.
+- Security headers (CSP, HSTS, X-Frame-Options) are configured in `firebase.json` (including `https://ik.imagekit.io` whitelist).
+- Static images have been offloaded to ImageKit CDN to preserve Hosting bandwidth.
 
 ## SonarQube CLI Integration
 For local code quality checks and issue inspection, developers and AI agents can use the official **SonarQube CLI** (`sonar` command).

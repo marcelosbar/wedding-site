@@ -15,6 +15,7 @@ Welcome to the source code of Lorena and Marcelo's wedding website. This is a fa
 
 - **Frontend**: HTML5, Vanilla CSS (CSS Variables), Vanilla JavaScript (ESModules)
 - **Build Tool**: Vite
+- **Image CDN**: ImageKit.io (for automated image optimization and delivery)
 - **Backend/Database**: Firebase Firestore (for real-time competition points)
 - **Dependencies**: `qrcode` (for PIX generation), `firebase`
 

@@ -23,44 +23,43 @@ Welcome to the source code of Lorena and Marcelo's wedding website. This is a fa
 
 To run this project locally, follow these steps:
 
-1. **Prerequisites**
-   Ensure you have the following installed on your machine:
-   - **Node.js** (v18 or higher recommended)
-   - **Java (JDK or JRE)** (Java 8 or higher). This is required to execute the Firebase Local Emulator Suite (Auth & Firestore).
+### 1. Prerequisites
+Ensure you have the following installed on your machine:
+- **Node.js** (v18 or higher recommended)
+- **Java (JDK or JRE)** (Java 8 or higher). This is required to execute the Firebase Local Emulator Suite (Auth & Firestore).
 
-2. **Install Dependencies**
-   Run the following command to install the project dependencies:
-   ```bash
-   npm install
-   ```
+### 2. Install Dependencies
+Run the following command to install the project dependencies:
+```bash
+npm install
+```
 
-2. **Firebase Configuration**
-   For local development with the Firebase Emulator Suite, **no configuration is required** out of the box (it uses the `demo-wedding-site` project ID and mock credentials automatically).
-   
-   If you need to connect to your live production/cloud database from your local machine:
-   - Copy the `.env.example` file to a new file named `.env`.
-   - Replace the placeholders with your actual Firebase credentials.
-   - Do *not* edit `firebase.js` directly or commit `.env` to Git (it is already ignored).
+### 3. Firebase Configuration
+For local development with the Firebase Emulator Suite, **no configuration is required** out of the box (it uses the `demo-wedding-site` project ID and mock credentials automatically).
 
-3. **Start the Dev Server with Emulators**
-   ```bash
-   npm run dev
-   ```
-   This spins up the Vite dev server (port 5173) and the Firebase Emulators (Auth on port 9099, Firestore on port 8080) concurrently.
-   - The site will be available at `http://localhost:5173/`.
-   - The admin panel will be available at `http://localhost:5173/admin.html`.
+If you need to connect to your live production/cloud database from your local machine:
+- Copy the `.env.example` file to a new file named `.env`.
+- Replace the placeholders with your actual Firebase credentials.
 
-4. **Local Admin Authentication**
-   - Click the "Entrar com o Google" button on the Admin page.
-   - The Firebase Auth Emulator pop-up will appear. Enter `admin@test.com` to log in.
-   - The database is automatically seeded with a `/config/admins` document to grant admin permissions to `admin@test.com` on startup.
+### 4. Start the Dev Server with Emulators
+```bash
+npm run dev
+```
+This spins up the Vite dev server (port 5173) and the Firebase Emulators (Auth on port 9099, Firestore on port 8080) concurrently.
+- The site will be available at `http://localhost:5173/`.
+- The admin panel will be available at `http://localhost:5173/admin.html`.
 
-5. **Security & CSP Verification**
-   To test the production build with strict security headers (Content Security Policy, HSTS, etc.) configured in `firebase.json`:
-   ```bash
-   npm run preview:secure
-   ```
-   This builds the site and starts the full Firebase Emulator suite (including the Hosting emulator on port 5000). Visit `http://localhost:5000/admin.html` to verify security compliance.
+### 5. Local Admin Authentication
+- Click the "Entrar com o Google" button on the Admin page.
+- The Firebase Auth Emulator pop-up will appear. Enter `admin@test.com` to log in.
+- The database is automatically seeded with a `/config/admins` document to grant admin permissions to `admin@test.com` on startup.
+
+### 6. Security & CSP Verification
+To test the production build with strict security headers (Content Security Policy, HSTS, etc.) configured in `firebase.json`:
+```bash
+npm run preview:secure
+```
+This builds the site and starts the full Firebase Emulator suite (including the Hosting emulator on port 5000). Visit `http://localhost:5000/admin.html` to verify security compliance.
 
 ## Running Tests
 
@@ -73,20 +72,20 @@ This runs the full test suite and outputs the code coverage report. To run tests
 npm run test:watch
 ```
 
+## Architecture & Security Notes
+
+- **Content Security Policy (CSP)**: The project enforces a strict Content Security Policy (configured in `firebase.json`) that disables `'unsafe-inline'` for scripts and styles. All styles must live in external CSS files, and all event handlers must be attached dynamically in JS modules. Compliance is verified locally via `tests/security.test.js`.
+- **Static Assets**: To conserve hosting bandwidth, high-resolution images are offloaded to the **ImageKit.io** CDN (ID: `vfxvr8vqa`) under the `wedding-site/` folder. Avoid committing large image files to the repository.
+
 ## Deployment
 
-This project is configured to be hosted on **Firebase Hosting**.
+### CI/CD (Automated)
+This project uses GitHub Actions for automated deployment. Any commit pushed or merged to `main` is automatically built and deployed to Firebase Hosting. Opening a pull request automatically generates a temporary staging/preview environment.
 
-1. **Install Firebase CLI**
-   ```bash
-   npm install -g firebase-tools
-   ```
-2. **Login and Initialize**
-   ```bash
-   firebase login
-   firebase init hosting # (Select your project and DO NOT overwrite index.html)
-   ```
-3. **Build and Deploy**
+### Manual Deployment (Fallback)
+If manual deployment is necessary:
+1. Ensure the Firebase CLI is installed: `npm install -g firebase-tools`
+2. Run the build and deploy commands:
    ```bash
    npm run build
    firebase deploy

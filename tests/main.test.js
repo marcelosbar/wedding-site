@@ -57,6 +57,15 @@ vi.mock('../src/js/utils.js', () => ({
   showConfirm: mockShowConfirm
 }));
 
+const mockCountdownInit = vi.fn();
+vi.mock('../src/js/countdown.js', () => ({
+  Countdown: vi.fn().mockImplementation(function() {
+    return {
+      init: mockCountdownInit
+    };
+  })
+}));
+
 function setupDOM() {
   document.body.innerHTML = `
     <div id="cart-overlay"></div>
@@ -92,8 +101,15 @@ function setupDOM() {
     <button id="proceed-to-pix-btn"></button>
     <button id="copy-pix-payload-btn"></button>
     <button id="confirm-transfer-btn"></button>
-    <button id="back-to-site-btn"></button>
     <button id="cart-back-to-list-btn" class="u-hidden"></button>
+    <button id="back-to-site-btn"></button>
+    <div id="countdown-timer"></div>
+    <div class="countdown-grid"></div>
+    <span id="countdown-days"></span>
+    <span id="countdown-hours"></span>
+    <span id="countdown-minutes"></span>
+    <span id="countdown-seconds"></span>
+    <div id="countdown-expired-msg"></div>
     <input id="guest-name" value="" />
     <span id="guest-name-error" class="field-error u-hidden">Error</span>
     <button class="gifts-modal-btn" data-modal="groom-gifts-modal">Ver Presentes</button>
@@ -145,6 +161,7 @@ describe('WeddingApp Orchestrator', () => {
     expect(app.scoreboard).toBeDefined();
     expect(app.pix).toBeDefined();
     expect(mockScoreboardInit).toHaveBeenCalled();
+    expect(mockCountdownInit).toHaveBeenCalled();
   });
 
   it('should delegate Cart methods', () => {

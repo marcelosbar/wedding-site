@@ -12,11 +12,10 @@ export class Countdown {
    * Initializes the countdown timer interval.
    */
   init() {
-    if (this.elements === undefined || this.elements === null ||
-        this.elements.days === undefined || this.elements.days === null ||
-        this.elements.hours === undefined || this.elements.hours === null ||
-        this.elements.minutes === undefined || this.elements.minutes === null ||
-        this.elements.seconds === undefined || this.elements.seconds === null) {
+    if (this.elements?.days === undefined || this.elements?.days === null ||
+        this.elements?.hours === undefined || this.elements?.hours === null ||
+        this.elements?.minutes === undefined || this.elements?.minutes === null ||
+        this.elements?.seconds === undefined || this.elements?.seconds === null) {
       return;
     }
     this.update();

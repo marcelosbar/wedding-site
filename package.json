@@ -11,9 +11,11 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest run --coverage",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "test:integration": "npx firebase emulators:exec --only firestore \"npx vitest run --config vitest.integration.config.js\""
   },
   "devDependencies": {
+    "@firebase/rules-unit-testing": "^5.0.1",
     "@vitest/coverage-v8": "^4.1.8",
     "concurrently": "^10.0.3",
     "jsdom": "^29.1.1",

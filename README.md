@@ -64,14 +64,24 @@ This builds the site and starts the full Firebase Emulator suite (including the 
 
 ## Running Tests
 
-This project uses **Vitest** with **JSDOM** and **v8** for code coverage. To run the tests locally:
+This project uses **Vitest** with **JSDOM** and **v8** for code coverage.
+
+### Unit Tests
+Runs the full unit test suite (9 files, JSDOM environment) and outputs the code coverage report:
 ```bash
 npm run test
 ```
-This runs the full test suite and outputs the code coverage report. To run tests in interactive watch mode, use:
+To run tests in interactive watch mode:
 ```bash
 npm run test:watch
 ```
+
+### Integration Tests
+Runs the Firestore Security Rules integration tests against the Firebase Emulator. Requires **Java** (JDK/JRE 8+) installed:
+```bash
+npm run test:integration
+```
+This command automatically starts the Firestore Emulator, runs the tests in `tests/integration/`, and shuts down the emulator when done. These tests validate that the `firestore.rules` correctly enforce access control (e.g., the R$ 5,000 cap, admin-only updates, field validation).
 
 ## Architecture & Security Notes
 

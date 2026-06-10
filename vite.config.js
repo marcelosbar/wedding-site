@@ -18,6 +18,7 @@ export default defineConfig({
   test: {
     root: './',
     environment: 'jsdom',
+    exclude: ['tests/integration/**', 'node_modules/**'],
     coverage: {
       include: ['src/js/**'],
       exclude: ['src/js/firebase.js'],

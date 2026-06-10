@@ -4,18 +4,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { MessagesCarousel } from '../src/js/messages.js';
 
-// Mock the firebase imports BEFORE importing anything that might use them
-vi.mock('../src/js/firebase.js', () => {
-  globalThis.__mockOnSnapshot = globalThis.__mockOnSnapshot || vi.fn();
-  globalThis.__mockQuery = globalThis.__mockQuery || vi.fn();
-  return {
-    transactionsRef: {},
-    onSnapshot: globalThis.__mockOnSnapshot,
-    query: globalThis.__mockQuery
-  };
-});
-
-import { onSnapshot, query } from '../src/js/firebase.js';
+// No direct Firebase connection in MessagesCarousel module anymore.
 
 function createMockElements() {
   document.body.innerHTML = `
@@ -63,8 +52,6 @@ describe('MessagesCarousel', () => {
 
   it('should load, filter, sort and deduplicate messages from snapshot', () => {
     carousel.init();
-
-    const snapshotCallback = onSnapshot.mock.calls[0][1];
 
     const mockDocs = [
       // 1. Valid groom item
@@ -129,7 +116,7 @@ describe('MessagesCarousel', () => {
       }
     ];
 
-    snapshotCallback(mockDocs);
+    carousel.updateFromSnapshot(mockDocs);
 
     // Jose (12:00:00) and Fernanda (12:10:00) are valid and unique.
     // Order should be newest first: Fernanda, then Jose.
@@ -154,26 +141,14 @@ describe('MessagesCarousel', () => {
     expect(dots[0].classList.contains('active')).toBe(true);
   });
 
-  it('should clear messages and hide section if snapshot is empty or error occurs', () => {
+  it('should clear messages and hide section if snapshot is empty', () => {
     carousel.init();
-
-    const snapshotCallback = onSnapshot.mock.calls[0][1];
-    snapshotCallback([]); // empty list
+    carousel.updateFromSnapshot([]);
 
     expect(carousel.messages.length).toBe(0);
     const section = document.getElementById('messages');
     expect(section.classList.contains('u-hidden')).toBe(true);
     expect(document.getElementById('competition').classList.contains('messages-hidden')).toBe(true);
-
-    // Test error callback
-    const errorCallback = onSnapshot.mock.calls[0][2];
-    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-    errorCallback(new Error('Firebase Error'));
-    expect(warnSpy).toHaveBeenCalled();
-    expect(carousel.messages.length).toBe(0);
-    expect(section.classList.contains('u-hidden')).toBe(true);
-    expect(document.getElementById('competition').classList.contains('messages-hidden')).toBe(true);
-    warnSpy.mockRestore();
   });
 
   it('should navigate through slides correctly using next and prev buttons', () => {
@@ -256,32 +231,13 @@ describe('MessagesCarousel', () => {
 
   it('should hide the messages section if no approved messages exist', () => {
     carousel.init();
-
-    const snapshotCallback = onSnapshot.mock.calls[0][1];
-    snapshotCallback([]); // empty list
+    carousel.updateFromSnapshot([]);
 
     expect(carousel.messages.length).toBe(0);
     
     // The messages section should have class 'u-hidden'
     const section = document.getElementById('messages');
     expect(section.classList.contains('u-hidden')).toBe(true);
-  });
-
-  it('should handle synchronous database errors during initialization', () => {
-    query.mockImplementationOnce(() => {
-      throw new Error('Sync Query Error');
-    });
-
-    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-    
-    carousel.init();
-
-    expect(carousel.messages.length).toBe(0);
-    const section = document.getElementById('messages');
-    expect(section.classList.contains('u-hidden')).toBe(true);
-    expect(document.getElementById('competition').classList.contains('messages-hidden')).toBe(true);
-
-    warnSpy.mockRestore();
   });
 
   it('should render correctly and disable controls if there is only 1 message', () => {

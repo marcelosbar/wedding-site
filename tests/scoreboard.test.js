@@ -4,20 +4,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { Scoreboard } from '../src/js/scoreboard.js';
 
-// Mock the firebase imports BEFORE importing anything that might use them
-vi.mock('../src/js/firebase.js', () => {
-  globalThis.__mockOnSnapshot = globalThis.__mockOnSnapshot || vi.fn();
-  globalThis.__mockQuery = globalThis.__mockQuery || vi.fn();
-  return {
-    transactionsRef: {},
-    onSnapshot: globalThis.__mockOnSnapshot,
-    query: globalThis.__mockQuery
-  };
-});
-
-// Capture firebase imports to trigger callbacks
-import { onSnapshot, query } from '../src/js/firebase.js';
-
 function createMockElements() {
   document.body.innerHTML = `
     <div id="global-groom-points">0 pts</div>
@@ -79,22 +65,14 @@ describe('Scoreboard', () => {
     expect(document.getElementById('global-progress-divider').style.left).toBe('50%');
   });
 
-  it('should set up realtime sync and handle snapshots', () => {
-    scoreboard.initRealtimeScoreboard();
-    expect(query).toHaveBeenCalled();
-    expect(onSnapshot).toHaveBeenCalled();
-
-    // Grab callback passed to onSnapshot
-    const snapshotCallback = onSnapshot.mock.calls[0][1];
-
-    // Trigger with mock transactions snapshot
+  it('should update the scoreboard and UI from a snapshot', () => {
     const mockDocs = [
       { data: () => ({ status: 'approved', listChosen: 'Groom', totalAmount: 150 }) },
       { data: () => ({ status: 'pending', listChosen: 'Bride', totalAmount: 50 }) },
       { data: () => ({ status: 'rejected', listChosen: 'Groom', totalAmount: 500 }) } // Rejected should be ignored!
     ];
 
-    snapshotCallback(mockDocs);
+    scoreboard.updateFromSnapshot(mockDocs);
 
     expect(document.getElementById('global-groom-points').innerText).toBe('150 pts');
     expect(document.getElementById('global-bride-points').innerText).toBe('50 pts');
@@ -102,15 +80,9 @@ describe('Scoreboard', () => {
     expect(document.getElementById('global-progress-divider').style.left).toBe('75%');
   });
 
-  it('should handle realtime error callback', () => {
-    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
-    scoreboard.initRealtimeScoreboard();
-    
-    // Grab error callback passed to onSnapshot (third arg)
-    const errorCallback = onSnapshot.mock.calls[0][2];
-    errorCallback(new Error('Permission denied'));
-
-    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('Firebase Config'));
-    logSpy.mockRestore();
+  it('should handle empty snapshot gracefully', () => {
+    scoreboard.updateFromSnapshot([]);
+    expect(document.getElementById('global-groom-points').innerText).toBe('0 pts');
+    expect(document.getElementById('global-bride-points').innerText).toBe('0 pts');
   });
 });

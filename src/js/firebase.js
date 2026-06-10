@@ -1,6 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore, collection, connectFirestoreEmulator, doc, getDoc, setDoc } from "firebase/firestore";
 import { getAuth, GoogleAuthProvider, connectAuthEmulator } from "firebase/auth";
+import { getAnalytics } from "firebase/analytics";
 
 // Configuração via variáveis de ambiente (.env)
 const firebaseConfig = {
@@ -9,7 +10,8 @@ const firebaseConfig = {
   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "demo-wedding-site",
   storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "mock-storage-bucket",
   messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "mock-sender-id",
-  appId: import.meta.env.VITE_FIREBASE_APP_ID || "mock-app-id"
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || "mock-app-id",
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || ""
 };
 
 const app = initializeApp(firebaseConfig);
@@ -63,6 +65,17 @@ if (isLocalhost && !isTest) {
   }
 }
 
+let analyticsInstance = null;
+if (!isLocalhost && !isTest && firebaseConfig.apiKey && firebaseConfig.apiKey !== "mock-api-key" && firebaseConfig.measurementId) {
+  try {
+    analyticsInstance = getAnalytics(app);
+    console.log("Google Analytics inicializado com sucesso.");
+  } catch (err) {
+    console.warn("Falha ao inicializar o Google Analytics:", err);
+  }
+}
+
 export const auth = authInstance;
 export const googleProvider = providerInstance;
-export { addDoc, onSnapshot, query, getDocs } from "firebase/firestore";
+export const analytics = analyticsInstance;
+export { addDoc, onSnapshot, query, getDocs, where } from "firebase/firestore";

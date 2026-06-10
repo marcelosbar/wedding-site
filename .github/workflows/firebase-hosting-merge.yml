@@ -24,6 +24,11 @@ jobs:
           base: ${{ github.event.before }}
           head: ${{ github.event.after }}
           extra_args: --only-verified
+      - name: Set up Node.js
+        uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4.1.0
+        with:
+          node-version: '20'
+          cache: 'npm'
       - run: npm ci --ignore-scripts
       - name: Snyk Open Source Scan
         uses: snyk/actions/node@8e119fbb6c251787721d34ba683ed48eba792766 # master @ 2026-05-27
@@ -46,11 +51,20 @@ jobs:
           args: --severity-threshold=high --include-ignores
       - name: Run Tests & Generate Coverage
         run: npm run test
-      - name: Set up JDK 21
+      - name: Set up JDK 21 (for Integration Tests & SonarCloud)
         uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654 # v5.2.0
         with:
           java-version: '21'
           distribution: 'temurin'
+      - name: Cache Firebase Emulators
+        uses: actions/cache@1bd1e32a3bdc45362d1e726936510720a7c30a57 # v4.2.0
+        with:
+          path: ~/.cache/firebase/emulators
+          key: ${{ runner.os }}-firebase-emulators-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-firebase-emulators-
+      - name: Run Integration Tests
+        run: npm run test:integration
       - name: SonarCloud Scan
         uses: SonarSource/sonarqube-scan-action@7006c4492b2e0ee0f816d36501671557c97f5995 # v8.1.0
         env:

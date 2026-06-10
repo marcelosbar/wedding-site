@@ -66,6 +66,14 @@ vi.mock('../src/js/countdown.js', () => ({
   })
 }));
 
+vi.mock('../src/js/firebase.js', () => ({
+  transactionsRef: {},
+  onSnapshot: vi.fn((q, callback) => {
+    return () => {};
+  }),
+  query: vi.fn()
+}));
+
 function setupDOM() {
   document.body.innerHTML = `
     <div id="cart-overlay"></div>

@@ -1,5 +1,3 @@
-import { transactionsRef, onSnapshot, query } from './firebase.js';
-
 /**
  * Scoreboard module — handles real-time score tracking and UI updates.
  */
@@ -13,30 +11,25 @@ export class Scoreboard {
   }
 
   initRealtimeScoreboard() {
+    // Database sync is now centralized in main.js
+    console.log('Scoreboard initialized.');
+  }
+
+  updateFromSnapshot(snapshot) {
     let groomScore = 0;
     let brideScore = 0;
 
-    try {
-      const q = query(transactionsRef);
-      onSnapshot(q, (snapshot) => {
-        groomScore = 0;
-        brideScore = 0;
-
-        snapshot.forEach((doc) => {
-          const data = doc.data();
-          if (data.status !== 'rejected') {
-            if (data.listChosen === 'Groom') groomScore += data.totalAmount;
-            if (data.listChosen === 'Bride') brideScore += data.totalAmount;
-          }
-        });
-
-        this.updateScoreboardUI(groomScore, brideScore);
-      }, () => {
-        console.log('Waiting for proper Firebase Config to enable real-time sync.');
+    if (snapshot && typeof snapshot.forEach === 'function') {
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        if (data.status !== 'rejected') {
+          if (data.listChosen === 'Groom') groomScore += data.totalAmount;
+          if (data.listChosen === 'Bride') brideScore += data.totalAmount;
+        }
       });
-    } catch (e) {
-      console.warn('Firebase not configured correctly for realtime sync.', e);
     }
+
+    this.updateScoreboardUI(groomScore, brideScore);
   }
 
   simulateLocalScoreboard(list, amount) {

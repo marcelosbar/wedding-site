@@ -1,5 +1,3 @@
-import { transactionsRef, onSnapshot, query } from './firebase.js';
-
 /**
  * MessagesCarousel module — handles fetching, deduplication, and display of guest messages in a premium carousel.
  */
@@ -27,47 +25,45 @@ export class MessagesCarousel {
   }
 
   /**
-   * Subscribes to transaction collection snapshots.
+   * Compatibility method for initialization. Database updates are handled in main.js.
    */
   loadMessages() {
-    try {
-      const q = query(transactionsRef);
-      onSnapshot(q, (snapshot) => {
-        const rawMessages = [];
-        snapshot.forEach((doc) => {
-          const data = doc.data();
-          // Select only approved, public transactions with non-empty messages
-          if (
-            data.status === 'approved' &&
-            data.isPublic === true &&
-            data.message &&
-            data.message.trim() !== ''
-          ) {
-            rawMessages.push({
-              guestName: data.guestName,
-              message: data.message,
-              timestamp: data.timestamp
-            });
-          }
-        });
+    console.log('Messages list ready to receive updates.');
+  }
 
-        // Deduplicate cart splits
-        this.messages = this.deduplicateMessages(rawMessages);
-        
-        // Sort by timestamp (newest first)
-        this.messages.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-
-        this.render();
-      }, (error) => {
-        console.warn('Firebase error fetching messages.', error);
-        this.messages = [];
-        this.render();
+  /**
+   * Receives transaction snapshots from the central listener in main.js,
+   * filters for approved public messages, and updates the carousel.
+   */
+  updateFromSnapshot(snapshot) {
+    const rawMessages = [];
+    
+    if (snapshot && typeof snapshot.forEach === 'function') {
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        // Select only approved, public transactions with non-empty messages
+        if (
+          data.status === 'approved' &&
+          data.isPublic === true &&
+          data.message &&
+          data.message.trim() !== ''
+        ) {
+          rawMessages.push({
+            guestName: data.guestName,
+            message: data.message,
+            timestamp: data.timestamp
+          });
+        }
       });
-    } catch (e) {
-      console.warn('Firebase not configured.', e);
-      this.messages = [];
-      this.render();
     }
+
+    // Deduplicate cart splits
+    this.messages = this.deduplicateMessages(rawMessages);
+    
+    // Sort by timestamp (newest first)
+    this.messages.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+    this.render();
   }
 
   /**

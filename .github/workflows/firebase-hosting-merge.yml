@@ -44,13 +44,13 @@ jobs:
         with:
           command: code test
           args: --severity-threshold=high --include-ignores
-      - name: Set up JDK 21
+      - name: Run Tests & Generate Coverage
+        run: npm run test
+      - name: Set up JDK 21 (for Integration Tests & SonarCloud)
         uses: actions/setup-java@99b8673ff64fbf99d8d325f52d9a5bdedb8483e9 # v4.2.1
         with:
           java-version: '21'
           distribution: 'temurin'
-      - name: Run Tests & Generate Coverage
-        run: npm run test
       - name: Run Integration Tests
         run: npm run test:integration
       - name: SonarCloud Scan

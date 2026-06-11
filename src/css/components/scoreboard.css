@@ -98,6 +98,16 @@
 .divider-icon {
   font-size: 1.2rem;
   animation: pulse-heart 2s infinite ease-in-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.divider-heart-svg {
+  width: 24px;
+  height: 24px;
+  fill: #d12020;
+  display: block;
 }
 
 @keyframes pulse-heart {

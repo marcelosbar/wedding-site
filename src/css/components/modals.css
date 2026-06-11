@@ -42,7 +42,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 1.5rem 2rem;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid #e7ddc8;
   flex-shrink: 0;
 }
 
@@ -79,7 +79,7 @@
 
 .gifts-modal-footer {
   padding: 1.25rem 2rem;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid #e7ddc8;
   display: flex;
   justify-content: flex-end;
   background: var(--color-surface);

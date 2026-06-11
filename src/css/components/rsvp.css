@@ -1,18 +1,123 @@
-/* RSVP Section */
+/* RSVP Section — Marcador de mesa (convite creme) */
 #rsvp {
-  background-color: var(--color-primary);
-  color: var(--color-text-inverse);
+  position: relative;
+  overflow: hidden;
+  background-color: var(--color-background);
+  color: var(--color-text-main);
   text-align: center;
-  padding-top: 2.5rem;
-  padding-bottom: 2.5rem;
+  margin-top: 2.5rem;
+  padding-top: 4rem;
+  padding-bottom: 4.5rem;
 }
 
-#rsvp .section-title, #rsvp .section-title::after {
-  color: var(--color-text-inverse);
-  background-color: var(--color-accent);
+/* Pattern de azulejos desfocado e suave */
+#rsvp::before {
+  content: '';
+  position: absolute;
+  inset: -40px;
+  background-image: url('https://ik.imagekit.io/vfxvr8vqa/wedding-site/azulejo-tile.png');
+  background-repeat: repeat;
+  background-size: 150px 150px;
+  filter: blur(2.5px);
+  opacity: 0.5;
+  z-index: 0;
+  pointer-events: none;
 }
 
-.rsvp-content {
-  max-width: 600px;
+/* Véu creme por cima do pattern (acalma o centro p/ leitura do cartão) */
+#rsvp::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 48% 58% at 50% 50%, rgba(247, 244, 239, 0.96) 0%, rgba(247, 244, 239, 0.78) 42%, rgba(247, 244, 239, 0.18) 100%);
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* O cartão creme com filete cobalto + cantos de azulejo */
+.rsvp-card {
+  position: relative;
+  z-index: 1;
+  max-width: 620px;
   margin: 0 auto;
+  padding: 3.75rem 3rem 3.5rem;
+  background: var(--color-surface);
+  box-shadow: 0 22px 50px -20px rgba(22, 48, 107, 0.35);
+}
+
+/* Filete cobalto interno */
+.rsvp-frame {
+  position: absolute;
+  inset: 22px;
+  border: 1.6px solid rgba(29, 70, 153, 0.85);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Cantos de azulejo (gotas azuis + ponto dourado) */
+.rsvp-corner {
+  position: absolute;
+  width: 56px;
+  height: 53px;
+  background-repeat: no-repeat;
+  background-size: contain;
+  pointer-events: none;
+  z-index: 1;
+}
+.rsvp-corner-tl { top: 11px;  left: 11px;  background-image: url('https://ik.imagekit.io/vfxvr8vqa/wedding-site/rsvp-corner-tl.png'); }
+.rsvp-corner-tr { top: 11px;  right: 11px; background-image: url('https://ik.imagekit.io/vfxvr8vqa/wedding-site/rsvp-corner-tr.png'); }
+.rsvp-corner-bl { bottom: 11px; left: 11px;  background-image: url('https://ik.imagekit.io/vfxvr8vqa/wedding-site/rsvp-corner-bl.png'); }
+.rsvp-corner-br { bottom: 11px; right: 11px; background-image: url('https://ik.imagekit.io/vfxvr8vqa/wedding-site/rsvp-corner-br.png'); }
+
+.rsvp-script {
+  font-family: var(--font-heading);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 1.35rem;
+  line-height: 1.2;
+  color: var(--color-secondary-deep);
+  margin-bottom: 0.5rem;
+}
+
+#rsvp .section-title {
+  color: var(--color-primary);
+  font-size: clamp(2rem, 4.5vw, 2.6rem);
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+#rsvp .section-title::after {
+  display: none;
+}
+
+#rsvp .ornament {
+  margin: 1.1rem auto 1.4rem;
+}
+
+#rsvp .divider-arabesco {
+  width: min(300px, 70%);
+  margin: 0.6rem auto 1.6rem;
+}
+
+#rsvp .u-lead-text {
+  font-family: var(--font-heading);
+  font-style: italic;
+  font-size: 1.3rem;
+  color: var(--color-text-muted);
+  max-width: 42ch;
+  margin: 0 auto 2rem;
+}
+
+@media (max-width: 600px) {
+  .rsvp-card {
+    padding: 3rem 1.75rem 2.75rem;
+  }
+  .rsvp-frame { inset: 16px; }
+  .rsvp-corner { width: 46px; height: 44px; top: auto; bottom: auto; }
+  .rsvp-corner-tl { top: 9px;  left: 9px; }
+  .rsvp-corner-tr { top: 9px;  right: 9px; }
+  .rsvp-corner-bl { bottom: 9px; left: 9px; }
+  .rsvp-corner-br { bottom: 9px; right: 9px; }
+  .rsvp-script { font-size: 1.2rem; }
 }

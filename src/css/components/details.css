@@ -9,6 +9,7 @@
 
 .details-card {
   background: var(--color-surface);
+  border: 1px solid rgba(198, 154, 58, 0.3);
   border-radius: var(--radius-lg);
   padding: 3rem 2rem;
   box-shadow: var(--shadow-md);
@@ -28,7 +29,7 @@
   left: 0;
   width: 100%;
   height: 4px;
-  background: linear-gradient(90deg, var(--color-primary), var(--color-secondary));
+  background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
   opacity: 0;
   transition: opacity 0.3s ease;
 }
@@ -50,9 +51,26 @@
   align-items: center;
   justify-content: center;
   margin-bottom: 2rem;
-  background: linear-gradient(135deg, rgba(29, 78, 216, 0.08), rgba(234, 88, 12, 0.08));
+  background: rgba(29, 70, 153, 0.08);
   color: var(--color-primary);
+  border: 1px solid rgba(29, 70, 153, 0.18);
   transition: all 0.3s ease;
+}
+
+/* Ícones de marca (azulejo) — herdam a cor do card; detalhes em ouro */
+.brand-icon {
+  width: auto;
+  height: auto;
+}
+.brand-icon path {
+  fill: currentColor;
+}
+.brand-icon .brand-icon-accent {
+  fill: var(--color-accent);
+}
+/* No card dourado, o detalhe vira cobalto p/ contraste */
+.details-card:nth-child(2) .brand-icon .brand-icon-accent {
+  fill: var(--color-primary);
 }
 
 .details-card:hover .details-icon-wrapper {
@@ -60,20 +78,23 @@
 }
 
 .details-card:nth-child(2) .details-icon-wrapper {
-  background: linear-gradient(135deg, rgba(234, 88, 12, 0.08), rgba(234, 88, 12, 0.15));
+  background: rgba(198, 154, 58, 0.1);
   color: var(--color-secondary);
+  border-color: rgba(198, 154, 58, 0.3);
 }
 
 .details-card:nth-child(3) .details-icon-wrapper {
-  background: linear-gradient(135deg, rgba(234, 179, 8, 0.08), rgba(234, 179, 8, 0.15));
-  color: var(--color-secondary); /* Cohesive styling using brand colors */
+  background: rgba(111, 133, 66, 0.1);
+  color: var(--color-green-deep);
+  border-color: rgba(111, 133, 66, 0.3);
 }
 
 .details-card h3 {
-  font-size: 1.6rem;
+  font-size: 1.7rem;
   margin-bottom: 1.25rem;
-  color: var(--color-text-main);
+  color: var(--color-primary);
   font-family: var(--font-heading);
+  font-weight: 600;
 }
 
 .details-card p {
@@ -112,7 +133,7 @@
 }
 
 .details-card:nth-child(3) .details-list li svg {
-  color: var(--color-secondary);
+  color: var(--color-green-deep);
 }
 
 .details-list li strong {

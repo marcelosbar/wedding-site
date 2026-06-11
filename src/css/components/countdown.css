@@ -12,12 +12,10 @@
 }
 
 .countdown-card {
-  background: rgba(255, 255, 255, 0.75);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(29, 78, 216, 0.15); /* Light blue border */
-  border-radius: var(--radius-lg);
-  padding: 1.25rem 0.5rem;
+  background: var(--color-surface);
+  border: 1px solid rgba(198, 154, 58, 0.4);
+  border-radius: var(--radius-md);
+  padding: 1.35rem 0.5rem;
   box-shadow: var(--shadow-sm);
   display: flex;
   flex-direction: column;
@@ -29,31 +27,31 @@
 .countdown-card:hover {
   transform: translateY(-4px);
   box-shadow: var(--shadow-md);
-  border-color: rgba(234, 88, 12, 0.3); /* Accent orange on hover */
+  border-color: var(--color-accent);
 }
 
 .countdown-value {
-  font-size: 2.5rem;
-  font-weight: 700;
+  font-size: 2.6rem;
+  font-weight: 600;
   color: var(--color-primary);
-  font-family: var(--font-body);
+  font-family: var(--font-heading);
   line-height: 1;
   margin-bottom: 0.35rem;
 }
 
 .countdown-label {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   text-transform: uppercase;
-  letter-spacing: 1px;
-  color: var(--color-text-muted);
-  font-weight: 600;
+  letter-spacing: 2px;
+  color: var(--color-secondary);
+  font-weight: 700;
 }
 
 .countdown-expired {
-  font-family: var(--font-heading);
-  font-size: 1.75rem;
-  color: var(--color-secondary);
-  font-weight: 700;
+  font-family: var(--font-script);
+  font-size: 2.6rem;
+  color: var(--color-primary);
+  font-weight: 400;
   padding: 1rem;
   border-radius: var(--radius-lg);
   animation: countdown-pulse 2s infinite ease-in-out;

@@ -1,27 +1,90 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Pinyon+Script&family=Dancing+Script:wght@600;700&display=swap');
+
+/* ===== Montserrat (tipografia do site) ===== */
+@font-face {
+  font-family: 'Montserrat';
+  src: url('../fonts/Montserrat-Light.otf') format('opentype');
+  font-weight: 300; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Montserrat';
+  src: url('../fonts/Montserrat-LightItalic.otf') format('opentype');
+  font-weight: 300; font-style: italic; font-display: swap;
+}
+@font-face {
+  font-family: 'Montserrat';
+  src: url('../fonts/Montserrat-Regular.otf') format('opentype');
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Montserrat';
+  src: url('../fonts/Montserrat-Italic.otf') format('opentype');
+  font-weight: 400; font-style: italic; font-display: swap;
+}
+@font-face {
+  font-family: 'Montserrat';
+  src: url('../fonts/Montserrat-Medium.otf') format('opentype');
+  font-weight: 500; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Montserrat';
+  src: url('../fonts/Montserrat-MediumItalic.otf') format('opentype');
+  font-weight: 500; font-style: italic; font-display: swap;
+}
+@font-face {
+  font-family: 'Montserrat';
+  src: url('../fonts/Montserrat-SemiBold.otf') format('opentype');
+  font-weight: 600; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Montserrat';
+  src: url('../fonts/Montserrat-Bold.otf') format('opentype');
+  font-weight: 700; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Montserrat';
+  src: url('../fonts/Montserrat-ExtraBold.otf') format('opentype');
+  font-weight: 800; font-style: normal; font-display: swap;
+}
 
 :root {
-  /* Brand Colors */
-  --color-primary: #1d4ed8;    /* Blue */
-  --color-secondary: #ea580c;  /* Orange */
-  --color-accent: #eab308;     /* Yellow */
-  --color-background: #f8fafc; /* Off-White */
-  --color-surface: #ffffff;    /* White */
-  
+  /* ===== Brand Colors — Azulejo Português (cobalto + ouro + creme) ===== */
+  --color-primary: #1d4699;       /* Cobalto — Time Noivo, títulos */
+  --color-primary-bright: #2f57bf;/* Azul flor — preenchimentos */
+  --color-primary-deep: #16306b;  /* Azul-marinho — filetes, footer */
+
+  --color-secondary: #a87c24;     /* Ocre/ouro — Time Noiva */
+  --color-secondary-deep: #855f17;
+  --color-accent: #c69a3a;        /* Ouro — ornamentos, divisores, botões */
+  --color-gold-soft: #ddbd72;     /* Ouro claro — detalhes sutis */
+
+  --color-green: #6f8542;         /* Folhagem/oliva — terciária */
+  --color-green-deep: #4f6b3a;    /* Verde porta da capela */
+
+  --color-background: #f7f4ef;    /* Papel creme */
+  --color-surface: #fffdf8;       /* Branco quente — cards */
+
   /* Text Colors */
-  --color-text-main: #1e293b;
-  --color-text-muted: #64748b;
-  --color-text-inverse: #ffffff;
+  --color-text-main: #2b3340;     /* Tinta ardósia quente */
+  --color-text-muted: #6f7164;    /* Cinza-oliva suave */
+  --color-text-inverse: #fdfbf3;
 
   /* Fonts */
-  --font-heading: 'Playfair Display', serif;
-  --font-body: 'Inter', sans-serif;
+  --font-script: 'Pinyon Script', cursive;          /* "Lorena e Marcelo" e acentos manuscritos */
+  --font-heading: 'Montserrat', system-ui, sans-serif;
+  --font-body: 'Montserrat', system-ui, sans-serif;
 
   /* Shadows & Radius */
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
-  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
-  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
-  --radius-md: 0.5rem;
-  --radius-lg: 1rem;
+  --shadow-sm: 0 1px 3px rgba(22, 48, 107, 0.08);
+  --shadow-md: 0 6px 18px -6px rgba(22, 48, 107, 0.18);
+  --shadow-lg: 0 18px 40px -12px rgba(22, 48, 107, 0.22);
+  --radius-md: 0.4rem;
+  --radius-lg: 0.75rem;
   --radius-full: 9999px;
+
+  /* Azulejo decorative assets */
+  --corner-tl: url('https://ik.imagekit.io/vfxvr8vqa/wedding-site/corner.png');
+  --corner-tr: url('https://ik.imagekit.io/vfxvr8vqa/wedding-site/corner-tr.png');
+  --corner-bl: url('https://ik.imagekit.io/vfxvr8vqa/wedding-site/corner-bl.png');
+  --corner-br: url('https://ik.imagekit.io/vfxvr8vqa/wedding-site/corner-br.png');
 }

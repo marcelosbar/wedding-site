@@ -61,7 +61,7 @@
   justify-content: space-between;
   gap: 1rem;
   padding: 0.75rem 0;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid #e7ddc8;
 }
 
 .cart-item-qty-controls {
@@ -74,8 +74,8 @@
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  border: 1px solid #cbd5e1;
-  background: #f8fafc;
+  border: 1px solid #cdbf9f;
+  background: #f7f4ef;
   color: var(--color-text-main);
   cursor: pointer;
   display: flex;
@@ -87,7 +87,7 @@
 }
 
 .cart-qty-btn:hover {
-  background: #e2e8f0;
+  background: #e7ddc8;
 }
 
 .cart-qty-val {

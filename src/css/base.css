@@ -111,5 +111,10 @@ img {
   display: block;
   width: min(360px, 74%);
   height: auto;
-  margin: 1.4rem auto;
+  margin: 0.85rem auto;
+}
+
+/* Hide Firebase emulator warning banner during local testing */
+.firebase-emulator-warning {
+  display: none !important;
 }

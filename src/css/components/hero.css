@@ -1,12 +1,13 @@
 #hero {
-  min-height: 100vh;
+  min-height: calc(100vh - 80px);
+  margin-top: 80px; /* Desloca o hero para começar exatamente após a altura do header */
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2.75rem;
+  gap: clamp(2rem, 6vh, 4rem); /* Aumentado dinamicamente para empurrar o topo e base */
   text-align: center;
-  padding: 6.5rem 1.25rem 3rem;
+  padding: 2rem 1.25rem; /* Reajustado levemente */
   position: relative;
   overflow: hidden;
   background-color: var(--color-background);
@@ -15,9 +16,10 @@
 /* Ilustração do casamento preenchendo o fundo inteiro */
 .hero-bg-img {
   position: absolute;
-  inset: 0;
+  top: -80px; /* Puxa para cima para cobrir a área do header */
+  left: 0;
   width: 100%;
-  height: 100%;
+  height: calc(100% + 80px); /* Preenche toda a tela útil */
   object-fit: cover;
   object-position: center 64%;
   z-index: 0;
@@ -27,7 +29,10 @@
 #hero::after {
   content: '';
   position: absolute;
-  inset: 0;
+  top: -80px; /* Puxa para cima para cobrir a área do header */
+  left: 0;
+  width: 100%;
+  height: calc(100% + 80px); /* Preenche toda a tela útil */
   background:
     radial-gradient(ellipse 46% 62% at 50% 48%, rgba(247, 244, 239, 0.5) 0%, rgba(247, 244, 239, 0.12) 55%, transparent 75%),
     linear-gradient(to bottom, rgba(247, 244, 239, 0.5) 0%, transparent 16%, transparent 88%, rgba(247, 244, 239, 0.35) 100%);
@@ -44,7 +49,7 @@
   font-family: var(--font-heading);
   font-style: italic;
   font-weight: 500;
-  font-size: clamp(1.2rem, 2.7vw, 1.6rem);
+  font-size: clamp(1.25rem, 2.5vw, 1.5rem); /* Aumentado para melhor presença visual no desktop */
   line-height: 1.5;
   color: var(--color-primary-deep);
   margin: 0;
@@ -84,7 +89,7 @@
   z-index: 2;
   max-width: 560px;
   width: 100%;
-  padding: 3.25rem 2.75rem 3rem;
+  padding: 2.5rem 2.5rem 2.25rem; /* Aumentado levemente para maior elegância no card */
   background: rgba(252, 250, 244, 0.86);
   backdrop-filter: blur(7px) saturate(1.05);
   -webkit-backdrop-filter: blur(7px) saturate(1.05);
@@ -118,7 +123,7 @@
   white-space: normal;
   font-family: var(--font-script);
   font-weight: 400;
-  font-size: clamp(3.6rem, 11vw, 5.4rem);
+  font-size: clamp(3.6rem, 11vw, 5.4rem); /* Restaurado o tamanho clássico maior em duas linhas */
   line-height: 0.95;
   color: var(--color-primary);
   letter-spacing: 0.01em;
@@ -141,19 +146,18 @@
   font-size: 1.05rem;
   color: var(--color-secondary-deep);
   font-weight: 600;
-  margin: 0.85rem 0 0.25rem;
+  margin: 0.5rem 0 0.25rem; /* Margem reduzida de 0.85rem */
   letter-spacing: 0.34em;
   text-transform: uppercase;
 }
 
 .hero-content > .story-content {
   font-family: var(--font-heading);
-  font-size: 1.2rem;
+  font-size: 1.05rem; /* Reduzido de 1.2rem */
   font-style: italic;
   color: var(--color-text-muted);
   max-width: 30ch;
-  margin-left: auto;
-  margin-right: auto;
+  margin: 0.5rem auto 1.25rem auto; /* Substitui u-story-margin-1 para economizar espaço */
 }
 
 @media (max-width: 600px) {
@@ -165,4 +169,60 @@
     background-size: 44px 44px, 44px 44px, 44px 44px, 44px 44px, cover;
   }
   .hero-content::after { inset: 12px; }
+}
+
+/* Ajustes para telas com altura reduzida (ex: monitores menores ou notebooks) */
+@media (max-height: 800px) {
+  #hero {
+    gap: 1.5rem;
+    padding-top: 1.5rem; /* Ajusta os paddings para comprimir o conteúdo verticalmente */
+    padding-bottom: 1.5rem;
+  }
+  .hero-content {
+    padding: 2.25rem 2rem 2rem;
+    background-size: 44px 44px, 44px 44px, 44px 44px, 44px 44px, cover;
+  }
+  .hero-content::after {
+    inset: 12px;
+  }
+  .hero-content h1 {
+    font-size: clamp(3rem, 8vh, 4.2rem);
+  }
+  .hero-date {
+    margin: 0.5rem 0 0.25rem;
+  }
+  .countdown-container {
+    margin-top: 0.5rem;
+  }
+}
+
+@media (max-height: 680px) {
+  #hero {
+    gap: 1rem;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+  }
+  .hero-content {
+    padding: 1.5rem 1.5rem 1.25rem;
+  }
+  .hero-content h1 {
+    font-size: clamp(2.5rem, 6vh, 3.5rem);
+  }
+  .hero-date {
+    font-size: 0.95rem;
+    margin: 0.35rem 0 0.15rem;
+  }
+  .hero-content > .story-content {
+    font-size: 1rem;
+  }
+}
+
+/* Overrides específicos para compactar elementos dentro do hero */
+#hero .btn-lg {
+  padding: 0.85rem 2.25rem;
+}
+
+#hero .divider-arabesco {
+  width: min(280px, 60%);
+  margin: 0.65rem auto;
 }

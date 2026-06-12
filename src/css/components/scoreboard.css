@@ -103,11 +103,11 @@
   justify-content: center;
 }
 
-.divider-heart-svg {
+.divider-heart-img {
   width: 24px;
   height: 24px;
-  fill: #d12020;
   display: block;
+  object-fit: contain;
 }
 
 @keyframes pulse-heart {

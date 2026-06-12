@@ -5,7 +5,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: clamp(2rem, 6vh, 4rem); /* Aumentado dinamicamente para empurrar o topo e base */
+  gap: clamp(1.5rem, 4vh, 2.5rem); /* Reduzido para aproximar intro e card */
   text-align: center;
   padding: 2rem 1.25rem; /* Reajustado levemente */
   position: relative;
@@ -21,7 +21,7 @@
   width: 100%;
   height: calc(100% + 80px); /* Preenche toda a tela útil */
   object-fit: cover;
-  object-position: center 64%;
+  object-position: center; /* Ajustado para center */
   z-index: 0;
 }
 
@@ -49,7 +49,7 @@
   font-family: var(--font-heading);
   font-style: italic;
   font-weight: 500;
-  font-size: clamp(1.25rem, 2.5vw, 1.5rem); /* Aumentado para melhor presença visual no desktop */
+  font-size: clamp(1.2rem, 2.7vw, 1.6rem); /* Restaurada fonte original da intro */
   line-height: 1.5;
   color: var(--color-primary-deep);
   margin: 0;
@@ -89,7 +89,7 @@
   z-index: 2;
   max-width: 560px;
   width: 100%;
-  padding: 2.5rem 2.5rem 2.25rem; /* Aumentado levemente para maior elegância no card */
+  padding: 3.25rem 2.75rem 3rem; /* 52px top, 44px laterais, 48px bottom */
   background: rgba(252, 250, 244, 0.86);
   backdrop-filter: blur(7px) saturate(1.05);
   -webkit-backdrop-filter: blur(7px) saturate(1.05);
@@ -153,7 +153,7 @@
 
 .hero-content > .story-content {
   font-family: var(--font-heading);
-  font-size: 1.05rem; /* Reduzido de 1.2rem */
+  font-size: 1.1rem; /* Reduzida levemente para melhor equilíbrio visual */
   font-style: italic;
   color: var(--color-text-muted);
   max-width: 30ch;
@@ -161,7 +161,7 @@
 }
 
 @media (max-width: 600px) {
-  #hero { gap: 1.9rem; }
+  #hero { gap: 1.5rem; }
   .hero-intro { font-size: 1.12rem; }
   .hero-intro-accent { font-size: 1.05em; }
   .hero-content {
@@ -186,7 +186,7 @@
     inset: 12px;
   }
   .hero-content h1 {
-    font-size: clamp(3rem, 8vh, 4.2rem);
+    /* font-size: clamp(3rem, 8vh, 4.2rem); */
   }
   .hero-date {
     margin: 0.5rem 0 0.25rem;
@@ -206,14 +206,14 @@
     padding: 1.5rem 1.5rem 1.25rem;
   }
   .hero-content h1 {
-    font-size: clamp(2.5rem, 6vh, 3.5rem);
+    /* font-size: clamp(2.5rem, 6vh, 3.5rem); */
   }
   .hero-date {
-    font-size: 0.95rem;
+    /* font-size: 0.95rem; */
     margin: 0.35rem 0 0.15rem;
   }
   .hero-content > .story-content {
-    font-size: 1rem;
+    /* font-size: 1rem; */
   }
 }
 

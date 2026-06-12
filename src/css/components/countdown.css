@@ -80,11 +80,10 @@
   }
   
   .countdown-value {
-    font-size: 1.45rem;
+    font-size: 1.5rem;
   }
   
   .countdown-label {
-    font-size: 0.55rem;
-    letter-spacing: 1px;
+    font-size: 0.7rem;
   }
 }

@@ -220,6 +220,44 @@
   }
 }
 
+/* Ajustes para phones com altura entre 680-740px (ex: Redmi Note 11 Pro com Chrome) */
+@media (max-height: 740px) {
+  #hero {
+    gap: 1rem;
+    padding-top: 1.25rem;
+    padding-bottom: 1.25rem;
+  }
+  .hero-intro {
+    font-size: 1.05rem;
+  }
+  .hero-content {
+    padding: 1.5rem 1.6rem 1.25rem;
+  }
+  .hero-content h1 {
+    font-size: clamp(3.4rem, 9vh, 4.2rem);
+  }
+  .hero-date {
+    font-size: 0.88rem;
+    margin: 0.4rem 0 0.2rem;
+  }
+  .hero-content > .story-content {
+    font-size: 0.92rem;
+  }
+  .countdown-container {
+    margin-top: 0.35rem;
+    margin-bottom: 0.25rem;
+  }
+  #hero .countdown-value {
+    font-size: 1.55rem;
+  }
+  #hero .countdown-card {
+    padding: 0.6rem 0.35rem;
+  }
+  #hero .countdown-label {
+    font-size: 0.62rem;
+  }
+}
+
 @media (max-height: 680px) {
   #hero {
     gap: 0.75rem;

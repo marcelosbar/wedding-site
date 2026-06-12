@@ -387,7 +387,7 @@ describe('WeddingApp Orchestrator', () => {
 
     // 5. Test button click error for values > 5000 (shows surprised custom modal alert)
     btn.click();
-    expect(mockShowAlert).toHaveBeenCalledWith('😱 Wow! A gente realmente não esperava tanta generosidade! Por favor, entre em contato diretamente com os noivos para combinar esse presente especial.');
+    expect(mockShowAlert).toHaveBeenCalledWith('A gente realmente não esperava tanta generosidade! Por favor, entre em contato diretamente com os noivos para combinar esse presente especial.', '😱 Wow!');
     expect(mockCartAddToCart).not.toHaveBeenCalled();
 
     // 6. Test button click error for too low values

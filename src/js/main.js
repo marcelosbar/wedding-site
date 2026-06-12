@@ -141,7 +141,7 @@ export class WeddingApp {
 
         if (!validation.isValid) {
           if (priceVal > 5000) {
-            showAlert('😱 Wow! A gente realmente não esperava tanta generosidade! Por favor, entre em contato diretamente com os noivos para combinar esse presente especial.');
+            showAlert('A gente realmente não esperava tanta generosidade! Por favor, entre em contato diretamente com os noivos para combinar esse presente especial.', '😱 Wow!');
             return;
           }
 

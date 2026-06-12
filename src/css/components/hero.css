@@ -160,7 +160,7 @@
   margin: 0.5rem auto 1.25rem auto; /* Substitui u-story-margin-1 para economizar espaço */
 }
 
-@media (max-width: 768px) {
+@media (max-width: 600px) {
   #hero { gap: 1.5rem; }
   .hero-intro { font-size: 1.12rem; }
   .hero-intro-accent { font-size: 1.05em; }

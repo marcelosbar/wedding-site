@@ -99,7 +99,7 @@
   background-image:
     var(--corner-tl), var(--corner-tr), var(--corner-bl), var(--corner-br),
     linear-gradient(rgba(252, 250, 244, 0.86), rgba(252, 250, 244, 0.86));
-  background-position: top left, top right, bottom left, bottom right, center;
+  background-position: top 8px left 9px, top 8px right 9px, bottom 8px left 9px, bottom 8px right 9px, center;
   background-repeat: no-repeat;
   background-size: 58px 58px, 58px 58px, 58px 58px, 58px 58px, cover;
 }
@@ -167,6 +167,7 @@
   .hero-content {
     padding: 2.75rem 1.6rem 2.5rem;
     background-size: 44px 44px, 44px 44px, 44px 44px, 44px 44px, cover;
+    background-position: top 6px left 7px, top 6px right 7px, bottom 6px left 7px, bottom 6px right 7px, center;
   }
   .hero-content::after { inset: 12px; }
 
@@ -193,6 +194,7 @@
   .hero-content {
     padding: 2.25rem 2rem 2rem;
     background-size: 44px 44px, 44px 44px, 44px 44px, 44px 44px, cover;
+    background-position: top 6px left 7px, top 6px right 7px, bottom 6px left 7px, bottom 6px right 7px, center;
   }
   .hero-content::after {
     inset: 12px;

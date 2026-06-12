@@ -86,7 +86,10 @@ This command automatically starts the Firestore Emulator, runs the tests in `tes
 ## Architecture & Security Notes
 
 - **Content Security Policy (CSP)**: The project enforces a strict Content Security Policy (configured in `firebase.json`) that disables `'unsafe-inline'` for scripts and styles. All styles must live in external CSS files, and all event handlers must be attached dynamically in JS modules. Compliance is verified locally via `tests/security.test.js`.
-- **Static Assets**: To conserve hosting bandwidth, high-resolution images are offloaded to the **ImageKit.io** CDN (ID: `vfxvr8vqa`) under the `wedding-site/` folder. Avoid committing large image files to the repository.
+- **Static Assets & Performance Optimization**: To conserve hosting bandwidth, high-resolution images and decorative design assets are offloaded to the **ImageKit.io** CDN (ID: `vfxvr8vqa`) under the `wedding-site/` folder. Avoid committing large image files to the repository.
+  - *Responsive Images*: The hero background (`hero-scene.jpg`) utilizes standard browser `srcset` and `sizes` combined with ImageKit real-time transformation parameters (`?tr=w-[width]`) to serve optimized sizes (600w, 1000w, 1600w) dynamically based on viewport width.
+  - *Asset Sizing*: Fixed display components request customized widths to avoid downloading large source files (e.g., `?tr=w-200` for the navigation logo and `?tr=w-500` for destination cards).
+  - *Typography*: The custom typography (`Montserrat` and `Playfair Display`) is integrated locally under `src/fonts/` and loaded dynamically via stylesheet rules.
 
 ## Deployment
 

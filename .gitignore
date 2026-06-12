@@ -24,3 +24,7 @@ coverage/
 .DS_Store
 .vscode/*
 !.vscode/extensions.json
+
+# ImageKit uploads directory
+imagekit-to-upload/
+

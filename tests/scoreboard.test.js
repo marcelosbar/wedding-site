@@ -11,6 +11,7 @@ function createMockElements() {
     <div id="global-groom-fill" style="width: 50%"></div>
     <div id="global-bride-fill" style="width: 50%"></div>
     <div id="global-progress-divider" style="left: 50%"></div>
+    <img id="global-divider-heart" src="https://ik.imagekit.io/vfxvr8vqa/wedding-site/heart_red.png?tr=w-50" />
   `;
   return {
     groomPointsBarEl: document.getElementById('global-groom-points'),
@@ -84,5 +85,21 @@ describe('Scoreboard', () => {
     scoreboard.updateFromSnapshot([]);
     expect(document.getElementById('global-groom-points').innerText).toBe('0 pts');
     expect(document.getElementById('global-bride-points').innerText).toBe('0 pts');
+  });
+
+  it('should update the heart image based on who is winning', () => {
+    const heartEl = document.getElementById('global-divider-heart');
+    
+    // Groom winning
+    scoreboard.updateScoreboardUI(150, 100);
+    expect(heartEl.src).toBe('https://ik.imagekit.io/vfxvr8vqa/wedding-site/heart_blue.png?tr=w-50');
+    
+    // Bride winning
+    scoreboard.updateScoreboardUI(100, 150);
+    expect(heartEl.src).toBe('https://ik.imagekit.io/vfxvr8vqa/wedding-site/heart_yellow.png?tr=w-50');
+    
+    // Tied
+    scoreboard.updateScoreboardUI(120, 120);
+    expect(heartEl.src).toBe('https://ik.imagekit.io/vfxvr8vqa/wedding-site/heart_red.png?tr=w-50');
   });
 });

@@ -1,13 +1,15 @@
 /* Button Styles */
 .btn {
   display: inline-block;
-  padding: 0.75rem 1.5rem;
+  padding: 0.8rem 1.8rem;
   border-radius: var(--radius-full);
+  font-family: var(--font-body);
   font-weight: 600;
+  letter-spacing: 0.02em;
   text-align: center;
   cursor: pointer;
   transition: all 0.3s ease;
-  border: none;
+  border: 1px solid transparent;
 }
 
 .btn-primary {
@@ -16,7 +18,7 @@
 }
 
 .btn-primary:hover {
-  background-color: #1e40af;
+  background-color: var(--color-primary-deep);
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
 }
@@ -27,20 +29,28 @@
 }
 
 .btn-secondary:hover {
-  background-color: #c2410c;
+  background-color: var(--color-secondary-deep);
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
 }
 
 .btn-accent {
   background-color: var(--color-accent);
-  color: var(--color-text-main);
+  color: var(--color-primary-deep);
 }
 
 .btn-accent:hover {
-  background-color: #ca8a04;
+  background-color: var(--color-secondary);
+  color: var(--color-text-inverse);
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
+}
+
+.btn-lg {
+  padding: 1rem 2.75rem;
+  font-size: 1.05rem;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
 }
 
 .btn-link {
@@ -61,7 +71,7 @@
 }
 
 .btn-link.groom:hover {
-  color: #1e40af;
+  color: var(--color-primary-deep);
 }
 
 .btn-link.bride {
@@ -69,7 +79,7 @@
 }
 
 .btn-link.bride:hover {
-  color: #c2410c;
+  color: var(--color-secondary-deep);
 }
 
 .btn-success {
@@ -109,6 +119,30 @@
 @keyframes btn-spin {
   to {
     transform: rotate(360deg);
+  }
+}
+
+/* Responsive adjustments for large buttons on narrow mobile devices */
+@media (max-width: 600px) {
+  .btn-lg {
+    padding: 0.85rem 1.25rem;
+    font-size: 0.95rem;
+    letter-spacing: 0.04em;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 576px) {
+  .btn {
+    padding: 0.7rem 1.4rem;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .btn {
+    padding: 0.6rem 1rem;
+    font-size: 0.85rem;
   }
 }
 

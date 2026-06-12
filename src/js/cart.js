@@ -362,6 +362,32 @@ export class Cart {
     });
   }
 
+  /** @private Configures the back-to-list button based on which modal was previously open. */
+  _configureBackButton(previousModalId) {
+    if (!this.backToListBtn) return;
+
+    const container = this.backToListBtn.closest('.cart-back-container');
+    this.backToListBtn.classList.remove('groom', 'bride');
+
+    const config = {
+      'groom-gifts-modal': { label: '← Voltar para Lista do Noivo', modifier: 'groom' },
+      'bride-gifts-modal': { label: '← Voltar para Lista da Noiva', modifier: 'bride' },
+    };
+    const match = config[previousModalId];
+
+    if (match) {
+      this.backToListBtn.textContent = match.label;
+      this.backToListBtn.dataset.targetModal = previousModalId;
+      this.backToListBtn.classList.add(match.modifier);
+      this.backToListBtn.classList.remove('u-hidden');
+      if (container) container.classList.remove('u-hidden');
+    } else {
+      this.backToListBtn.classList.add('u-hidden');
+      if (container) container.classList.add('u-hidden');
+      delete this.backToListBtn.dataset.targetModal;
+    }
+  }
+
   openCart(previousModalId = null) {
     this.overlay.classList.add('active');
     this.cartView.style.display = 'block';
@@ -369,23 +395,7 @@ export class Cart {
     this.pixView.classList.remove('active');
     this.successView.classList.remove('active');
 
-    if (this.backToListBtn) {
-      this.backToListBtn.classList.remove('groom', 'bride');
-      if (previousModalId === 'groom-gifts-modal') {
-        this.backToListBtn.textContent = '← Voltar para Lista do Noivo';
-        this.backToListBtn.dataset.targetModal = 'groom-gifts-modal';
-        this.backToListBtn.classList.add('groom');
-        this.backToListBtn.classList.remove('u-hidden');
-      } else if (previousModalId === 'bride-gifts-modal') {
-        this.backToListBtn.textContent = '← Voltar para Lista da Noiva';
-        this.backToListBtn.dataset.targetModal = 'bride-gifts-modal';
-        this.backToListBtn.classList.add('bride');
-        this.backToListBtn.classList.remove('u-hidden');
-      } else {
-        this.backToListBtn.classList.add('u-hidden');
-        delete this.backToListBtn.dataset.targetModal;
-      }
-    }
+    this._configureBackButton(previousModalId);
 
     if (typeof document !== 'undefined') {
       const cartTitle = document.getElementById('cart-title');

@@ -1,17 +1,25 @@
 /* Footer */
 footer {
-  background: #0f172a;
-  color: #94a3b8;
+  background: var(--color-primary-deep);
+  color: rgba(253, 251, 243, 0.65);
   text-align: center;
-  padding: 2rem 0;
+  padding: 2.5rem 0;
+  font-family: var(--font-heading);
+}
+
+footer p:first-child {
+  font-size: 1.15rem;
+  font-style: italic;
+  color: rgba(253, 251, 243, 0.9);
 }
 
 .footer-disclaimer {
-  font-size: 0.75rem;
-  color: #64748b;
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  color: rgba(253, 251, 243, 0.45);
   margin-top: 1rem;
   max-width: 600px;
   margin-left: auto;
   margin-right: auto;
-  line-height: 1.4;
+  line-height: 1.5;
 }

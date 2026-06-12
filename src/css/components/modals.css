@@ -42,7 +42,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 1.5rem 2rem;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid #e7ddc8;
   flex-shrink: 0;
 }
 
@@ -79,7 +79,7 @@
 
 .gifts-modal-footer {
   padding: 1.25rem 2rem;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid #e7ddc8;
   display: flex;
   justify-content: flex-end;
   background: var(--color-surface);
@@ -151,5 +151,27 @@
   display: flex;
   justify-content: center;
   gap: 1rem;
+}
+
+@media (max-width: 576px) {
+  .gifts-modal-header {
+    padding: 1.25rem 1.25rem;
+  }
+  .gifts-modal-body {
+    padding: 1rem;
+  }
+  .gifts-modal-footer {
+    padding: 1rem 1.25rem;
+  }
+  .gifts-modal-title {
+    font-size: 1.15rem;
+  }
+  .confirm-modal-box {
+    padding: 1.5rem 1.25rem;
+  }
+  .gifts-list {
+    padding: 0.5rem 0;
+    gap: 1rem;
+  }
 }
 

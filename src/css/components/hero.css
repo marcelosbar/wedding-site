@@ -1,38 +1,332 @@
 #hero {
-  min-height: 100vh;
+  min-height: calc(100dvh - 80px);
+  margin-top: 80px; /* Desloca o hero para começar exatamente após a altura do header */
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: clamp(1.5rem, 4vh, 2.5rem); /* Reduzido para aproximar intro e card */
   text-align: center;
-  padding-top: 5rem;
-  background: linear-gradient(135deg, rgba(29, 78, 216, 0.1) 0%, rgba(234, 88, 12, 0.1) 100%);
+  padding: 2rem 1.25rem; /* Reajustado levemente */
   position: relative;
   overflow: hidden;
+  background-color: var(--color-background);
 }
 
+/* Ilustração do casamento preenchendo o fundo inteiro */
+.hero-bg-img {
+  position: absolute;
+  top: -80px; /* Puxa para cima para cobrir a área do header */
+  left: 0;
+  width: 100%;
+  height: calc(100% + 80px); /* Preenche toda a tela útil */
+  object-fit: cover;
+  object-position: center; /* Ajustado para center */
+  z-index: 0;
+}
+
+/* Vinheta creme suave só atrás do painel + base, p/ leitura */
+#hero::after {
+  content: '';
+  position: absolute;
+  top: -80px; /* Puxa para cima para cobrir a área do header */
+  left: 0;
+  width: 100%;
+  height: calc(100% + 80px); /* Preenche toda a tela útil */
+  background:
+    radial-gradient(ellipse 46% 62% at 50% 48%, rgba(247, 244, 239, 0.5) 0%, rgba(247, 244, 239, 0.12) 55%, transparent 75%),
+    linear-gradient(to bottom, rgba(247, 244, 239, 0.5) 0%, transparent 16%, transparent 88%, rgba(247, 244, 239, 0.35) 100%);
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Texto poético de introdução, sobre o fundo */
+.hero-intro {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 92vw;
+  font-family: var(--font-heading);
+  font-style: italic;
+  font-weight: 500;
+  font-size: clamp(1.2rem, 2.7vw, 1.6rem); /* Restaurada fonte original da intro */
+  line-height: 1.5;
+  color: var(--color-primary-deep);
+  margin: 0;
+  text-align: center;
+  text-shadow:
+    0 1px 0 rgba(247, 244, 239, 0.95),
+    0 0 16px rgba(247, 244, 239, 1),
+    0 0 30px rgba(247, 244, 239, 0.9);
+}
+.hero-intro-line {
+  display: block;
+  white-space: nowrap;
+}
+.hero-intro-accent {
+  margin-top: 0.65rem;
+  font-family: var(--font-heading);
+  font-style: italic;
+  font-weight: 700;
+  font-size: 1.08em;
+  line-height: 1.2;
+  color: var(--color-secondary-deep);
+}
+.hero-intro em {
+  display: inline-block;
+  margin-top: 0.5rem;
+  font-family: var(--font-script);
+  font-style: normal;
+  font-size: 1.4em;
+  line-height: 1;
+  color: var(--color-secondary-deep);
+}
+
+
+/* Painel creme orgânico com moldura de azulejo */
 .hero-content {
-  max-width: 800px;
-  padding: 2rem;
-  background: rgba(255, 255, 255, 0.6);
-  backdrop-filter: blur(12px);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg);
+  position: relative;
+  z-index: 2;
+  max-width: 560px;
+  width: 100%;
+  padding: 3.25rem 2.75rem 3rem; /* 52px top, 44px laterais, 48px bottom */
+  background: rgba(252, 250, 244, 0.86);
+  backdrop-filter: blur(7px) saturate(1.05);
+  -webkit-backdrop-filter: blur(7px) saturate(1.05);
+  border-radius: 3px;
+  box-shadow: 0 24px 60px -18px rgba(22, 48, 107, 0.4);
+  /* moldura azulejo nos 4 cantos */
+  background-image:
+    var(--corner-tl), var(--corner-tr), var(--corner-bl), var(--corner-br),
+    linear-gradient(rgba(252, 250, 244, 0.86), rgba(252, 250, 244, 0.86));
+  background-position: top 8px left 9px, top 8px right 9px, bottom 8px left 9px, bottom 8px right 9px, center;
+  background-repeat: no-repeat;
+  background-size: 58px 58px, 58px 58px, 58px 58px, 58px 58px, cover;
+}
+.hero-content::after {
+  content: '';
+  position: absolute;
+  inset: 16px;
+  border: 1.5px solid var(--color-primary);
+  border-radius: 2px;
+  pointer-events: none;
 }
 
+/* Nome do casal em caligrafia — protagonista */
 .hero-content h1 {
-  font-size: 4rem;
-  margin-bottom: 0.5rem;
-  background: linear-gradient(to right, var(--color-primary), var(--color-secondary));
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  position: static;
+  width: auto; height: auto;
+  margin: 0;
+  padding: 0;
+  clip: auto;
+  overflow: visible;
+  white-space: normal;
+  font-family: var(--font-script);
+  font-weight: 400;
+  font-size: clamp(3.6rem, 11vw, 5.4rem); /* Restaurado o tamanho clássico maior em duas linhas */
+  line-height: 0.95;
+  color: var(--color-primary);
+  letter-spacing: 0.01em;
+}
+
+/* "&" em manuscrita (Dancing Script) — legível e harmônica com os nomes */
+.hero-content h1 .amp-regular {
+  font-family: 'Dancing Script', cursive;
+  font-weight: 700;
+  font-style: normal;
+  font-size: 0.62em;
+  vertical-align: middle;
+  letter-spacing: 0;
+  margin: 0 0.06em;
+  color: var(--color-secondary-deep);
 }
 
 .hero-date {
-  font-size: 1.25rem;
-  color: var(--color-text-muted);
-  font-weight: 500;
-  margin-bottom: 2rem;
-  letter-spacing: 2px;
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  color: var(--color-secondary-deep);
+  font-weight: 600;
+  margin: 0.5rem 0 0.25rem; /* Margem reduzida de 0.85rem */
+  letter-spacing: 0.34em;
   text-transform: uppercase;
+}
+
+.hero-content > .story-content {
+  font-family: var(--font-heading);
+  font-size: 1.1rem; /* Reduzida levemente para melhor equilíbrio visual */
+  font-style: italic;
+  color: var(--color-text-muted);
+  max-width: 30ch;
+  margin: 0.5rem auto 1.25rem auto; /* Substitui u-story-margin-1 para economizar espaço */
+}
+
+@media (max-width: 600px) {
+  #hero { gap: 1.5rem; }
+  .hero-intro { font-size: 1.12rem; }
+  .hero-intro-accent { font-size: 1.05em; }
+  .hero-content {
+    padding: 2.75rem 1.6rem 2.5rem;
+    background-size: 44px 44px, 44px 44px, 44px 44px, 44px 44px, cover;
+    background-position: top 6px left 7px, top 6px right 7px, bottom 6px left 7px, bottom 6px right 7px, center;
+  }
+  .hero-content::after { inset: 12px; }
+
+  /* Proporção tipográfica corrigida para mobile/tablet */
+  .hero-content h1 {
+    font-size: clamp(3.6rem, 12vw, 4.5rem);
+  }
+  .hero-date {
+    font-size: 0.85rem;
+    margin: 0.4rem 0 0.2rem;
+  }
+  .hero-content > .story-content {
+    font-size: 0.9rem;
+  }
+}
+
+/* Ajustes para telas com altura reduzida (ex: monitores menores ou notebooks) */
+@media (max-height: 800px) {
+  #hero {
+    gap: 1.5rem;
+    padding-top: 1.5rem; /* Ajusta os paddings para comprimir o conteúdo verticalmente */
+    padding-bottom: 1.5rem;
+  }
+  .hero-content {
+    padding: 2.25rem 2rem 2rem;
+    background-size: 44px 44px, 44px 44px, 44px 44px, 44px 44px, cover;
+    background-position: top 6px left 7px, top 6px right 7px, bottom 6px left 7px, bottom 6px right 7px, center;
+  }
+  .hero-content::after {
+    inset: 12px;
+  }
+  .hero-content h1 {
+    font-size: clamp(3.8rem, 10vh, 4.8rem);
+  }
+  .hero-date {
+    font-size: 0.95rem;
+    margin: 0.5rem 0 0.25rem;
+  }
+  .hero-content > .story-content {
+    font-size: 1rem;
+  }
+  .countdown-container {
+    margin-top: 0.5rem;
+  }
+  #hero .countdown-value {
+    font-size: 1.8rem;
+  }
+  #hero .countdown-card {
+    padding: 0.75rem 0.5rem;
+  }
+}
+
+/* Ajustes para phones com altura entre 680-740px (ex: Redmi Note 11 Pro com Chrome) */
+@media (max-height: 740px) {
+  #hero {
+    gap: 1rem;
+    padding-top: 1.25rem;
+    padding-bottom: 1.25rem;
+  }
+  .hero-intro {
+    font-size: 1.05rem;
+  }
+  .hero-content {
+    padding: 1.5rem 1.6rem 1.25rem;
+  }
+  .hero-content h1 {
+    font-size: clamp(3.4rem, 9vh, 4.2rem);
+  }
+  .hero-date {
+    font-size: 0.88rem;
+    margin: 0.4rem 0 0.2rem;
+  }
+  .hero-content > .story-content {
+    font-size: 0.92rem;
+  }
+  .countdown-container {
+    margin-top: 0.35rem;
+    margin-bottom: 0.25rem;
+  }
+  #hero .countdown-value {
+    font-size: 1.55rem;
+  }
+  #hero .countdown-card {
+    padding: 0.6rem 0.35rem;
+  }
+  #hero .countdown-label {
+    font-size: 0.62rem;
+  }
+}
+
+@media (max-height: 680px) {
+  #hero {
+    gap: 0.75rem;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+  }
+  .hero-intro {
+    font-size: 1rem;
+    line-height: 1.35;
+  }
+  .hero-content {
+    padding: 1.25rem 1.25rem 1rem;
+  }
+  .hero-content h1 {
+    font-size: clamp(3.2rem, 8vh, 4.0rem);
+  }
+  .hero-date {
+    font-size: 0.85rem;
+    margin: 0.35rem 0 0.15rem;
+  }
+  .hero-content > .story-content {
+    font-size: 0.9rem;
+  }
+  .countdown-container {
+    margin-top: 0.25rem;
+    margin-bottom: 0.5rem;
+  }
+  #hero .countdown-value {
+    font-size: 1.4rem;
+  }
+  #hero .countdown-card {
+    padding: 0.5rem 0.25rem;
+  }
+  #hero .countdown-label {
+    font-size: 0.6rem;
+    letter-spacing: 1px;
+  }
+  #hero .divider-arabesco {
+    display: none;
+  }
+}
+
+/* Overrides específicos para compactar elementos dentro do hero */
+#hero .btn-lg {
+  padding: 0.85rem 2.25rem;
+}
+
+@media (max-width: 600px) {
+  #hero .btn-lg {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 360px) {
+  #hero .btn-lg {
+    padding: 0.65rem 1.25rem;
+    font-size: 0.85rem;
+  }
+  .hero-content {
+    padding: 2rem 1.15rem 1.75rem;
+  }
+  .hero-content h1 {
+    font-size: 3.2rem;
+  }
+  .hero-date {
+    font-size: 0.8rem;
+  }
+  .hero-content > .story-content {
+    font-size: 0.85rem;
+  }
 }

@@ -3,7 +3,8 @@
   margin: 0 auto 3rem auto;
   max-width: 800px;
   background: var(--color-surface);
-  padding: 1.5rem 2rem;
+  border: 1px solid rgba(198, 154, 58, 0.3);
+  padding: 1.75rem 2rem;
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-md);
 }
@@ -36,8 +37,9 @@
 }
 
 .team-score {
-  font-size: 1.5rem;
+  font-size: 1.6rem;
   font-weight: 700;
+  font-family: var(--font-heading);
 }
 
 .team-groom .team-score {
@@ -51,11 +53,11 @@
 .global-progress-bar {
   width: 100%;
   height: 20px;
-  background-color: #e2e8f0;
+  background-color: #ece4d3;
   border-radius: var(--radius-full);
   position: relative;
   display: flex;
-  box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: inset 0 2px 4px rgba(22,48,107,0.12);
 }
 
 .global-progress-fill {
@@ -64,13 +66,13 @@
 }
 
 .groom-fill {
-  background: linear-gradient(90deg, #1e3a8a, var(--color-primary));
+  background: linear-gradient(90deg, var(--color-primary-deep), var(--color-primary-bright));
   border-radius: var(--radius-full) 0 0 var(--radius-full);
   width: 50%;
 }
 
 .bride-fill {
-  background: linear-gradient(90deg, var(--color-secondary), var(--color-accent));
+  background: linear-gradient(90deg, var(--color-accent), var(--color-secondary));
   border-radius: 0 var(--radius-full) var(--radius-full) 0;
   width: 50%;
 }
@@ -81,12 +83,13 @@
   transform: translate(-50%, -50%);
   width: 40px;
   height: 40px;
-  background: white;
+  background: var(--color-surface);
+  border: 1px solid rgba(198, 154, 58, 0.5);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 10px rgba(22,48,107,0.18);
   transition: left 0.8s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 10;
   left: 50%;
@@ -95,6 +98,16 @@
 .divider-icon {
   font-size: 1.2rem;
   animation: pulse-heart 2s infinite ease-in-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.divider-heart-img {
+  width: 24px;
+  height: 24px;
+  display: block;
+  object-fit: contain;
 }
 
 @keyframes pulse-heart {

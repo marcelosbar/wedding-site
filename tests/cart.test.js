@@ -23,7 +23,9 @@ function createMockElements() {
     <span id="floating-cart-badge"></span>
     <button id="nav-cart-link" style="display: none;"></button>
     <span id="nav-cart-badge"></span>
-    <button id="cart-back-to-list-btn" class="u-hidden"></button>
+    <div class="cart-back-container u-hidden">
+      <button id="cart-back-to-list-btn" class="u-hidden"></button>
+    </div>
     <input id="guest-name" value="" />
     <textarea id="guest-message"></textarea>
     <input type="checkbox" id="message-public" checked />
@@ -110,18 +112,23 @@ describe('Cart', () => {
   });
 
   it('should show back to list button dynamically based on previous modal id', () => {
+    const container = cart.backToListBtn.closest('.cart-back-container');
     expect(cart.backToListBtn.classList.contains('u-hidden')).toBe(true);
+    expect(container.classList.contains('u-hidden')).toBe(true);
 
     cart.openCart('groom-gifts-modal');
     expect(cart.backToListBtn.classList.contains('u-hidden')).toBe(false);
+    expect(container.classList.contains('u-hidden')).toBe(false);
     expect(cart.backToListBtn.textContent).toBe('← Voltar para Lista do Noivo');
 
     cart.openCart('bride-gifts-modal');
     expect(cart.backToListBtn.classList.contains('u-hidden')).toBe(false);
+    expect(container.classList.contains('u-hidden')).toBe(false);
     expect(cart.backToListBtn.textContent).toBe('← Voltar para Lista da Noiva');
 
     cart.openCart();
     expect(cart.backToListBtn.classList.contains('u-hidden')).toBe(true);
+    expect(container.classList.contains('u-hidden')).toBe(true);
   });
 
   it('should add active class on openCart', () => {

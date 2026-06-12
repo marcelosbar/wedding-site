@@ -58,5 +58,16 @@ export class Scoreboard {
     if (this.groomFillEl) this.groomFillEl.style.width = `${groomPercent}%`;
     if (this.brideFillEl) this.brideFillEl.style.width = `${bridePercent}%`;
     if (this.dividerEl) this.dividerEl.style.left = `${groomPercent}%`;
+
+    const heartEl = document.getElementById('global-divider-heart');
+    if (heartEl) {
+      if (groomPts > bridePts) {
+        heartEl.src = 'https://ik.imagekit.io/vfxvr8vqa/wedding-site/heart_blue.png?tr=w-50';
+      } else if (bridePts > groomPts) {
+        heartEl.src = 'https://ik.imagekit.io/vfxvr8vqa/wedding-site/heart_yellow.png?tr=w-50';
+      } else {
+        heartEl.src = 'https://ik.imagekit.io/vfxvr8vqa/wedding-site/heart_red.png?tr=w-50';
+      }
+    }
   }
 }

@@ -11,7 +11,7 @@
 .qr-code-container {
   margin: 1.5rem 0;
   padding: 1rem;
-  background: #f8fafc;
+  background: #f7f4ef;
   border-radius: var(--radius-md);
   display: inline-block;
 }
@@ -24,7 +24,7 @@
 .copy-input {
   flex: 1;
   padding: 0.75rem;
-  border: 1px solid #cbd5e1;
+  border: 1px solid #cdbf9f;
   border-radius: var(--radius-md) 0 0 var(--radius-md);
   font-size: 0.875rem;
 }

@@ -4,6 +4,7 @@ import { Scoreboard } from './scoreboard.js';
 import { MessagesCarousel } from './messages.js';
 import { Countdown } from './countdown.js';
 import { transactionsRef, onSnapshot, query } from './firebase.js';
+import { showAlert } from './utils.js';
 
 
 /**
@@ -139,6 +140,11 @@ export class WeddingApp {
         const validation = this.validateCustomPrice(input, rawValue, priceVal);
 
         if (!validation.isValid) {
+          if (priceVal > 5000) {
+            showAlert('😱 Wow! A gente realmente não esperava tanta generosidade! Por favor, entre em contato diretamente com os noivos para combinar esse presente especial.');
+            return;
+          }
+
           if (errorEl) {
             errorEl.textContent = validation.message || 'Por favor, insira um valor inteiro válido entre R$ 1 e R$ 5.000.';
             errorEl.classList.remove('u-hidden');
@@ -163,6 +169,19 @@ export class WeddingApp {
 
     // Real-time custom contribution validation on input
     document.querySelectorAll('.gift-custom-price-input').forEach(input => {
+      // Prevent typing decimals, signs, exponents
+      input.addEventListener('keydown', (e) => {
+        if (['.', ',', '-', '+', 'e', 'E'].includes(e.key)) {
+          e.preventDefault();
+          const parent = input.closest('.gift-item');
+          const errorEl = parent ? parent.querySelector('.gift-custom-error') : null;
+          if (errorEl) {
+            errorEl.textContent = 'Por favor, insira apenas números inteiros (sem centavos ou vírgula).';
+            errorEl.classList.remove('u-hidden');
+          }
+        }
+      });
+
       input.addEventListener('input', (e) => {
         const currentInput = e.target;
         const parent = currentInput.closest('.gift-item');
@@ -172,14 +191,24 @@ export class WeddingApp {
         const rawValue = currentInput.value.trim();
         const priceVal = Number.parseFloat(rawValue);
 
+        // Sanitize pasted or otherwise inputted decimals/signs
+        if (/[.,\-+eE]/.test(rawValue)) {
+          currentInput.value = rawValue.replace(/[.,\-+eE]/g, '');
+          if (errorEl) {
+            errorEl.textContent = 'Por favor, insira apenas números inteiros (sem centavos ou vírgula).';
+            errorEl.classList.remove('u-hidden');
+          }
+          return;
+        }
+
         const validation = this.validateCustomPrice(currentInput, rawValue, priceVal);
 
         if (validation.isEmpty) {
           errorEl.classList.add('u-hidden');
           errorEl.textContent = '';
         } else if (!validation.isValid) {
-          // Immediately show error if they typed non-digits, or if they exceeded max (5000)
-          if (!/^\d+$/.test(rawValue) || priceVal > 5000) {
+          // Immediately show error if they exceeded max (5000)
+          if (priceVal > 5000) {
             errorEl.textContent = validation.message;
             errorEl.classList.remove('u-hidden');
           } else {
@@ -281,7 +310,7 @@ export class WeddingApp {
     }
 
     if (priceVal > max) {
-      return { isValid: false, message: 'Wow! A gente fica lisonjeado, mas tem certeza de que você quer nos dar todo esse valor? 😂' };
+      return { isValid: false, message: 'Wow! A gente fica lisonjeado, mas você digitou o valor certo? 😂' };
     }
 
     return { isValid: true, message: '' };

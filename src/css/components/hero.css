@@ -160,7 +160,7 @@
   margin: 0.5rem auto 1.25rem auto; /* Substitui u-story-margin-1 para economizar espaço */
 }
 
-@media (max-width: 600px) {
+@media (max-width: 768px) {
   #hero { gap: 1.5rem; }
   .hero-intro { font-size: 1.12rem; }
   .hero-intro-accent { font-size: 1.05em; }
@@ -169,6 +169,18 @@
     background-size: 44px 44px, 44px 44px, 44px 44px, 44px 44px, cover;
   }
   .hero-content::after { inset: 12px; }
+
+  /* Proporção tipográfica corrigida para mobile/tablet */
+  .hero-content h1 {
+    font-size: clamp(2.8rem, 10vw, 3.4rem);
+  }
+  .hero-date {
+    font-size: 0.9rem;
+    margin: 0.4rem 0 0.2rem;
+  }
+  .hero-content > .story-content {
+    font-size: 0.95rem;
+  }
 }
 
 /* Ajustes para telas com altura reduzida (ex: monitores menores ou notebooks) */
@@ -236,5 +248,14 @@
 @media (max-width: 360px) {
   .hero-content {
     padding: 2.25rem 1.15rem 2rem;
+  }
+  .hero-content h1 {
+    font-size: 2.5rem;
+  }
+  .hero-date {
+    font-size: 0.82rem;
+  }
+  .hero-content > .story-content {
+    font-size: 0.88rem;
   }
 }

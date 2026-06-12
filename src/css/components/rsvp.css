@@ -66,7 +66,7 @@
   z-index: 1;
 }
 .rsvp-corner-tl { top: 11px;  left: 11px;  background-image: url('https://ik.imagekit.io/vfxvr8vqa/wedding-site/rsvp-corner-tl.png'); }
-.rsvp-corner-tr { top: 11px;  right: 11px; background-image: url('https://ik.imagekit.io/vfxvr8vqa/wedding-site/rsvp-corner-tr.png'); }
+.rsvp-corner-tr { top: 13px;  right: 5px; background-image: url('https://ik.imagekit.io/vfxvr8vqa/wedding-site/rsvp-corner-tr.png'); }
 .rsvp-corner-bl { bottom: 11px; left: 11px;  background-image: url('https://ik.imagekit.io/vfxvr8vqa/wedding-site/rsvp-corner-bl.png'); }
 .rsvp-corner-br { bottom: 11px; right: 11px; background-image: url('https://ik.imagekit.io/vfxvr8vqa/wedding-site/rsvp-corner-br.png'); }
 
@@ -116,7 +116,7 @@
   .rsvp-frame { inset: 16px; }
   .rsvp-corner { width: 46px; height: 44px; top: auto; bottom: auto; }
   .rsvp-corner-tl { top: 9px;  left: 9px; }
-  .rsvp-corner-tr { top: 9px;  right: 9px; }
+  .rsvp-corner-tr { top: 11px;  right: 4px; }
   .rsvp-corner-bl { bottom: 9px; left: 9px; }
   .rsvp-corner-br { bottom: 9px; right: 9px; }
   .rsvp-script { font-size: 1.2rem; }

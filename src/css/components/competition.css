@@ -160,3 +160,9 @@
   }
 }
 
+@media (max-width: 360px) {
+  .destination-info {
+    padding: 1.25rem 0.75rem;
+  }
+}
+

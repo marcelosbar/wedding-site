@@ -107,7 +107,7 @@ function setupDOM() {
     <div id="global-bride-fill"></div>
     <div id="global-progress-divider"></div>
     <button id="hamburger-btn"></button>
-    <div class="nav-links"></div>
+    <div class="nav-links"><a href="#story">Story</a></div>
     <button class="add-to-cart-btn" data-list="Groom" data-item="Gift" data-price="100"></button>
     <div class="gift-item">
       <input class="gift-custom-price-input" value="150" />
@@ -221,6 +221,12 @@ describe('WeddingApp Orchestrator', () => {
     hamburgerBtn.click();
     expect(navLinks.classList.contains('open')).toBe(true);
     expect(hamburgerBtn.classList.contains('active')).toBe(true);
+
+    // Test that clicking a nav item closes the hamburger menu
+    const firstNavLink = navLinks.querySelector('a');
+    firstNavLink.click();
+    expect(navLinks.classList.contains('open')).toBe(false);
+    expect(hamburgerBtn.classList.contains('active')).toBe(false);
 
     // 2. Open cart button/links
     document.getElementById('nav-cart-link').click();

@@ -139,3 +139,10 @@
   }
 }
 
+@media (max-width: 360px) {
+  .btn {
+    padding: 0.6rem 1rem;
+    font-size: 0.85rem;
+  }
+}
+

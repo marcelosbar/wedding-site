@@ -85,10 +85,19 @@ export class WeddingApp {
   initEvents() {
     // 1. Hamburger menu
     const hamburgerBtn = document.getElementById('hamburger-btn');
-    if (hamburgerBtn) {
+    const navLinks = document.querySelector('.nav-links');
+    if (hamburgerBtn && navLinks) {
       hamburgerBtn.addEventListener('click', () => {
-        document.querySelector('.nav-links').classList.toggle('open');
+        navLinks.classList.toggle('open');
         hamburgerBtn.classList.toggle('active');
+      });
+
+      // Fechar menu ao selecionar uma opção
+      navLinks.querySelectorAll('a, button').forEach(link => {
+        link.addEventListener('click', () => {
+          navLinks.classList.remove('open');
+          hamburgerBtn.classList.remove('active');
+        });
       });
     }
 

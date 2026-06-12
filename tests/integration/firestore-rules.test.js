@@ -152,6 +152,12 @@ describe('/transactions — Create', () => {
     await assertFails(addDoc(collection(db, 'transactions'), data));
   });
 
+  it('rejects totalAmount with decimal/fractional value', async () => {
+    const db = getUnauthedDb();
+    const data = buildValidTransaction({ totalAmount: 150.50 });
+    await assertFails(addDoc(collection(db, 'transactions'), data));
+  });
+
   it('rejects totalAmount of zero', async () => {
     const db = getUnauthedDb();
     const data = buildValidTransaction({ totalAmount: 0 });

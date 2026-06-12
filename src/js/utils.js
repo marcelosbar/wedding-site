@@ -118,7 +118,7 @@ export function showConfirm(message) {
  * @param {string} message - The message to show.
  * @returns {Promise<void>} Resolves when the user clicks OK.
  */
-export function showAlert(message) {
+export function showAlert(message, title = 'Aviso') {
   return new Promise((resolve) => {
     let modal = document.getElementById('alert-modal');
     let msgEl = document.getElementById('alert-modal-message');
@@ -144,6 +144,11 @@ export function showAlert(message) {
       document.body.appendChild(modal);
       msgEl = document.getElementById('alert-modal-message');
       okBtn = document.getElementById('alert-modal-ok');
+    }
+
+    const titleEl = document.getElementById('alert-modal-title');
+    if (titleEl) {
+      titleEl.textContent = title;
     }
 
     msgEl.textContent = message;

@@ -52,11 +52,13 @@ vi.mock('../src/js/scoreboard.js', () => ({
 
 const mockShowToast = vi.fn();
 const mockShowConfirm = vi.fn();
+const mockShowAlert = vi.fn();
 
 vi.mock('../src/js/utils.js', () => ({
   escapeHTML: (str) => str,
   showToast: mockShowToast,
-  showConfirm: mockShowConfirm
+  showConfirm: mockShowConfirm,
+  showAlert: mockShowAlert
 }));
 
 const mockCountdownInit = vi.fn();
@@ -349,27 +351,50 @@ describe('WeddingApp Orchestrator', () => {
     expect(input.value).toBe('');
   });
 
-  it('should alert on invalid custom contribution', () => {
+  it('should alert on invalid custom contribution and validate in real-time', () => {
     const input = document.querySelector('.gift-custom-price-input');
     const btn = document.querySelector('.add-custom-to-cart-btn');
     const errorEl = document.querySelector('.gift-custom-error');
 
     expect(errorEl.classList.contains('u-hidden')).toBe(true);
 
-    input.value = 'abc';
-    btn.click();
-
+    // 1. Test keydown decimal rejection
+    const preventDefaultSpy = vi.fn();
+    const keydownEvent = new KeyboardEvent('keydown', { key: '.' });
+    Object.defineProperty(keydownEvent, 'preventDefault', { value: preventDefaultSpy });
+    input.dispatchEvent(keydownEvent);
+    expect(preventDefaultSpy).toHaveBeenCalled();
     expect(errorEl.classList.contains('u-hidden')).toBe(false);
-    expect(mockCartAddToCart).not.toHaveBeenCalled();
+    expect(errorEl.textContent).toBe('Por favor, insira apenas números inteiros (sem centavos ou vírgula).');
 
-    // Type to clear error
+    // 2. Test input paste sanitization
+    input.value = '150.50';
+    input.dispatchEvent(new Event('input'));
+    expect(input.value).toBe('15050'); // dots removed
+    expect(errorEl.classList.contains('u-hidden')).toBe(false);
+    expect(errorEl.textContent).toBe('Por favor, insira apenas números inteiros (sem centavos ou vírgula).');
+
+    // 3. Clear error by typing valid integer
     input.value = '100';
     input.dispatchEvent(new Event('input'));
     expect(errorEl.classList.contains('u-hidden')).toBe(true);
 
-    input.value = '-50';
+    // 4. Test real-time limit exceeded (joke message)
+    input.value = '6000';
+    input.dispatchEvent(new Event('input'));
+    expect(errorEl.classList.contains('u-hidden')).toBe(false);
+    expect(errorEl.textContent).toBe('Wow! A gente fica lisonjeado, mas você digitou o valor certo? 😂');
+
+    // 5. Test button click error for values > 5000 (shows surprised custom modal alert)
+    btn.click();
+    expect(mockShowAlert).toHaveBeenCalledWith('A gente realmente não esperava tanta generosidade! Por favor, entre em contato diretamente com os noivos para combinar esse presente especial.', '😱 Wow!');
+    expect(mockCartAddToCart).not.toHaveBeenCalled();
+
+    // 6. Test button click error for too low values
+    input.value = '0';
     btn.click();
     expect(errorEl.classList.contains('u-hidden')).toBe(false);
+    expect(errorEl.textContent).toBe('Por favor, insira um valor a partir de R$ 1.');
     expect(mockCartAddToCart).not.toHaveBeenCalled();
   });
 

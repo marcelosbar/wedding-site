@@ -4,6 +4,7 @@ import { Scoreboard } from './scoreboard.js';
 import { MessagesCarousel } from './messages.js';
 import { Countdown } from './countdown.js';
 import { transactionsRef, onSnapshot, query } from './firebase.js';
+import { showAlert } from './utils.js';
 
 
 /**
@@ -132,11 +133,20 @@ export class WeddingApp {
         const input = parent ? parent.querySelector('.gift-custom-price-input') : null;
         if (!input) return;
 
-        const priceVal = Number.parseFloat(input.value);
+        const rawValue = input.value.trim();
+        const priceVal = Number.parseFloat(rawValue);
         const errorEl = parent ? parent.querySelector('.gift-custom-error') : null;
 
-        if (Number.isNaN(priceVal) || priceVal <= 0) {
+        const validation = this.validateCustomPrice(input, rawValue, priceVal);
+
+        if (!validation.isValid) {
+          if (priceVal > 5000) {
+            showAlert('A gente realmente não esperava tanta generosidade! Por favor, entre em contato diretamente com os noivos para combinar esse presente especial.', '😱 Wow!');
+            return;
+          }
+
           if (errorEl) {
+            errorEl.textContent = validation.message || 'Por favor, insira um valor inteiro válido entre R$ 1 e R$ 5.000.';
             errorEl.classList.remove('u-hidden');
           }
           return;
@@ -157,12 +167,49 @@ export class WeddingApp {
       });
     });
 
-    // Clear custom contribution error on input
+    // Real-time custom contribution validation on input
     document.querySelectorAll('.gift-custom-price-input').forEach(input => {
+      // Prevent typing decimals, signs, exponents
+      input.addEventListener('keydown', (e) => {
+        if (['.', ',', '-', '+', 'e', 'E'].includes(e.key)) {
+          e.preventDefault();
+          const parent = input.closest('.gift-item');
+          const errorEl = parent ? parent.querySelector('.gift-custom-error') : null;
+          if (errorEl) {
+            errorEl.textContent = 'Por favor, insira apenas números inteiros (sem centavos ou vírgula).';
+            errorEl.classList.remove('u-hidden');
+          }
+        }
+      });
+
       input.addEventListener('input', (e) => {
-        const parent = e.target.closest('.gift-item');
+        const currentInput = e.target;
+        const parent = currentInput.closest('.gift-item');
         const errorEl = parent ? parent.querySelector('.gift-custom-error') : null;
-        if (errorEl) {
+        if (!errorEl) return;
+
+        const rawValue = currentInput.value.trim();
+        const priceVal = Number.parseFloat(rawValue);
+
+        // Sanitize pasted or otherwise inputted decimals/signs
+        if (/[.,\-+eE]/.test(rawValue)) {
+          currentInput.value = rawValue.replace(/[.,\-+eE]/g, '');
+          if (errorEl) {
+            errorEl.textContent = 'Por favor, insira apenas números inteiros (sem centavos ou vírgula).';
+            errorEl.classList.remove('u-hidden');
+          }
+          return;
+        }
+
+        const validation = this.validateCustomPrice(currentInput, rawValue, priceVal);
+
+        if (validation.isValid || validation.isEmpty) {
+          errorEl.classList.add('u-hidden');
+          errorEl.textContent = '';
+        } else if (priceVal > 5000) {
+          errorEl.textContent = validation.message;
+          errorEl.classList.remove('u-hidden');
+        } else {
           errorEl.classList.add('u-hidden');
         }
       });
@@ -238,6 +285,29 @@ export class WeddingApp {
     document.querySelectorAll('.view-cart-modal-btn').forEach(btn => {
       btn.addEventListener('click', () => this.openCart());
     });
+  }
+
+  validateCustomPrice(input, rawValue, priceVal) {
+    const min = Number.parseInt(input.getAttribute('min') || '1', 10);
+    const max = Number.parseInt(input.getAttribute('max') || '5000', 10);
+
+    if (rawValue === '') {
+      return { isValid: false, message: '', isEmpty: true };
+    }
+
+    if (!/^\d+$/.test(rawValue)) {
+      return { isValid: false, message: 'Por favor, insira apenas números inteiros (sem centavos ou vírgula).' };
+    }
+
+    if (priceVal < min) {
+      return { isValid: false, message: `Por favor, insira um valor a partir de R$ ${min}.` };
+    }
+
+    if (priceVal > max) {
+      return { isValid: false, message: 'Wow! A gente fica lisonjeado, mas você digitou o valor certo? 😂' };
+    }
+
+    return { isValid: true, message: '' };
   }
 
   // --- Delegate Cart methods ---

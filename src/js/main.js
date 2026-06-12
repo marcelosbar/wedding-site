@@ -132,10 +132,14 @@ export class WeddingApp {
         const input = parent ? parent.querySelector('.gift-custom-price-input') : null;
         if (!input) return;
 
-        const priceVal = Number.parseFloat(input.value);
+        const rawValue = input.value.trim();
+        const priceVal = Number.parseFloat(rawValue);
         const errorEl = parent ? parent.querySelector('.gift-custom-error') : null;
 
-        if (Number.isNaN(priceVal) || priceVal <= 0) {
+        const min = Number.parseInt(input.getAttribute('min') || '1', 10);
+        const max = Number.parseInt(input.getAttribute('max') || '5000', 10);
+
+        if (Number.isNaN(priceVal) || priceVal < min || priceVal > max || !/^\d+$/.test(rawValue)) {
           if (errorEl) {
             errorEl.classList.remove('u-hidden');
           }

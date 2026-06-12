@@ -371,6 +371,18 @@ describe('WeddingApp Orchestrator', () => {
     btn.click();
     expect(errorEl.classList.contains('u-hidden')).toBe(false);
     expect(mockCartAddToCart).not.toHaveBeenCalled();
+
+    // Decimal numbers should fail validation
+    input.value = '150.50';
+    btn.click();
+    expect(errorEl.classList.contains('u-hidden')).toBe(false);
+    expect(mockCartAddToCart).not.toHaveBeenCalled();
+
+    // Numbers above max (5000) should fail validation
+    input.value = '6000';
+    btn.click();
+    expect(errorEl.classList.contains('u-hidden')).toBe(false);
+    expect(mockCartAddToCart).not.toHaveBeenCalled();
   });
 
   it('should clear guest name error when user types', () => {

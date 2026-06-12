@@ -48,3 +48,10 @@ section.container {
   line-height: 1.7;
   color: var(--color-text-main);
 }
+
+@media (max-width: 576px) {
+  .story-content {
+    font-size: 1.15rem;
+    line-height: 1.6;
+  }
+}

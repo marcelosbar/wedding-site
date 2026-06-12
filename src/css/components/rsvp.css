@@ -121,3 +121,9 @@
   .rsvp-corner-br { bottom: 9px; right: 9px; }
   .rsvp-script { font-size: 1.2rem; }
 }
+
+@media (max-width: 360px) {
+  .rsvp-card {
+    padding: 2.25rem 1.15rem 2rem;
+  }
+}

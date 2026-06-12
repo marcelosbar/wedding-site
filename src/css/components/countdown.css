@@ -84,6 +84,16 @@
   }
   
   .countdown-label {
-    font-size: 0.7rem;
+    font-size: 0.55rem;
+    letter-spacing: 0.5px;
+  }
+}
+
+@media (max-width: 360px) {
+  .countdown-grid {
+    gap: 0.35rem;
+  }
+  .countdown-card {
+    padding: 0.6rem 0.15rem;
   }
 }

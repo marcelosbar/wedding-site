@@ -1,5 +1,5 @@
 #hero {
-  min-height: calc(100vh - 80px);
+  min-height: calc(100dvh - 80px);
   margin-top: 80px; /* Desloca o hero para começar exatamente após a altura do header */
   display: flex;
   flex-direction: column;
@@ -186,7 +186,7 @@
     inset: 12px;
   }
   .hero-content h1 {
-    /* font-size: clamp(3rem, 8vh, 4.2rem); */
+    font-size: clamp(3rem, 8vh, 4.2rem);
   }
   .hero-date {
     margin: 0.5rem 0 0.25rem;
@@ -206,18 +206,27 @@
     padding: 1.5rem 1.5rem 1.25rem;
   }
   .hero-content h1 {
-    /* font-size: clamp(2.5rem, 6vh, 3.5rem); */
+    font-size: clamp(2.5rem, 6vh, 3.5rem);
   }
   .hero-date {
-    /* font-size: 0.95rem; */
+    font-size: 0.95rem;
     margin: 0.35rem 0 0.15rem;
   }
   .hero-content > .story-content {
-    /* font-size: 1rem; */
+    font-size: 1rem;
+  }
+  #hero .divider-arabesco {
+    display: none;
   }
 }
 
 /* Overrides específicos para compactar elementos dentro do hero */
 #hero .btn-lg {
   padding: 0.85rem 2.25rem;
+}
+
+@media (max-width: 360px) {
+  .hero-content {
+    padding: 2.25rem 1.15rem 2rem;
+  }
 }

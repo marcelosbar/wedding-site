@@ -349,39 +349,42 @@ describe('WeddingApp Orchestrator', () => {
     expect(input.value).toBe('');
   });
 
-  it('should alert on invalid custom contribution', () => {
+  it('should alert on invalid custom contribution and validate in real-time', () => {
     const input = document.querySelector('.gift-custom-price-input');
     const btn = document.querySelector('.add-custom-to-cart-btn');
     const errorEl = document.querySelector('.gift-custom-error');
 
     expect(errorEl.classList.contains('u-hidden')).toBe(true);
 
+    // 1. Test real-time non-digit validation
     input.value = 'abc';
-    btn.click();
-
+    input.dispatchEvent(new Event('input'));
     expect(errorEl.classList.contains('u-hidden')).toBe(false);
-    expect(mockCartAddToCart).not.toHaveBeenCalled();
+    expect(errorEl.textContent).toBe('Por favor, insira apenas números inteiros (sem centavos ou vírgula).');
 
-    // Type to clear error
+    // 2. Clear error by typing valid integer
     input.value = '100';
     input.dispatchEvent(new Event('input'));
     expect(errorEl.classList.contains('u-hidden')).toBe(true);
 
+    // 3. Test real-time limit exceeded (joke message)
+    input.value = '6000';
+    input.dispatchEvent(new Event('input'));
+    expect(errorEl.classList.contains('u-hidden')).toBe(false);
+    expect(errorEl.textContent).toBe('Wow! A gente fica lisonjeado, mas tem certeza de que você quer nos dar todo esse valor? 😂');
+
+    // 4. Test button click error for invalid/negative values
     input.value = '-50';
     btn.click();
     expect(errorEl.classList.contains('u-hidden')).toBe(false);
+    expect(errorEl.textContent).toBe('Por favor, insira apenas números inteiros (sem centavos ou vírgula).');
     expect(mockCartAddToCart).not.toHaveBeenCalled();
 
-    // Decimal numbers should fail validation
-    input.value = '150.50';
+    // 5. Test button click error for too low values
+    input.value = '0';
     btn.click();
     expect(errorEl.classList.contains('u-hidden')).toBe(false);
-    expect(mockCartAddToCart).not.toHaveBeenCalled();
-
-    // Numbers above max (5000) should fail validation
-    input.value = '6000';
-    btn.click();
-    expect(errorEl.classList.contains('u-hidden')).toBe(false);
+    expect(errorEl.textContent).toBe('Por favor, insira um valor a partir de R$ 1.');
     expect(mockCartAddToCart).not.toHaveBeenCalled();
   });
 

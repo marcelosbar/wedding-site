@@ -136,11 +136,11 @@ export class WeddingApp {
         const priceVal = Number.parseFloat(rawValue);
         const errorEl = parent ? parent.querySelector('.gift-custom-error') : null;
 
-        const min = Number.parseInt(input.getAttribute('min') || '1', 10);
-        const max = Number.parseInt(input.getAttribute('max') || '5000', 10);
+        const validation = this.validateCustomPrice(input, rawValue, priceVal);
 
-        if (Number.isNaN(priceVal) || priceVal < min || priceVal > max || !/^\d+$/.test(rawValue)) {
+        if (!validation.isValid) {
           if (errorEl) {
+            errorEl.textContent = validation.message || 'Por favor, insira um valor inteiro válido entre R$ 1 e R$ 5.000.';
             errorEl.classList.remove('u-hidden');
           }
           return;
@@ -161,13 +161,33 @@ export class WeddingApp {
       });
     });
 
-    // Clear custom contribution error on input
+    // Real-time custom contribution validation on input
     document.querySelectorAll('.gift-custom-price-input').forEach(input => {
       input.addEventListener('input', (e) => {
-        const parent = e.target.closest('.gift-item');
+        const currentInput = e.target;
+        const parent = currentInput.closest('.gift-item');
         const errorEl = parent ? parent.querySelector('.gift-custom-error') : null;
-        if (errorEl) {
+        if (!errorEl) return;
+
+        const rawValue = currentInput.value.trim();
+        const priceVal = Number.parseFloat(rawValue);
+
+        const validation = this.validateCustomPrice(currentInput, rawValue, priceVal);
+
+        if (validation.isEmpty) {
           errorEl.classList.add('u-hidden');
+          errorEl.textContent = '';
+        } else if (!validation.isValid) {
+          // Immediately show error if they typed non-digits, or if they exceeded max (5000)
+          if (!/^\d+$/.test(rawValue) || priceVal > 5000) {
+            errorEl.textContent = validation.message;
+            errorEl.classList.remove('u-hidden');
+          } else {
+            errorEl.classList.add('u-hidden');
+          }
+        } else {
+          errorEl.classList.add('u-hidden');
+          errorEl.textContent = '';
         }
       });
     });
@@ -242,6 +262,29 @@ export class WeddingApp {
     document.querySelectorAll('.view-cart-modal-btn').forEach(btn => {
       btn.addEventListener('click', () => this.openCart());
     });
+  }
+
+  validateCustomPrice(input, rawValue, priceVal) {
+    const min = Number.parseInt(input.getAttribute('min') || '1', 10);
+    const max = Number.parseInt(input.getAttribute('max') || '5000', 10);
+
+    if (rawValue === '') {
+      return { isValid: false, message: '', isEmpty: true };
+    }
+
+    if (!/^\d+$/.test(rawValue)) {
+      return { isValid: false, message: 'Por favor, insira apenas números inteiros (sem centavos ou vírgula).' };
+    }
+
+    if (priceVal < min) {
+      return { isValid: false, message: `Por favor, insira um valor a partir de R$ ${min}.` };
+    }
+
+    if (priceVal > max) {
+      return { isValid: false, message: 'Wow! A gente fica lisonjeado, mas tem certeza de que você quer nos dar todo esse valor? 😂' };
+    }
+
+    return { isValid: true, message: '' };
   }
 
   // --- Delegate Cart methods ---

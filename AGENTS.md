@@ -28,6 +28,11 @@ This is a wedding website for Lorena and Marcelo. The primary goal is to provide
       - *Local Copies*: Any raw mock images used during design iterations must be placed in a directory ignored by Git (e.g., `imagekit-to-upload/`) and uploaded to the ImageKit CDN. No local mock images are allowed in production code.
 11. **Documentation Maintenance**: At the end of any feature implementation, configuration change, or script update, always review and update the project documentation (such as `README.md`) to ensure setup, testing, and deployment instructions are kept fully up to date.
 12. **Continuous Improvement of Guidelines**: Proactively propose updates to this `AGENTS.md` file whenever you discover new repository quirks, security gotchas, emulator requirements, or testing best practices during your task. Focus updates on high-leverage guidelines that cannot be easily enforced by automated tests or linters to prevent documentation clutter.
+13. **Responsive Design and UI Layering Best Practices**:
+    - *Script Font Proportions*: Script typefaces (like `Pinyon Script`) appear visually smaller than blocky serif or sans-serif fonts at equivalent font-sizes. Always ensure they have significantly larger font-sizes on mobile (`clamp(3.6rem, 12vw, 4.5rem)` or `3.2rem` minimum) so they remain the proud protagonists of the page and don't get drowned out by bold numbers (like countdown values) or uppercase dates.
+    - *Proportional Height Scaling*: When compressing sections for short viewports (like laptops, landscape tablets, or smart displays using `@media (max-height)`), scale down all text elements, paddings, and components (e.g. countdown cards) proportionally. If only the title is reduced, the details will look disproportionately large.
+    - *Z-Index Stacking with Modals*: Keep fixed floating elements (like the floating cart) at a `z-index` lower than the backdrop overlays of modals (`1050` vs overlay backdrop `1100`). This ensures the floating buttons go behind the backdrop when a modal is open, preventing them from overlapping footer buttons inside the modal on small screens.
+
 
 ## Current State
 - The UI is complete and tested.

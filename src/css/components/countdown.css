@@ -96,4 +96,11 @@
   .countdown-card {
     padding: 0.6rem 0.15rem;
   }
+  .countdown-value {
+    font-size: 1.35rem;
+  }
+  .countdown-label {
+    font-size: 0.5rem;
+    letter-spacing: 0.3px;
+  }
 }

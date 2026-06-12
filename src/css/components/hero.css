@@ -172,14 +172,14 @@
 
   /* Proporção tipográfica corrigida para mobile/tablet */
   .hero-content h1 {
-    font-size: clamp(2.8rem, 10vw, 3.4rem);
+    font-size: clamp(3.6rem, 12vw, 4.5rem);
   }
   .hero-date {
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     margin: 0.4rem 0 0.2rem;
   }
   .hero-content > .story-content {
-    font-size: 0.95rem;
+    font-size: 0.9rem;
   }
 }
 
@@ -198,13 +198,23 @@
     inset: 12px;
   }
   .hero-content h1 {
-    font-size: clamp(3rem, 8vh, 4.2rem);
+    font-size: clamp(3.8rem, 10vh, 4.8rem);
   }
   .hero-date {
+    font-size: 0.95rem;
     margin: 0.5rem 0 0.25rem;
+  }
+  .hero-content > .story-content {
+    font-size: 1rem;
   }
   .countdown-container {
     margin-top: 0.5rem;
+  }
+  #hero .countdown-value {
+    font-size: 1.8rem;
+  }
+  #hero .countdown-card {
+    padding: 0.75rem 0.5rem;
   }
 }
 
@@ -222,18 +232,28 @@
     padding: 1.25rem 1.25rem 1rem;
   }
   .hero-content h1 {
-    font-size: clamp(2.5rem, 6vh, 3.5rem);
+    font-size: clamp(3.2rem, 8vh, 4.0rem);
   }
   .hero-date {
-    font-size: 0.95rem;
+    font-size: 0.85rem;
     margin: 0.35rem 0 0.15rem;
   }
   .hero-content > .story-content {
-    font-size: 1rem;
+    font-size: 0.9rem;
   }
   .countdown-container {
     margin-top: 0.25rem;
     margin-bottom: 0.5rem;
+  }
+  #hero .countdown-value {
+    font-size: 1.4rem;
+  }
+  #hero .countdown-card {
+    padding: 0.5rem 0.25rem;
+  }
+  #hero .countdown-label {
+    font-size: 0.6rem;
+    letter-spacing: 1px;
   }
   #hero .divider-arabesco {
     display: none;
@@ -245,17 +265,28 @@
   padding: 0.85rem 2.25rem;
 }
 
+@media (max-width: 600px) {
+  #hero .btn-lg {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.9rem;
+  }
+}
+
 @media (max-width: 360px) {
+  #hero .btn-lg {
+    padding: 0.65rem 1.25rem;
+    font-size: 0.85rem;
+  }
   .hero-content {
-    padding: 2.25rem 1.15rem 2rem;
+    padding: 2rem 1.15rem 1.75rem;
   }
   .hero-content h1 {
-    font-size: 2.5rem;
+    font-size: 3.2rem;
   }
   .hero-date {
-    font-size: 0.82rem;
+    font-size: 0.8rem;
   }
   .hero-content > .story-content {
-    font-size: 0.88rem;
+    font-size: 0.85rem;
   }
 }

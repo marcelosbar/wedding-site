@@ -370,19 +370,23 @@ export class Cart {
     this.successView.classList.remove('active');
 
     if (this.backToListBtn) {
+      const container = this.backToListBtn.closest('.cart-back-container');
       this.backToListBtn.classList.remove('groom', 'bride');
       if (previousModalId === 'groom-gifts-modal') {
         this.backToListBtn.textContent = '← Voltar para Lista do Noivo';
         this.backToListBtn.dataset.targetModal = 'groom-gifts-modal';
         this.backToListBtn.classList.add('groom');
         this.backToListBtn.classList.remove('u-hidden');
+        if (container) container.classList.remove('u-hidden');
       } else if (previousModalId === 'bride-gifts-modal') {
         this.backToListBtn.textContent = '← Voltar para Lista da Noiva';
         this.backToListBtn.dataset.targetModal = 'bride-gifts-modal';
         this.backToListBtn.classList.add('bride');
         this.backToListBtn.classList.remove('u-hidden');
+        if (container) container.classList.remove('u-hidden');
       } else {
         this.backToListBtn.classList.add('u-hidden');
+        if (container) container.classList.add('u-hidden');
         delete this.backToListBtn.dataset.targetModal;
       }
     }

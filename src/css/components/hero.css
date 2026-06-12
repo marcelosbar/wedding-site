@@ -221,8 +221,3 @@
 #hero .btn-lg {
   padding: 0.85rem 2.25rem;
 }
-
-#hero .divider-arabesco {
-  width: min(280px, 60%);
-  margin: 0.65rem auto;
-}

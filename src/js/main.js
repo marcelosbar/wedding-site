@@ -203,20 +203,14 @@ export class WeddingApp {
 
         const validation = this.validateCustomPrice(currentInput, rawValue, priceVal);
 
-        if (validation.isEmpty) {
+        if (validation.isValid || validation.isEmpty) {
           errorEl.classList.add('u-hidden');
           errorEl.textContent = '';
-        } else if (!validation.isValid) {
-          // Immediately show error if they exceeded max (5000)
-          if (priceVal > 5000) {
-            errorEl.textContent = validation.message;
-            errorEl.classList.remove('u-hidden');
-          } else {
-            errorEl.classList.add('u-hidden');
-          }
+        } else if (priceVal > 5000) {
+          errorEl.textContent = validation.message;
+          errorEl.classList.remove('u-hidden');
         } else {
           errorEl.classList.add('u-hidden');
-          errorEl.textContent = '';
         }
       });
     });

@@ -153,3 +153,25 @@
   gap: 1rem;
 }
 
+@media (max-width: 576px) {
+  .gifts-modal-header {
+    padding: 1.25rem 1.25rem;
+  }
+  .gifts-modal-body {
+    padding: 1rem;
+  }
+  .gifts-modal-footer {
+    padding: 1rem 1.25rem;
+  }
+  .gifts-modal-title {
+    font-size: 1.15rem;
+  }
+  .confirm-modal-box {
+    padding: 1.5rem 1.25rem;
+  }
+  .gifts-list {
+    padding: 0.5rem 0;
+    gap: 1rem;
+  }
+}
+

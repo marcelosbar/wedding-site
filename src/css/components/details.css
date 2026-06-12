@@ -181,3 +181,25 @@
     padding: 2.5rem 1.5rem;
   }
 }
+
+@media (max-width: 576px) {
+  .details-card {
+    padding: 2rem 1.25rem;
+  }
+  .details-card h3 {
+    font-size: 1.45rem;
+    margin-bottom: 1rem;
+  }
+  .details-card p {
+    font-size: 0.9rem;
+  }
+  .details-list li {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .details-card {
+    padding: 1.75rem 1rem;
+  }
+}

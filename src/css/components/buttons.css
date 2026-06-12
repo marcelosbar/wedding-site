@@ -122,3 +122,13 @@
   }
 }
 
+/* Responsive adjustments for large buttons on narrow mobile devices */
+@media (max-width: 600px) {
+  .btn-lg {
+    padding: 0.85rem 1.25rem;
+    font-size: 0.95rem;
+    letter-spacing: 0.04em;
+    max-width: 100%;
+  }
+}
+

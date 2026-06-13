@@ -23,3 +23,23 @@ footer p:first-child {
   margin-right: auto;
   line-height: 1.5;
 }
+
+.footer-credits {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  color: rgba(253, 251, 243, 0.65);
+  margin-top: 0.5rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+}
+
+.footer-credits a {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: opacity 0.2s ease;
+}
+
+.footer-credits a:hover {
+  opacity: 0.8;
+}

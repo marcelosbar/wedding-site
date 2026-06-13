@@ -5,12 +5,13 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: clamp(1.5rem, 4vh, 2.5rem); /* Reduzido para aproximar intro e card */
+  gap: clamp(1rem, 3.5vh, 1.75rem); /* Reduzido para aproximar intro e card */
   text-align: center;
-  padding: 2rem 1.25rem; /* Reajustado levemente */
+  padding: 1.5rem 1.25rem; /* Reajustado levemente */
   position: relative;
   overflow: hidden;
   background-color: var(--color-background);
+  transition: margin-top 0.5s ease, min-height 0.5s ease;
 }
 
 /* Ilustração do casamento preenchendo o fundo inteiro */
@@ -21,8 +22,9 @@
   width: 100%;
   height: calc(100% + 80px); /* Preenche toda a tela útil */
   object-fit: cover;
-  object-position: center; /* Ajustado para center */
+  object-position: center 94%; /* Ajustado para melhor enquadramento vertical da capela */
   z-index: 0;
+  transition: top 0.5s ease, height 0.5s ease;
 }
 
 /* Vinheta creme suave só atrás do painel + base, p/ leitura */
@@ -38,6 +40,7 @@
     linear-gradient(to bottom, rgba(247, 244, 239, 0.5) 0%, transparent 16%, transparent 88%, rgba(247, 244, 239, 0.35) 100%);
   z-index: 1;
   pointer-events: none;
+  transition: opacity 0.5s ease;
 }
 
 /* Texto poético de introdução, sobre o fundo */
@@ -89,7 +92,7 @@
   z-index: 2;
   max-width: 560px;
   width: 100%;
-  padding: 3.25rem 2.75rem 3rem; /* 52px top, 44px laterais, 48px bottom */
+  padding: 3.25rem 2.75rem 3rem; /* Restaurado o espaçamento original conforme feedback do usuário */
   background: rgba(252, 250, 244, 0.86);
   backdrop-filter: blur(7px) saturate(1.05);
   -webkit-backdrop-filter: blur(7px) saturate(1.05);
@@ -157,7 +160,176 @@
   font-style: italic;
   color: var(--color-text-muted);
   max-width: 30ch;
-  margin: 0.5rem auto 1.25rem auto; /* Substitui u-story-margin-1 para economizar espaço */
+  margin: 0.4rem auto 1rem auto; /* Substitui u-story-margin-1 para economizar espaço */
+}
+
+/* ------ Art Mode button ------ */
+.btn-link-art {
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: var(--font-heading);
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+  opacity: 0.65;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: transparent;
+}
+.btn-link-art:hover,
+.btn-link-art:focus-visible {
+  opacity: 1;
+  text-decoration-color: var(--color-primary);
+  outline: none;
+}
+
+/* ------ Art Mode hint pill ("Toque para voltar") ------ */
+.hero-art-hint {
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  font-family: var(--font-heading);
+  font-size: 0.82rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-primary-deep);
+  background: rgba(252, 250, 244, 0.78);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid rgba(22, 48, 107, 0.18);
+  border-radius: 40px;
+  padding: 0.45rem 1.2rem;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease; /* Exits quickly without delay */
+  cursor: pointer;
+}
+
+/* Default transitions for smooth toggling */
+.hero-intro,
+.hero-content {
+  transition: opacity 0.5s ease;
+}
+
+/* ------ Art Mode active state ------ */
+#hero.art-mode .hero-intro,
+#hero.art-mode .hero-content {
+  opacity: 0;
+  pointer-events: none;
+}
+
+#hero.art-mode::after {
+  opacity: 0;
+}
+
+#hero.art-mode .hero-art-hint {
+  opacity: 1;
+  pointer-events: auto;
+  transition: opacity 0.5s ease 0.4s; /* Enters smoothly with a delay after content fades out */
+}
+
+/* ------ Art Mode body-level styles ------ */
+body.art-mode-active {
+  overflow: hidden;
+}
+
+body.art-mode-active header,
+body.art-mode-active footer,
+body.art-mode-active section:not(#hero),
+body.art-mode-active .floating-cart-btn {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden;
+  transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+body.art-mode-active #hero {
+  margin-top: 0;
+  min-height: 100dvh;
+}
+
+body.art-mode-active #hero .hero-bg-img {
+  top: 0;
+  height: 100%;
+}
+
+/* ------ Art Mode Rotation Hint (suggest rotating phone to landscape) ------ */
+.hero-art-rotate-hint {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--color-primary-deep);
+  background: rgba(252, 250, 244, 0.92);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid rgba(22, 48, 107, 0.18);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  text-align: center;
+  font-family: var(--font-heading);
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.5s ease 0.6s, visibility 0.5s ease 0.6s;
+}
+
+/* Show only on small portrait viewports when Art Mode is active */
+@media (max-width: 768px) and (orientation: portrait) {
+  #hero.art-mode .hero-art-rotate-hint {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+/* Animated CSS Phone Icon */
+.rotate-phone-icon {
+  width: 24px;
+  height: 40px;
+  border: 2px solid var(--color-primary-deep);
+  border-radius: 4px;
+  position: relative;
+  animation: rotate-phone 2.5s infinite ease-in-out;
+}
+
+.rotate-phone-icon::after {
+  content: '';
+  position: absolute;
+  bottom: 3px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background-color: var(--color-primary-deep);
+}
+
+@keyframes rotate-phone {
+  0%, 10% {
+    transform: rotate(0deg);
+  }
+  40%, 65% {
+    transform: rotate(-90deg);
+  }
+  95%, 100% {
+    transform: rotate(0deg);
+  }
 }
 
 @media (max-width: 600px) {

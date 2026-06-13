@@ -145,6 +145,12 @@ function setupDOM() {
         <button class="btn btn-accent view-cart-modal-btn">Ver Carrinho (<span class="modal-cart-count">0</span>)</button>
       </div>
     </div>
+    <section id="hero">
+      <button id="view-art-btn"></button>
+      <div class="hero-intro"></div>
+      <div class="hero-content"></div>
+      <div class="hero-art-hint" aria-hidden="true" tabindex="-1">Toque em qualquer lugar para voltar</div>
+    </section>
   `;
 }
 
@@ -445,5 +451,117 @@ describe('WeddingApp Orchestrator', () => {
 
     expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('Firebase não configurado'), expect.any(Error));
     warnSpy.mockRestore();
+  });
+
+  it('should enter art-mode when view-art-btn is clicked and manage accessibility/focus', () => {
+    const heroSection = document.getElementById('hero');
+    const viewArtBtn = document.getElementById('view-art-btn');
+    const artHint = document.querySelector('.hero-art-hint');
+
+    // Add elements to body so focus works in JSDOM
+    document.body.appendChild(heroSection);
+    viewArtBtn.focus(); // Set initial focus
+
+    expect(heroSection.classList.contains('art-mode')).toBe(false);
+    expect(document.body.classList.contains('art-mode-active')).toBe(false);
+    expect(artHint.getAttribute('tabindex')).toBe('-1');
+    expect(artHint.getAttribute('aria-hidden')).toBe('true');
+
+    viewArtBtn.click();
+
+    expect(heroSection.classList.contains('art-mode')).toBe(true);
+    expect(document.body.classList.contains('art-mode-active')).toBe(true);
+    expect(artHint.getAttribute('tabindex')).toBe('0');
+    expect(artHint.getAttribute('aria-hidden')).toBe('false');
+    expect(document.activeElement).toBe(artHint);
+
+    // Clean up body
+    document.body.removeChild(heroSection);
+    document.body.classList.remove('art-mode-active');
+  });
+
+  it('should exit art-mode and restore focus when hero section is clicked', () => {
+    const heroSection = document.getElementById('hero');
+    const viewArtBtn = document.getElementById('view-art-btn');
+    const artHint = document.querySelector('.hero-art-hint');
+
+    document.body.appendChild(heroSection);
+
+    // Enter art-mode first
+    viewArtBtn.click();
+    expect(heroSection.classList.contains('art-mode')).toBe(true);
+    expect(document.body.classList.contains('art-mode-active')).toBe(true);
+
+    // Click on the section background to exit
+    const event = new MouseEvent('click', { bubbles: true });
+    Object.defineProperty(event, 'target', { value: heroSection });
+    heroSection.dispatchEvent(event);
+
+    expect(heroSection.classList.contains('art-mode')).toBe(false);
+    expect(document.body.classList.contains('art-mode-active')).toBe(false);
+    expect(artHint.getAttribute('tabindex')).toBe('-1');
+    expect(artHint.getAttribute('aria-hidden')).toBe('true');
+    expect(document.activeElement).toBe(viewArtBtn);
+
+    document.body.removeChild(heroSection);
+    document.body.classList.remove('art-mode-active');
+  });
+
+  it('should exit art-mode when Escape key is pressed', () => {
+    const heroSection = document.getElementById('hero');
+    const viewArtBtn = document.getElementById('view-art-btn');
+
+    document.body.appendChild(heroSection);
+
+    // Enter art-mode
+    viewArtBtn.click();
+    expect(heroSection.classList.contains('art-mode')).toBe(true);
+    expect(document.body.classList.contains('art-mode-active')).toBe(true);
+
+    // Press Escape
+    const escapeEvent = new KeyboardEvent('keydown', { key: 'Escape', bubbles: true });
+    document.dispatchEvent(escapeEvent);
+
+    expect(heroSection.classList.contains('art-mode')).toBe(false);
+    expect(document.body.classList.contains('art-mode-active')).toBe(false);
+    expect(document.activeElement).toBe(viewArtBtn);
+
+    document.body.removeChild(heroSection);
+    document.body.classList.remove('art-mode-active');
+  });
+
+  it('should exit art-mode when Enter or Space is pressed on the hint pill', () => {
+    const heroSection = document.getElementById('hero');
+    const viewArtBtn = document.getElementById('view-art-btn');
+    const artHint = document.querySelector('.hero-art-hint');
+
+    document.body.appendChild(heroSection);
+
+    // Test Enter key
+    viewArtBtn.click();
+    expect(heroSection.classList.contains('art-mode')).toBe(true);
+    expect(document.body.classList.contains('art-mode-active')).toBe(true);
+
+    const enterEvent = new KeyboardEvent('keydown', { key: 'Enter', bubbles: true });
+    artHint.dispatchEvent(enterEvent);
+
+    expect(heroSection.classList.contains('art-mode')).toBe(false);
+    expect(document.body.classList.contains('art-mode-active')).toBe(false);
+    expect(document.activeElement).toBe(viewArtBtn);
+
+    // Test Space key
+    viewArtBtn.click();
+    expect(heroSection.classList.contains('art-mode')).toBe(true);
+    expect(document.body.classList.contains('art-mode-active')).toBe(true);
+
+    const spaceEvent = new KeyboardEvent('keydown', { key: ' ', bubbles: true });
+    artHint.dispatchEvent(spaceEvent);
+
+    expect(heroSection.classList.contains('art-mode')).toBe(false);
+    expect(document.body.classList.contains('art-mode-active')).toBe(false);
+    expect(document.activeElement).toBe(viewArtBtn);
+
+    document.body.removeChild(heroSection);
+    document.body.classList.remove('art-mode-active');
   });
 });

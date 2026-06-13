@@ -48,6 +48,10 @@
   margin-top: 1rem;
 }
 
+.u-mt-2 {
+  margin-top: 0.5rem;
+}
+
 .u-justify-center {
   justify-content: center;
 }

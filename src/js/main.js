@@ -285,6 +285,64 @@ export class WeddingApp {
     document.querySelectorAll('.view-cart-modal-btn').forEach(btn => {
       btn.addEventListener('click', () => this.openCart());
     });
+
+    // 9. Art Mode — toggle fullscreen illustration view
+    const heroSection = document.getElementById('hero');
+    const viewArtBtn = document.getElementById('view-art-btn');
+    const artHint = document.querySelector('.hero-art-hint');
+
+    const enterArtMode = () => {
+      if (!heroSection) return;
+      heroSection.classList.add('art-mode');
+      document.body.classList.add('art-mode-active');
+      if (artHint) {
+        artHint.setAttribute('tabindex', '0');
+        artHint.setAttribute('aria-hidden', 'false');
+        artHint.focus();
+      }
+    };
+
+    const exitArtMode = () => {
+      if (!heroSection) return;
+      heroSection.classList.remove('art-mode');
+      document.body.classList.remove('art-mode-active');
+      if (artHint) {
+        artHint.setAttribute('tabindex', '-1');
+        artHint.setAttribute('aria-hidden', 'true');
+      }
+      if (viewArtBtn) {
+        viewArtBtn.focus();
+      }
+    };
+
+    if (heroSection && viewArtBtn) {
+      viewArtBtn.addEventListener('click', enterArtMode);
+      heroSection.addEventListener('click', (e) => {
+        if (!heroSection.classList.contains('art-mode')) return;
+        // Exit art mode when clicking anywhere (hint pill or background)
+        if (e.target !== viewArtBtn) {
+          exitArtMode();
+        }
+      });
+
+      // Exit art mode on Escape key press
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && heroSection.classList.contains('art-mode')) {
+          exitArtMode();
+        }
+      });
+    }
+    if (artHint) {
+      artHint.setAttribute('role', 'button');
+      artHint.setAttribute('tabindex', '-1');
+      artHint.addEventListener('keydown', (e) => {
+        if (!heroSection || !heroSection.classList.contains('art-mode')) return;
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          exitArtMode();
+        }
+      });
+    }
   }
 
   validateCustomPrice(input, rawValue, priceVal) {

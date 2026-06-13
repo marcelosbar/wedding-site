@@ -336,7 +336,7 @@ export class WeddingApp {
       artHint.setAttribute('role', 'button');
       artHint.setAttribute('tabindex', '-1');
       artHint.addEventListener('keydown', (e) => {
-        if (!heroSection || !heroSection.classList.contains('art-mode')) return;
+        if (!heroSection?.classList.contains('art-mode')) return;
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
           exitArtMode();

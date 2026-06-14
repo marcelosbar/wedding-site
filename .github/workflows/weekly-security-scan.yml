@@ -30,8 +30,14 @@ jobs:
         with:
           extra_args: --only-verified
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@fe02b34f77f8bc703788d5817da081398fad5df2 # v4.0.0
+        with:
+          version: 9
+          run_install: false
+
       - name: Install Dependencies
-        run: npm ci --ignore-scripts
+        run: pnpm install --frozen-lockfile --ignore-scripts
 
       - name: Snyk Weekly Dependency Scan
         uses: snyk/actions/node@8e119fbb6c251787721d34ba683ed48eba792766 # master @ 2026-05-27

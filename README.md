@@ -33,7 +33,7 @@ Ensure you have the following installed on your machine:
 ### 2. Install Dependencies
 Run the following command to install the project dependencies:
 ```bash
-npm install
+pnpm install
 ```
 
 ### 3. Firebase Configuration
@@ -45,7 +45,7 @@ If you need to connect to your live production/cloud database from your local ma
 
 ### 4. Start the Dev Server with Emulators
 ```bash
-npm run dev
+pnpm run dev
 ```
 This spins up the Vite dev server (port 5173) and the Firebase Emulators (Auth on port 9099, Firestore on port 8080) concurrently.
 - The site will be available at `http://localhost:5173/`.
@@ -59,7 +59,7 @@ This spins up the Vite dev server (port 5173) and the Firebase Emulators (Auth o
 ### 6. Security & CSP Verification
 To test the production build with strict security headers (Content Security Policy, HSTS, etc.) configured in `firebase.json`:
 ```bash
-npm run preview:secure
+pnpm run preview:secure
 ```
 This builds the site and starts the full Firebase Emulator suite (including the Hosting emulator on port 5000). Visit `http://localhost:5000/admin.html` to verify security compliance.
 
@@ -70,17 +70,17 @@ This project uses **Vitest** with **JSDOM** and **v8** for code coverage.
 ### Unit Tests
 Runs the full unit test suite (9 files, JSDOM environment) and outputs the code coverage report:
 ```bash
-npm run test
+pnpm run test
 ```
 To run tests in interactive watch mode:
 ```bash
-npm run test:watch
+pnpm run test:watch
 ```
 
 ### Integration Tests
 Runs the Firestore Security Rules integration tests against the Firebase Emulator. Requires **Java** (JDK/JRE 8+) installed:
 ```bash
-npm run test:integration
+pnpm run test:integration
 ```
 This command automatically starts the Firestore Emulator, runs the tests in `tests/integration/`, and shuts down the emulator when done. These tests validate that the `firestore.rules` correctly enforce access control (e.g., the R$ 5,000 cap, admin-only updates, field validation).
 
@@ -99,10 +99,10 @@ This project uses GitHub Actions for automated deployment. Any commit pushed or 
 
 ### Manual Deployment (Fallback)
 If manual deployment is necessary:
-1. Ensure the Firebase CLI is installed: `npm install -g firebase-tools`
+1. Ensure the Firebase CLI is installed: `npm install -g firebase-tools` (or `pnpm add -g firebase-tools`)
 2. Run the build and deploy commands:
    ```bash
-   npm run build
+   pnpm run build
    firebase deploy
    ```
 

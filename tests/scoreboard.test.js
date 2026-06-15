@@ -4,17 +4,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { Scoreboard } from '../src/js/scoreboard.js';
 
-const mockOnSnapshot = vi.fn();
-const mockDoc = vi.fn();
-
-vi.mock('../src/js/firebase.js', () => {
-  return {
-    db: {},
-    doc: (...args) => mockDoc(...args),
-    onSnapshot: (...args) => mockOnSnapshot(...args),
-  };
-});
-
 function createMockElements() {
   document.body.innerHTML = `
     <div id="global-groom-points">0 pts</div>
@@ -38,8 +27,6 @@ describe('Scoreboard', () => {
 
   beforeEach(() => {
     scoreboard = new Scoreboard(createMockElements());
-    mockOnSnapshot.mockReset();
-    mockDoc.mockReset();
     vi.clearAllMocks();
   });
 
@@ -114,51 +101,5 @@ describe('Scoreboard', () => {
     // Tied
     scoreboard.updateScoreboardUI(120, 120);
     expect(heartEl.src).toBe('https://ik.imagekit.io/vfxvr8vqa/wedding-site/heart_red.png?tr=w-50');
-  });
-
-  it('should initialize realtime scoreboard listener and update UI on snapshot', () => {
-    mockDoc.mockReturnValueOnce('mock-doc-ref');
-    
-    scoreboard.initRealtimeScoreboard();
-    
-    expect(mockDoc).toHaveBeenCalledWith(expect.anything(), 'scoreboard', 'totals');
-    expect(mockOnSnapshot).toHaveBeenCalledWith('mock-doc-ref', expect.any(Function), expect.any(Function));
-    
-    // Extract callbacks
-    const successCallback = mockOnSnapshot.mock.calls[0][1];
-    const errorCallback = mockOnSnapshot.mock.calls[0][2];
-    
-    // Trigger callback with doc that exists
-    const mockDocSnapExist = {
-      exists: () => true,
-      data: () => ({ groomTotal: 250, brideTotal: 150 })
-    };
-    successCallback(mockDocSnapExist);
-    expect(document.getElementById('global-groom-points').innerText).toBe('250 pts');
-    expect(document.getElementById('global-bride-points').innerText).toBe('150 pts');
-    
-    // Trigger callback with doc that does NOT exist
-    const mockDocSnapNotExist = {
-      exists: () => false
-    };
-    successCallback(mockDocSnapNotExist);
-    expect(document.getElementById('global-groom-points').innerText).toBe('0 pts');
-    expect(document.getElementById('global-bride-points').innerText).toBe('0 pts');
-    
-    // Trigger error callback
-    const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-    errorCallback(new Error('snapshot error'));
-    expect(consoleWarnSpy).toHaveBeenCalledWith(expect.stringContaining('Erro ao carregar totais'), expect.any(Error));
-    consoleWarnSpy.mockRestore();
-  });
-  
-  it('should handle exceptions in initRealtimeScoreboard', () => {
-    mockDoc.mockImplementationOnce(() => { throw new Error('doc error'); });
-    const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-    
-    scoreboard.initRealtimeScoreboard();
-    
-    expect(consoleWarnSpy).toHaveBeenCalledWith(expect.stringContaining('Erro ao inicializar o listener'), expect.any(Error));
-    consoleWarnSpy.mockRestore();
   });
 });

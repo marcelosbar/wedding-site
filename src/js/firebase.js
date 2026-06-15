@@ -105,4 +105,4 @@ export const auth = authInstance;
 export const googleProvider = providerInstance;
 export const analytics = analyticsInstance;
 export const appCheck = appCheckInstance;
-export { addDoc, onSnapshot, query, getDocs, where, doc, limit, collection, orderBy, startAfter, endBefore, limitToLast, updateDoc, getDoc } from "firebase/firestore";
+export { addDoc, onSnapshot, query, getDocs, where } from "firebase/firestore";

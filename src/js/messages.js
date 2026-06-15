@@ -1,7 +1,5 @@
-import { db, collection, query, orderBy, limit, startAfter, getDocs, onSnapshot } from './firebase.js';
-
 /**
- * MessagesCarousel module — handles fetching, pagination, and display of guest messages in a premium carousel.
+ * MessagesCarousel module — handles fetching, deduplication, and display of guest messages in a premium carousel.
  */
 export class MessagesCarousel {
   constructor(elements = {}) {
@@ -9,20 +7,11 @@ export class MessagesCarousel {
     this.prevBtn = elements.prevBtn || document.getElementById('carousel-prev');
     this.nextBtn = elements.nextBtn || document.getElementById('carousel-next');
     this.dotsEl = elements.dotsEl || document.getElementById('carousel-dots');
-    this.loadMoreBtn = elements.loadMoreBtn || document.getElementById('carousel-load-more');
     
     this.messages = [];
-    this.realtimeMessages = [];
-    this.paginatedMessages = [];
-    
-    this.realtimeDocs = [];
-    this.paginatedDocs = [];
-    
     this.currentIndex = 0;
     this.autoplayTimer = null;
     this.autoplayInterval = 6000; // 6 seconds
-    this.isAllLoaded = false;
-    this.isLoadingMore = false;
   }
 
   /**
@@ -33,140 +22,57 @@ export class MessagesCarousel {
 
     this.setupListeners();
     this.loadMessages();
-    this.startRealtimeListener();
   }
 
   /**
-   * Stub for testing/compatibility.
+   * Compatibility method for initialization. Database updates are handled in main.js.
    */
   loadMessages() {
     console.log('Messages list ready to receive updates.');
   }
 
   /**
-   * Starts listening to the latest 10 public messages in real time.
+   * Receives transaction snapshots from the central listener in main.js,
+   * filters for approved public messages, and updates the carousel.
    */
-  startRealtimeListener() {
-    try {
-      const q = query(
-        collection(db, "publicMessages"),
-        orderBy("timestamp", "desc"),
-        limit(10)
-      );
-
-      onSnapshot(q, (snapshot) => {
-        this.realtimeMessages = [];
-        this.realtimeDocs = [];
-
-        snapshot.forEach((doc) => {
-          const data = doc.data();
-          this.realtimeMessages.push({
-            id: doc.id || (data.guestName + "_" + data.timestamp),
+  updateFromSnapshot(snapshot) {
+    const rawMessages = [];
+    
+    if (snapshot && typeof snapshot.forEach === 'function') {
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        // Select only approved, public transactions with non-empty messages
+        if (
+          data.status === 'approved' &&
+          data.isPublic === true &&
+          data.message &&
+          data.message.trim() !== ''
+        ) {
+          rawMessages.push({
             guestName: data.guestName,
             message: data.message,
             timestamp: data.timestamp
           });
-          this.realtimeDocs.push(doc);
-        });
-
-        // Se retornou menos que 10 documentos na consulta inicial e não carregou paginação anterior,
-        // significa que todas as mensagens já foram carregadas.
-        if (snapshot.docs.length < 10 && this.paginatedMessages.length === 0) {
-          this.isAllLoaded = true;
-        } else if (snapshot.docs.length === 10 && this.paginatedMessages.length === 0) {
-          this.isAllLoaded = false;
         }
-
-        this.combineAndDeduplicate();
-        this.render();
-      }, (error) => {
-        console.warn('Erro ao sincronizar mensagens públicas:', error);
       });
-    } catch (e) {
-      console.warn('Firebase não configurado ou offline para carregar mensagens.', e);
     }
+
+    // Deduplicate cart splits
+    this.messages = this.deduplicateMessages(rawMessages);
+    
+    // Sort by timestamp (newest first)
+    this.messages.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+    this.render();
   }
 
   /**
-   * Loads the next page of 10 messages from Firestore using cursor-based pagination.
+   * Deduplicates messages that were split across multiple lists (Groom/Bride)
+   * in the same checkout session (matching guest name, message content, and close timestamps).
    */
-  async loadMoreMessages() {
-    if (this.isLoadingMore || this.isAllLoaded) return;
-
-    const cursor = this.paginatedDocs.length > 0
-      ? this.paginatedDocs.at(-1)
-      : this.realtimeDocs.at(-1);
-
-    if (!cursor) return;
-
-    this.isLoadingMore = true;
-    if (this.loadMoreBtn) {
-      this.loadMoreBtn.disabled = true;
-      this.loadMoreBtn.textContent = 'Carregando...';
-    }
-
-    try {
-      const q = query(
-        collection(db, "publicMessages"),
-        orderBy("timestamp", "desc"),
-        startAfter(cursor),
-        limit(10)
-      );
-
-      const snap = await getDocs(q);
-      
-      if (snap.empty || snap.docs.length < 10) {
-        this.isAllLoaded = true;
-      }
-
-      snap.forEach((doc) => {
-        const data = doc.data();
-        this.paginatedMessages.push({
-          id: doc.id,
-          guestName: data.guestName,
-          message: data.message,
-          timestamp: data.timestamp
-        });
-        this.paginatedDocs.push(doc);
-      });
-
-      this.combineAndDeduplicate();
-      
-      // Armazenar índice do slide atual para restaurá-lo após re-renderizar
-      const currentMsgId = this.messages[this.currentIndex]?.id;
-      
-      this.render();
-      
-      // Restaurar o slide ativo ou ir para o primeiro
-      if (currentMsgId) {
-        const newIdx = this.messages.findIndex(m => m.id === currentMsgId);
-        if (newIdx !== -1) {
-          this.goToSlide(newIdx);
-        }
-      }
-    } catch (error) {
-      console.error('Erro ao carregar mais mensagens:', error);
-    } finally {
-      this.isLoadingMore = false;
-      if (this.loadMoreBtn) {
-        this.loadMoreBtn.disabled = false;
-        this.loadMoreBtn.textContent = 'Ver mais mensagens';
-      }
-    }
-  }
-
-  combineAndDeduplicate() {
-    const allMap = new Map();
-    this.realtimeMessages.forEach(m => allMap.set(m.id, m));
-    this.paginatedMessages.forEach(m => allMap.set(m.id, m));
-    
-    const combined = Array.from(allMap.values());
-    
-    // Sort by timestamp desc first to ensure newer messages are kept or order is consistent
-    combined.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-    
+  deduplicateMessages(rawMessages) {
     const unique = [];
-    for (const tx of combined) {
+    for (const tx of rawMessages) {
       const isDuplicate = unique.some(u => 
         u.guestName === tx.guestName &&
         u.message === tx.message &&
@@ -176,43 +82,12 @@ export class MessagesCarousel {
         unique.push(tx);
       }
     }
-    
-    this.messages = unique;
-  }
-
-  /**
-   * Compatibility method for central update call (used in tests).
-   */
-  updateFromSnapshot(snapshot) {
-    const rawMessages = [];
-    
-    if (snapshot && typeof snapshot.forEach === 'function') {
-      snapshot.forEach((doc) => {
-        const data = doc.data();
-        if (
-          data.status === 'approved' &&
-          data.isPublic === true &&
-          data.message &&
-          data.message.trim() !== ''
-        ) {
-          rawMessages.push({
-            id: doc.id || (data.guestName + "_" + data.timestamp),
-            guestName: data.guestName,
-            message: data.message,
-            timestamp: data.timestamp
-          });
-        }
-      });
-    }
-
-    this.realtimeMessages = rawMessages;
-    this.combineAndDeduplicate();
-    this.render();
+    return unique;
   }
 
   _createSlideElement(msg, idx) {
     const slide = document.createElement('div');
-    slide.className = `carousel-slide${idx === this.currentIndex ? ' active' : ''}`;
+    slide.className = `carousel-slide${idx === 0 ? ' active' : ''}`;
     
     const textEl = document.createElement('p');
     const msgLen = msg.message.length;
@@ -236,7 +111,7 @@ export class MessagesCarousel {
 
   _createDotElement(idx) {
     const dot = document.createElement('button');
-    dot.className = `carousel-dot${idx === this.currentIndex ? ' active' : ''}`;
+    dot.className = `carousel-dot${idx === 0 ? ' active' : ''}`;
     dot.setAttribute('aria-label', `Ir para slide ${idx + 1}`);
     dot.addEventListener('click', () => {
       this.goToSlide(idx);
@@ -289,9 +164,6 @@ export class MessagesCarousel {
       this._toggleSectionVisibility(false);
       this.trackEl.innerHTML = '';
       this.stopAutoplay();
-      if (this.loadMoreBtn) {
-        this.loadMoreBtn.classList.add('u-hidden');
-      }
       return;
     }
 
@@ -304,29 +176,17 @@ export class MessagesCarousel {
 
     this._renderSlidesAndDots(showControls);
 
-    // Ajustar currentIndex se ele estiver fora dos limites após novo render
-    if (this.currentIndex >= this.messages.length) {
-      this.currentIndex = 0;
-    }
+    this.currentIndex = 0;
     
     if (showControls) {
       this.startAutoplay();
     } else {
       this.stopAutoplay();
     }
-
-    // Gerenciar exibição do botão "Ver mais"
-    if (this.loadMoreBtn) {
-      if (this.isAllLoaded) {
-        this.loadMoreBtn.classList.add('u-hidden');
-      } else {
-        this.loadMoreBtn.classList.remove('u-hidden');
-      }
-    }
   }
 
   /**
-   * Event listeners for the control arrows and Load More button.
+   * Event listeners for the control arrows.
    */
   setupListeners() {
     if (this.prevBtn) {
@@ -339,13 +199,6 @@ export class MessagesCarousel {
     if (this.nextBtn) {
       this.nextBtn.addEventListener('click', () => {
         this.nextSlide();
-        this.resetAutoplay();
-      });
-    }
-
-    if (this.loadMoreBtn) {
-      this.loadMoreBtn.addEventListener('click', () => {
-        this.loadMoreMessages();
         this.resetAutoplay();
       });
     }

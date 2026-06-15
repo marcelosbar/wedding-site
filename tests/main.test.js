@@ -415,7 +415,43 @@ describe('WeddingApp Orchestrator', () => {
     expect(errorEl.classList.contains('u-hidden')).toBe(true);
   });
 
+  it('should propagate real-time Firestore snapshots to scoreboard and messagesCarousel', () => {
+    const mockSnapshot = [{ data: () => ({ status: 'approved', totalAmount: 100 }) }];
+    const messagesCarouselSpy = vi.spyOn(app.messagesCarousel, 'updateFromSnapshot').mockImplementation(() => {});
 
+    if (mockCapturedSnapshotCallback) {
+      mockCapturedSnapshotCallback(mockSnapshot);
+    }
+
+    expect(mockScoreboardUpdateFromSnapshot).toHaveBeenCalledWith(mockSnapshot);
+    expect(messagesCarouselSpy).toHaveBeenCalledWith(mockSnapshot);
+
+    messagesCarouselSpy.mockRestore();
+  });
+
+  it('should handle real-time Firestore sync errors', () => {
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const mockError = new Error('Firestore Error');
+
+    if (mockCapturedErrorCallback) {
+      mockCapturedErrorCallback(mockError);
+    }
+
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('Erro ao sincronizar'), mockError);
+    warnSpy.mockRestore();
+  });
+
+  it('should handle errors thrown during query setup in initRealtimeSync', () => {
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    mockQuery.mockImplementationOnce(() => {
+      throw new Error('Query Setup Error');
+    });
+
+    new WeddingApp();
+
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('Firebase não configurado'), expect.any(Error));
+    warnSpy.mockRestore();
+  });
 
   it('should enter art-mode when view-art-btn is clicked and manage accessibility/focus', () => {
     const heroSection = document.getElementById('hero');

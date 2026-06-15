@@ -34,18 +34,6 @@
           Aprove transações apenas quando o dinheiro cair na conta. Rejeitar removerá os pontos do placar.
         </p>
 
-        <div class="admin-controls-flex">
-          <div class="admin-filter-group">
-            <label for="admin-filter-status" class="admin-control-label">Status:</label>
-            <select id="admin-filter-status" class="admin-filter-select">
-              <option value="all">Todos</option>
-              <option value="pending">Pendentes</option>
-              <option value="approved">Aprovados</option>
-              <option value="rejected">Rejeitados</option>
-            </select>
-          </div>
-        </div>
-
         <table class="admin-table">
           <thead>
             <tr>
@@ -61,12 +49,6 @@
             <!-- Populated via JS -->
           </tbody>
         </table>
-
-        <div class="admin-pagination">
-          <button id="admin-prev-btn" class="admin-page-btn" disabled>Anterior</button>
-          <span id="admin-page-info" class="admin-page-info">Página 1</span>
-          <button id="admin-next-btn" class="admin-page-btn" disabled>Próxima</button>
-        </div>
       </div>
     </div>
 

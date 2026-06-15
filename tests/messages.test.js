@@ -4,22 +4,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { MessagesCarousel } from '../src/js/messages.js';
 
-const mockOnSnapshot = vi.fn();
-const mockGetDocs = vi.fn();
-const mockQuery = vi.fn();
-
-vi.mock('../src/js/firebase.js', () => {
-  return {
-    db: {},
-    collection: vi.fn(),
-    query: (...args) => mockQuery(...args),
-    orderBy: vi.fn(),
-    limit: vi.fn(),
-    startAfter: vi.fn(),
-    getDocs: (...args) => mockGetDocs(...args),
-    onSnapshot: (...args) => mockOnSnapshot(...args),
-  };
-});
+// No direct Firebase connection in MessagesCarousel module anymore.
 
 function createMockElements() {
   document.body.innerHTML = `
@@ -31,15 +16,13 @@ function createMockElements() {
       <button id="carousel-prev"></button>
       <button id="carousel-next"></button>
       <div id="carousel-dots"></div>
-      <button id="carousel-load-more"></button>
     </section>
   `;
   return {
     trackEl: document.getElementById('messages-carousel-track'),
     prevBtn: document.getElementById('carousel-prev'),
     nextBtn: document.getElementById('carousel-next'),
-    dotsEl: document.getElementById('carousel-dots'),
-    loadMoreBtn: document.getElementById('carousel-load-more')
+    dotsEl: document.getElementById('carousel-dots')
   };
 }
 
@@ -50,9 +33,6 @@ describe('MessagesCarousel', () => {
   beforeEach(() => {
     elements = createMockElements();
     carousel = new MessagesCarousel(elements);
-    mockOnSnapshot.mockReset();
-    mockGetDocs.mockReset();
-    mockQuery.mockReset();
     vi.clearAllMocks();
   });
 
@@ -311,125 +291,5 @@ describe('MessagesCarousel', () => {
     if (compSec) compSec.remove();
     carousel.messages = [];
     expect(() => carousel.render()).not.toThrow();
-  });
-
-  describe('Pagination & Load More', () => {
-    it('should show/hide loadMoreBtn based on isAllLoaded', () => {
-      carousel.messages = [
-        { id: '1', guestName: 'A', message: 'Msg A', timestamp: '2026-05-31T12:00:00Z' }
-      ];
-      
-      // Case 1: isAllLoaded is false
-      carousel.isAllLoaded = false;
-      carousel.render();
-      expect(elements.loadMoreBtn.classList.contains('u-hidden')).toBe(false);
-
-      // Case 2: isAllLoaded is true
-      carousel.isAllLoaded = true;
-      carousel.render();
-      expect(elements.loadMoreBtn.classList.contains('u-hidden')).toBe(true);
-    });
-
-    it('should reset currentIndex to 0 if it is out of bounds on render', () => {
-      carousel.messages = [
-        { id: '1', guestName: 'A', message: 'Msg A', timestamp: '2026-05-31T12:00:00Z' }
-      ];
-      carousel.currentIndex = 5; // Out of bounds
-      carousel.render();
-      expect(carousel.currentIndex).toBe(0);
-    });
-
-    it('should trigger loadMoreMessages and resetAutoplay when loadMoreBtn is clicked', () => {
-      const loadMoreSpy = vi.spyOn(carousel, 'loadMoreMessages').mockImplementation(() => Promise.resolve());
-      const resetSpy = vi.spyOn(carousel, 'resetAutoplay').mockImplementation(() => {});
-
-      carousel.setupListeners();
-      elements.loadMoreBtn.click();
-
-      expect(loadMoreSpy).toHaveBeenCalled();
-      expect(resetSpy).toHaveBeenCalled();
-
-      loadMoreSpy.mockRestore();
-      resetSpy.mockRestore();
-    });
-
-    it('should load more messages using cursor-based pagination', async () => {
-      const mockDoc1 = { id: 'doc-1', data: () => ({ guestName: 'Jose', message: 'Hi', timestamp: '2026-05-31T12:00:00Z' }) };
-      const mockDoc2 = { id: 'doc-2', data: () => ({ guestName: 'Maria', message: 'Hello', timestamp: '2026-05-31T12:01:00Z' }) };
-      
-      // Populate docs to simulate existing state
-      carousel.realtimeDocs = [mockDoc1];
-      carousel.paginatedDocs = [];
-      carousel.isAllLoaded = false;
-      carousel.isLoadingMore = false;
-
-      // Mock getDocs to return a snapshot with 10 documents (not all loaded)
-      const mockDocs = Array(10).fill(null).map((_, i) => ({
-        id: `p-doc-${i}`,
-        data: () => ({
-          guestName: `Guest ${i}`,
-          message: `Msg ${i}`,
-          timestamp: new Date(Date.now() - i * 60000).toISOString()
-        })
-      }));
-      
-      mockGetDocs.mockResolvedValueOnce({
-        empty: false,
-        docs: mockDocs,
-        forEach: (cb) => mockDocs.forEach(cb)
-      });
-
-      await carousel.loadMoreMessages();
-
-      expect(carousel.isLoadingMore).toBe(false);
-      expect(mockGetDocs).toHaveBeenCalled();
-      expect(carousel.isAllLoaded).toBe(false); // Since size was exactly 10
-      expect(carousel.paginatedMessages.length).toBe(10);
-      expect(carousel.paginatedDocs.length).toBe(10);
-      
-      // Next call with less than 10 docs should set isAllLoaded to true
-      mockGetDocs.mockResolvedValueOnce({
-        empty: false,
-        docs: [mockDoc2],
-        forEach: (cb) => [mockDoc2].forEach(cb)
-      });
-      
-      await carousel.loadMoreMessages();
-      expect(carousel.isAllLoaded).toBe(true);
-    });
-
-    it('should handle errors in loadMoreMessages gracefully', async () => {
-      const mockDoc1 = { id: 'doc-1', data: () => ({ guestName: 'Jose', message: 'Hi', timestamp: '2026-05-31T12:00:00Z' }) };
-      carousel.realtimeDocs = [mockDoc1];
-      
-      mockGetDocs.mockRejectedValueOnce(new Error('Firebase error'));
-      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-
-      await carousel.loadMoreMessages();
-
-      expect(carousel.isLoadingMore).toBe(false);
-      expect(consoleErrorSpy).toHaveBeenCalledWith(expect.stringContaining('Erro ao carregar mais mensagens'), expect.any(Error));
-      consoleErrorSpy.mockRestore();
-    });
-
-    it('should handle loadMessages snapshot updates', () => {
-      carousel.init();
-      expect(mockOnSnapshot).toHaveBeenCalled();
-
-      const onSnapshotCallback = mockOnSnapshot.mock.calls[0][1];
-      
-      const mockSnapDocs = [
-        { id: '1', data: () => ({ status: 'approved', isPublic: true, message: 'Message 1', guestName: 'User 1', timestamp: '2026-05-31T12:00:00Z' }) }
-      ];
-      
-      onSnapshotCallback({
-        docs: mockSnapDocs,
-        forEach: (cb) => mockSnapDocs.forEach(cb)
-      });
-
-      expect(carousel.realtimeMessages.length).toBe(1);
-      expect(carousel.realtimeMessages[0].guestName).toBe('User 1');
-      expect(carousel.messages[0].guestName).toBe('User 1');
-    });
   });
 });

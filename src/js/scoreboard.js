@@ -1,5 +1,3 @@
-import { db, doc, onSnapshot } from './firebase.js';
-
 /**
  * Scoreboard module — handles real-time score tracking and UI updates.
  */
@@ -13,23 +11,8 @@ export class Scoreboard {
   }
 
   initRealtimeScoreboard() {
-    try {
-      const totalsRef = doc(db, 'scoreboard', 'totals');
-      onSnapshot(totalsRef, (docSnap) => {
-        let groomScore = 0;
-        let brideScore = 0;
-        if (docSnap.exists()) {
-          const data = docSnap.data();
-          groomScore = data.groomTotal || 0;
-          brideScore = data.brideTotal || 0;
-        }
-        this.updateScoreboardUI(groomScore, brideScore);
-      }, (error) => {
-        console.warn('Erro ao carregar totais do scoreboard:', error);
-      });
-    } catch (e) {
-      console.warn('Erro ao inicializar o listener do scoreboard:', e);
-    }
+    // Database sync is now centralized in main.js
+    console.log('Scoreboard initialized.');
   }
 
   updateFromSnapshot(snapshot) {

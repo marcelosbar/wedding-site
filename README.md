@@ -27,14 +27,13 @@ To run this project locally, follow these steps:
 
 ### 1. Prerequisites
 Ensure you have the following installed on your machine:
-- **Node.js** (v20 or higher recommended)
-- **Java (JDK or JRE)** (Java 8 or higher). This is required to execute the Firebase Local Emulator Suite (Auth, Firestore, & Functions).
+- **Node.js** (v18 or higher recommended)
+- **Java (JDK or JRE)** (Java 8 or higher). This is required to execute the Firebase Local Emulator Suite (Auth & Firestore).
 
 ### 2. Install Dependencies
-Run the following command to install the project and Cloud Functions dependencies:
+Run the following command to install the project dependencies:
 ```bash
 pnpm install
-cd functions && pnpm install && cd ..
 ```
 
 ### 3. Firebase Configuration
@@ -48,7 +47,7 @@ If you need to connect to your live production/cloud database from your local ma
 ```bash
 pnpm run dev
 ```
-This spins up the Vite dev server (port 5173) and the Firebase Emulators (Auth on port 9099, Firestore on port 8080, Functions on port 5001) concurrently.
+This spins up the Vite dev server (port 5173) and the Firebase Emulators (Auth on port 9099, Firestore on port 8080) concurrently.
 - The site will be available at `http://localhost:5173/`.
 - The admin panel will be available at `http://localhost:5173/admin.html`.
 

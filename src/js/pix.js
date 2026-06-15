@@ -31,15 +31,15 @@ export class PixCheckout {
 
     const total = this.cart.getTotal();
 
-    // In a real app, you construct a valid BR Code (PIX Payload) here based on your Pix Key
-    const pixKey = 'celular_ou_cpf'; // Insira a sua chave PIX real aqui
-    const mockPayload = `00020126360014br.gov.bcb.pix0114${pixKey}5204000053039865405${total.toFixed(2)}5802BR5915LORENA E MARCELO6009SAO PAULO62070503***6304ABCD`;
+    // Construct a valid BR Code (PIX Payload) based on the Pix Key
+    const pixKey = 'f51fb084-d1a3-41fc-b1ed-eb79b269aba2';
+    const payload = generatePixPayload(pixKey, total);
 
-    document.getElementById('pix-payload').value = mockPayload;
+    document.getElementById('pix-payload').value = payload;
 
     try {
       const canvas = document.getElementById('pix-qr-code');
-      await QRCode.toCanvas(canvas, mockPayload, { width: 250, margin: 2 });
+      await QRCode.toCanvas(canvas, payload, { width: 250, margin: 2 });
 
       this.cartView.style.display = 'none';
       this.pixView.classList.add('active');
@@ -185,3 +185,71 @@ export class PixCheckout {
     }
   }
 }
+
+/**
+ * Calculates the CRC16 CCITT-FALSE checksum for the given string.
+ * @param {string} str - The string to calculate the checksum for.
+ * @returns {string} The 4-character hex checksum (uppercase).
+ */
+function calculateCRC16(str) {
+  let crc = 0xFFFF;
+  const polynomial = 0x1021;
+  for (let i = 0; i < str.length; i++) {
+    const code = str.charCodeAt(i);
+    crc ^= (code << 8);
+    for (let j = 0; j < 8; j++) {
+      if ((crc & 0x8000) !== 0) {
+        crc = (crc << 1) ^ polynomial;
+      } else {
+        crc = crc << 1;
+      }
+      crc &= 0xFFFF;
+    }
+  }
+  return crc.toString(16).toUpperCase().padStart(4, '0');
+}
+
+/**
+ * Generates a valid PIX BR Code (payload).
+ * @param {string} pixKey - The PIX key (e.g. UUID, CPF, phone).
+ * @param {number} amount - The transaction amount.
+ * @param {string} merchantName - The name of the merchant.
+ * @param {string} merchantCity - The city of the merchant.
+ * @returns {string} The complete PIX payload with a valid CRC16.
+ */
+export function generatePixPayload(pixKey, amount, merchantName = 'LORENA E MARCELO', merchantCity = 'SAO PAULO') {
+  const formatField = (id, value) => {
+    const valStr = String(value);
+    return id.toString().padStart(2, '0') + valStr.length.toString().padStart(2, '0') + valStr;
+  };
+
+  const gui = formatField(0, 'br.gov.bcb.pix');
+  const key = formatField(1, pixKey);
+  const merchantAccountInfo = formatField(26, gui + key);
+
+  const payloadFormatIndicator = formatField(0, '01');
+  const merchantCategoryCode = formatField(52, '0000');
+  const transactionCurrency = formatField(53, '986');
+  const transactionAmount = formatField(54, amount.toFixed(2));
+  const countryCode = formatField(58, 'BR');
+  const nameField = formatField(59, merchantName);
+  const cityField = formatField(60, merchantCity);
+  const referenceLabel = formatField(5, '***');
+  const additionalData = formatField(62, referenceLabel);
+
+  const partialPayload = 
+    payloadFormatIndicator +
+    merchantAccountInfo +
+    merchantCategoryCode +
+    transactionCurrency +
+    transactionAmount +
+    countryCode +
+    nameField +
+    cityField +
+    additionalData +
+    '6304';
+
+  const crc = calculateCRC16(partialPayload);
+  return partialPayload + crc;
+}
+

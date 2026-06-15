@@ -100,7 +100,8 @@ jobs:
         id: read_cred
         run: |
           echo "cred_content<<EOF" >> $GITHUB_OUTPUT
-          cat ${{ steps.auth.outputs.credentials_file_path }} >> $GITHUB_OUTPUT
+          cat "${{ steps.auth.outputs.credentials_file_path }}" >> $GITHUB_OUTPUT
+          echo "" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
       - uses: FirebaseExtended/action-hosting-deploy@e2eda2e106cfa35cdbcf4ac9ddaf6c4756df2c8c # v0
         if: ${{ github.actor != 'dependabot[bot]' }}

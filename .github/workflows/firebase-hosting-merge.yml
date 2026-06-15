@@ -96,6 +96,7 @@ jobs:
       - name: Deploy Firestore Rules and Indexes
         run: |
           echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT_LORENAEMARCELO2026 }}' > gcp-key.json
+          node -e "console.log('Using Service Account:', require('./gcp-key.json').client_email)"
           export GOOGLE_APPLICATION_CREDENTIALS=gcp-key.json
           export GOOGLE_CLOUD_PROJECT=lorenaemarcelo2026
           export GOOGLE_CLOUD_QUOTA_PROJECT=lorenaemarcelo2026

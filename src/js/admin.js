@@ -238,7 +238,7 @@ class AdminApp {
       this.nextBtn.disabled = this.currentPageDocs.length < 20;
     }
     if (this.pageInfo) {
-      this.pageInfo.innerText = `Página ${this.currentPage}`;
+      this.pageInfo.textContent = `Página ${this.currentPage}`;
     }
   }
 

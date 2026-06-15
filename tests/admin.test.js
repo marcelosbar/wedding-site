@@ -8,6 +8,7 @@ vi.mock('../src/js/firebase.js', () => {
   globalThis.__mockOnSnapshot = globalThis.__mockOnSnapshot || vi.fn();
   globalThis.__mockQuery = globalThis.__mockQuery || vi.fn();
   globalThis.__mockAuth = globalThis.__mockAuth !== undefined ? globalThis.__mockAuth : {};
+  
   return {
     db: {},
     onSnapshot: globalThis.__mockOnSnapshot,
@@ -23,7 +24,11 @@ vi.mock('firebase/firestore', () => ({
   doc: vi.fn(),
   updateDoc: vi.fn(),
   collection: vi.fn(),
-  getDoc: vi.fn()
+  getDoc: vi.fn(),
+  where: vi.fn(),
+  orderBy: vi.fn(),
+  startAfter: vi.fn(),
+  limit: vi.fn()
 }));
 
 vi.mock('firebase/auth', () => {
@@ -49,7 +54,7 @@ const alertMock = vi.spyOn(globalThis, 'alert').mockImplementation(() => {});
 const confirmMock = vi.spyOn(globalThis, 'confirm').mockImplementation(() => true);
 
 // 2. Import elements
-import { getDoc, updateDoc, collection } from 'firebase/firestore';
+import { getDoc, updateDoc, collection, where, orderBy, startAfter, limit } from 'firebase/firestore';
 import { signInWithPopup, signOut } from 'firebase/auth';
 import * as firebaseAuthMock from 'firebase/auth';
 
@@ -63,6 +68,17 @@ describe('AdminApp', () => {
       </div>
       <div id="dashboard-screen">
         <button id="admin-logout-btn"></button>
+        
+        <!-- Controls added for testing pagination and filtering -->
+        <select id="admin-filter-status">
+          <option value="all">Todos</option>
+          <option value="pending">Pendentes</option>
+          <option value="approved">Aprovados</option>
+          <option value="rejected">Rejeitados</option>
+        </select>
+        <button id="admin-prev-btn">Anterior</button>
+        <span id="admin-page-info">Página 1</span>
+        <button id="admin-next-btn">Próxima</button>
       </div>
       <table>
         <tbody id="admin-table-body"></tbody>
@@ -411,6 +427,115 @@ describe('AdminApp', () => {
     }).not.toThrow();
 
     globalThis.__mockAuth = {}; // Restore auth
+  });
+
+  describe('Pagination & Filtering', () => {
+    beforeEach(() => {
+      // Re-create DOM elements to clear previous listeners
+      const dashboard = document.getElementById('dashboard-screen');
+      if (dashboard) {
+        dashboard.innerHTML = `
+          <button id="admin-logout-btn"></button>
+          <select id="admin-filter-status">
+            <option value="all">Todos</option>
+            <option value="pending">Pendentes</option>
+            <option value="approved">Aprovados</option>
+            <option value="rejected">Rejeitados</option>
+          </select>
+          <button id="admin-prev-btn">Anterior</button>
+          <span id="admin-page-info">Página 1</span>
+          <button id="admin-next-btn">Próxima</button>
+        `;
+      }
+      adminApp = new adminApp.constructor();
+      vi.clearAllMocks();
+    });
+
+    it('should handle filters and query matching status', () => {
+      // Simulate filter change
+      const filterEl = document.getElementById('admin-filter-status');
+      filterEl.value = 'approved';
+      filterEl.dispatchEvent(new Event('change'));
+
+      expect(adminApp.currentFilter).toBe('approved');
+      expect(adminApp.currentPage).toBe(1);
+      expect(where).toHaveBeenCalledWith('status', '==', 'approved');
+      expect(limit).toHaveBeenCalledWith(20);
+      expect(orderBy).toHaveBeenCalledWith('timestamp', 'desc');
+    });
+
+    it('should navigate to next page and prev page', () => {
+      const mockDoc = { id: 'some-doc-id', data: () => ({}) };
+      
+      // Page 1 with less than 20 items -> nextPage should not proceed
+      adminApp.currentPageDocs = [mockDoc];
+      adminApp.currentPage = 1;
+      adminApp.nextPage();
+      expect(adminApp.currentPage).toBe(1);
+
+      // Page 1 with 20 items -> nextPage should proceed
+      adminApp.currentPageDocs = Array(20).fill(mockDoc);
+      adminApp.nextPage();
+      expect(adminApp.currentPage).toBe(2);
+      expect(adminApp.pageCursors[2]).toBe(mockDoc);
+
+      // Page 2 with 20 items -> nextPage should proceed to Page 3
+      adminApp.currentPageDocs = Array(20).fill(mockDoc);
+      adminApp.nextPage();
+      expect(adminApp.currentPage).toBe(3);
+      expect(adminApp.pageCursors[3]).toBe(mockDoc);
+
+      // Go back to Page 2
+      adminApp.prevPage();
+      expect(adminApp.currentPage).toBe(2);
+
+      // Go back to Page 1
+      adminApp.prevPage();
+      expect(adminApp.currentPage).toBe(1);
+
+      // Page 1 -> prevPage should not change page
+      adminApp.prevPage();
+      expect(adminApp.currentPage).toBe(1);
+    });
+
+    it('should update pagination UI elements correctly', () => {
+      const prevBtn = document.getElementById('admin-prev-btn');
+      const nextBtn = document.getElementById('admin-next-btn');
+      const pageInfo = document.getElementById('admin-page-info');
+
+      // Case 1: Page 1, < 20 items
+      adminApp.currentPage = 1;
+      adminApp.currentPageDocs = Array(10).fill({});
+      adminApp.updatePaginationUI();
+      expect(prevBtn.disabled).toBe(true);
+      expect(nextBtn.disabled).toBe(true);
+      expect(pageInfo.textContent).toBe('Página 1');
+
+      // Case 2: Page 2, 20 items
+      adminApp.currentPage = 2;
+      adminApp.currentPageDocs = Array(20).fill({});
+      adminApp.updatePaginationUI();
+      expect(prevBtn.disabled).toBe(false);
+      expect(nextBtn.disabled).toBe(false);
+      expect(pageInfo.textContent).toBe('Página 2');
+    });
+
+    it('should trigger nextPage and prevPage when buttons are clicked', () => {
+      const prevSpy = vi.spyOn(adminApp, 'prevPage').mockImplementation(() => {});
+      const nextSpy = vi.spyOn(adminApp, 'nextPage').mockImplementation(() => {});
+
+      const prevBtn = document.getElementById('admin-prev-btn');
+      const nextBtn = document.getElementById('admin-next-btn');
+
+      prevBtn.click();
+      expect(prevSpy).toHaveBeenCalled();
+
+      nextBtn.click();
+      expect(nextSpy).toHaveBeenCalled();
+      
+      prevSpy.mockRestore();
+      nextSpy.mockRestore();
+    });
   });
 
 });

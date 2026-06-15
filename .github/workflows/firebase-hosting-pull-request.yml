@@ -95,9 +95,16 @@ jobs:
           workload_identity_provider: 'projects/587786769343/locations/global/workloadIdentityPools/github-pool/providers/github-provider'
           service_account: 'github-action-1241764119@lorenaemarcelo2026.iam.gserviceaccount.com'
           create_credentials_file: true
+      - name: Read credential file
+        if: ${{ github.actor != 'dependabot[bot]' }}
+        id: read_cred
+        run: |
+          echo "cred_content<<EOF" >> $GITHUB_OUTPUT
+          cat ${{ steps.auth.outputs.credentials_file_path }} >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
       - uses: FirebaseExtended/action-hosting-deploy@e2eda2e106cfa35cdbcf4ac9ddaf6c4756df2c8c # v0
         if: ${{ github.actor != 'dependabot[bot]' }}
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
-          firebaseServiceAccount: '${{ steps.auth.outputs.credentials_file_path }}'
+          firebaseServiceAccount: '${{ steps.read_cred.outputs.cred_content }}'
           projectId: lorenaemarcelo2026

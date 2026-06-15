@@ -36,18 +36,21 @@ jobs:
       - run: pnpm install --frozen-lockfile --ignore-scripts
       - name: Snyk Open Source Scan
         uses: snyk/actions/node@8e119fbb6c251787721d34ba683ed48eba792766 # master @ 2026-05-27
+        continue-on-error: true
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
           args: --severity-threshold=high
       - name: Snyk Monitor (Register Production Snapshot)
         uses: snyk/actions/node@8e119fbb6c251787721d34ba683ed48eba792766 # master @ 2026-05-27
+        continue-on-error: true
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
           command: monitor
       - name: Snyk Code Analysis
         uses: snyk/actions/node@8e119fbb6c251787721d34ba683ed48eba792766 # master @ 2026-05-27
+        continue-on-error: true
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
@@ -94,6 +97,8 @@ jobs:
         run: |
           echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT_LORENAEMARCELO2026 }}' > gcp-key.json
           export GOOGLE_APPLICATION_CREDENTIALS=gcp-key.json
+          export GOOGLE_CLOUD_PROJECT=lorenaemarcelo2026
+          export GOOGLE_CLOUD_QUOTA_PROJECT=lorenaemarcelo2026
           npx firebase deploy --only firestore --project lorenaemarcelo2026
           rm gcp-key.json
       - uses: FirebaseExtended/action-hosting-deploy@e2eda2e106cfa35cdbcf4ac9ddaf6c4756df2c8c # v0

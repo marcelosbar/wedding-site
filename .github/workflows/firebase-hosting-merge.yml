@@ -90,6 +90,12 @@ jobs:
           VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
           VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
           VITE_FIREBASE_MEASUREMENT_ID: ${{ secrets.VITE_FIREBASE_MEASUREMENT_ID }}
+      - name: Deploy Firestore Rules
+        run: |
+          echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT_LORENAEMARCELO2026 }}' > gcp-key.json
+          export GOOGLE_APPLICATION_CREDENTIALS=gcp-key.json
+          npx firebase deploy --only firestore:rules --project lorenaemarcelo2026
+          rm gcp-key.json
       - uses: FirebaseExtended/action-hosting-deploy@e2eda2e106cfa35cdbcf4ac9ddaf6c4756df2c8c # v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}

@@ -2,7 +2,7 @@
  * @vitest-environment jsdom
  */
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { PixCheckout } from '../src/js/pix.js';
+import { PixCheckout, generatePixPayload } from '../src/js/pix.js';
 import { Cart } from '../src/js/cart.js';
 import { Scoreboard } from '../src/js/scoreboard.js';
 
@@ -134,6 +134,28 @@ describe('PixCheckout', () => {
     await pix.proceedToPix();
     expect(QRCode.toCanvas).toHaveBeenCalled();
     expect(document.getElementById('pix-view').classList.contains('active')).toBe(true);
+  });
+
+  it('should generate a valid PIX BR Code payload with dynamic amount and CRC16', () => {
+    const pixKey = 'f51fb084-d1a3-41fc-b1ed-eb79b269aba2';
+    const amount = 150.00;
+    const payload = generatePixPayload(pixKey, amount);
+
+    // Verify format and specific parts of the EMV payload
+    expect(payload.startsWith('000201')).toBe(true);
+    expect(payload.includes('26580014br.gov.bcb.pix0136f51fb084-d1a3-41fc-b1ed-eb79b269aba2')).toBe(true);
+    expect(payload.includes('52040000')).toBe(true);
+    expect(payload.includes('5303986')).toBe(true);
+    expect(payload.includes('5406150.00')).toBe(true); // 6 characters: 150.00
+    expect(payload.includes('5802BR')).toBe(true);
+    expect(payload.includes('5916LORENA E MARCELO')).toBe(true);
+    expect(payload.includes('6009SAO PAULO')).toBe(true);
+    expect(payload.includes('62070503***')).toBe(true);
+    expect(payload.includes('6304')).toBe(true);
+    
+    // Ensure the payload ends with a 4-character hex CRC checksum (uppercase)
+    const crcPart = payload.slice(-4);
+    expect(/^[0-9A-F]{4}$/.test(crcPart)).toBe(true);
   });
 
   it('should handle QR code error gracefully', async () => {

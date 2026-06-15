@@ -10,6 +10,7 @@ on:
 permissions:
   checks: write
   contents: read
+  id-token: write
 
 jobs:
   build_and_deploy:
@@ -93,18 +94,11 @@ jobs:
           VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
           VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
           VITE_FIREBASE_MEASUREMENT_ID: ${{ secrets.VITE_FIREBASE_MEASUREMENT_ID }}
-      - name: Deploy Firestore Rules and Indexes
-        run: |
-          echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT_LORENAEMARCELO2026 }}' > gcp-key.json
-          node -e "console.log('Using Service Account:', require('./gcp-key.json').client_email)"
-          export GOOGLE_APPLICATION_CREDENTIALS=gcp-key.json
-          export GOOGLE_CLOUD_PROJECT=lorenaemarcelo2026
-          export GOOGLE_CLOUD_QUOTA_PROJECT=lorenaemarcelo2026
-          npx firebase deploy --only firestore --project lorenaemarcelo2026 --debug
-          rm gcp-key.json
-      - uses: FirebaseExtended/action-hosting-deploy@e2eda2e106cfa35cdbcf4ac9ddaf6c4756df2c8c # v0
+      - id: auth
+        uses: google-github-actions/auth@71f986410dfbc7added4569d411d040a91dc6935 # v2.1.8
         with:
-          repoToken: ${{ secrets.GITHUB_TOKEN }}
-          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_LORENAEMARCELO2026 }}
-          channelId: live
-          projectId: lorenaemarcelo2026
+          workload_identity_provider: 'projects/587786769343/locations/global/workloadIdentityPools/github-pool/providers/github-provider'
+          service_account: 'github-action-1241764119@lorenaemarcelo2026.iam.gserviceaccount.com'
+      - name: Deploy to Firebase
+        run: |
+          npx firebase deploy --only firestore,hosting --project lorenaemarcelo2026

@@ -2,6 +2,7 @@ import { initializeApp } from "firebase/app";
 import { getFirestore, collection, connectFirestoreEmulator, doc, getDoc, setDoc } from "firebase/firestore";
 import { getAuth, GoogleAuthProvider, connectAuthEmulator } from "firebase/auth";
 import { getAnalytics } from "firebase/analytics";
+import { initializeAppCheck, ReCaptchaEnterpriseProvider } from "firebase/app-check";
 
 // Configuração via variáveis de ambiente (.env)
 const firebaseConfig = {
@@ -16,6 +17,35 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
+
+// Ativar o App Check de forma segura
+let appCheckInstance = null;
+
+const isLocalhost = globalThis.window !== undefined && 
+  (globalThis.window.location.hostname === 'localhost' || globalThis.window.location.hostname === '127.0.0.1');
+const isTest = import.meta.env.MODE === 'test';
+
+if (globalThis.window !== undefined && !isTest) {
+  // Para desenvolvimento local (localhost), ativa o modo debug automaticamente
+  if (isLocalhost) {
+    globalThis.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
+  }
+
+  const recaptchaSiteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
+  if (recaptchaSiteKey) {
+    try {
+      appCheckInstance = initializeAppCheck(app, {
+        provider: new ReCaptchaEnterpriseProvider(recaptchaSiteKey),
+        isTokenAutoRefreshEnabled: true
+      });
+      console.log("Firebase App Check inicializado com sucesso.");
+    } catch (err) {
+      console.warn("Falha ao inicializar o Firebase App Check:", err);
+    }
+  } else {
+    console.warn("Chave do reCAPTCHA não configurada. App Check desabilitado.");
+  }
+}
 
 // Helper collections
 export const transactionsRef = collection(db, "transactions");
@@ -34,10 +64,6 @@ try {
 }
 
 // Connect to Emulators locally in development or preview mode
-const isLocalhost = globalThis.window !== undefined && 
-  (globalThis.window.location.hostname === 'localhost' || globalThis.window.location.hostname === '127.0.0.1');
-const isTest = import.meta.env.MODE === 'test';
-
 if (isLocalhost && !isTest) {
   try {
     connectFirestoreEmulator(db, 'localhost', 8080);
@@ -78,4 +104,5 @@ if (!isLocalhost && !isTest && firebaseConfig.apiKey && firebaseConfig.apiKey !=
 export const auth = authInstance;
 export const googleProvider = providerInstance;
 export const analytics = analyticsInstance;
+export const appCheck = appCheckInstance;
 export { addDoc, onSnapshot, query, getDocs, where } from "firebase/firestore";

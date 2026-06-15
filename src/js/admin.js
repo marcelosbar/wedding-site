@@ -173,15 +173,15 @@ class AdminApp {
       let q;
       const baseCol = collection(db, "transactions");
       
-      if (this.currentFilter !== 'all') {
+      if (this.currentFilter === 'all') {
         q = query(
           baseCol,
-          where("status", "==", this.currentFilter),
           orderBy("timestamp", "desc")
         );
       } else {
         q = query(
           baseCol,
+          where("status", "==", this.currentFilter),
           orderBy("timestamp", "desc")
         );
       }
@@ -225,7 +225,7 @@ class AdminApp {
   nextPage() {
     if (this.currentPageDocs.length < 20) return;
     // Salva o cursor (último documento da página atual) para a próxima página
-    this.pageCursors[this.currentPage + 1] = this.currentPageDocs[this.currentPageDocs.length - 1];
+    this.pageCursors[this.currentPage + 1] = this.currentPageDocs.at(-1);
     this.currentPage++;
     this.fetchData();
   }

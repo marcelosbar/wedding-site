@@ -94,8 +94,8 @@ export class MessagesCarousel {
     if (this.isLoadingMore || this.isAllLoaded) return;
 
     const cursor = this.paginatedDocs.length > 0
-      ? this.paginatedDocs[this.paginatedDocs.length - 1]
-      : this.realtimeDocs[this.realtimeDocs.length - 1];
+      ? this.paginatedDocs.at(-1)
+      : this.realtimeDocs.at(-1);
 
     if (!cursor) return;
 

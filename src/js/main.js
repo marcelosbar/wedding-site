@@ -3,7 +3,6 @@ import { PixCheckout } from './pix.js';
 import { Scoreboard } from './scoreboard.js';
 import { MessagesCarousel } from './messages.js';
 import { Countdown } from './countdown.js';
-import { transactionsRef, onSnapshot, query } from './firebase.js';
 import { showAlert } from './utils.js';
 
 

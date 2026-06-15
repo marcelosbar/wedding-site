@@ -23,3 +23,10 @@ Database access is secured by rules defined in [firestore.rules](file:///C:/User
 - **Location**: The admin interface is at `admin.html`.
 - **Authentication**: Protected by Firebase Google Sign-In.
 - **Allowlist**: Admin permissions are verified against a whitelist stored in Firestore under `/config/admins`.
+
+## 4. Cloud Functions & Secure Data Separation
+To protect guests' privacy and optimize read quotas:
+- **Transactions Collection**: Restricted to admin-only reads. Public users cannot query `/transactions` directly.
+- **Scoreboard Totals**: Calculated server-side by the `onTransactionWritten` Cloud Function in the `functions/` folder. Public clients read from the single document `/scoreboard/totals`.
+- **Public Messages**: Publicly readable messages are securely copied by the Cloud Function to a `/publicMessages` collection (filtering for approved, public messages only).
+- **Pagination**: The carousel fetches `/publicMessages` with a limit of 10 and uses cursor queries (`startAfter`) for lazy loading. The admin panel paginates transactions (limit 20).

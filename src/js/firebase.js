@@ -64,10 +64,6 @@ try {
 }
 
 // Connect to Emulators locally in development or preview mode
-const isLocalhost = globalThis.window !== undefined && 
-  (globalThis.window.location.hostname === 'localhost' || globalThis.window.location.hostname === '127.0.0.1');
-const isTest = import.meta.env.MODE === 'test';
-
 if (isLocalhost && !isTest) {
   try {
     connectFirestoreEmulator(db, 'localhost', 8080);

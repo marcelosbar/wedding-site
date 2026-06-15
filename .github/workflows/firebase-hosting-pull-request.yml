@@ -7,6 +7,7 @@ permissions:
   checks: write
   contents: read
   pull-requests: write
+  id-token: write
 jobs:
   build_and_preview:
     if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
@@ -87,9 +88,16 @@ jobs:
           VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
           VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
           VITE_FIREBASE_MEASUREMENT_ID: ${{ secrets.VITE_FIREBASE_MEASUREMENT_ID }}
+      - id: auth
+        if: ${{ github.actor != 'dependabot[bot]' }}
+        uses: google-github-actions/auth@71f986410dfbc7added4569d411d040a91dc6935 # v2.1.8
+        with:
+          workload_identity_provider: 'projects/587786769343/locations/global/workloadIdentityPools/github-pool/providers/github-provider'
+          service_account: 'github-action-1241764119@lorenaemarcelo2026.iam.gserviceaccount.com'
+          create_credentials_file: true
       - uses: FirebaseExtended/action-hosting-deploy@e2eda2e106cfa35cdbcf4ac9ddaf6c4756df2c8c # v0
         if: ${{ github.actor != 'dependabot[bot]' }}
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
-          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_LORENAEMARCELO2026 }}
+          firebaseServiceAccount: '${{ steps.auth.outputs.credentials_file_path }}'
           projectId: lorenaemarcelo2026

@@ -98,6 +98,8 @@ This command automatically starts the Firestore Emulator, runs the tests in `tes
 ### CI/CD (Automated)
 This project uses GitHub Actions for automated deployment. Any commit pushed or merged to `main` is automatically built and deployed to Firebase Hosting. Opening a pull request automatically generates a temporary staging/preview environment.
 
+Authentication is configured securely using **Workload Identity Federation (OIDC)**, eliminating the need for long-lived JSON keys in GitHub Secrets. The workflows use Google's official auth action to request short-lived, dynamic access tokens.
+
 ### Manual Deployment (Fallback)
 If manual deployment is necessary:
 1. Ensure the Firebase CLI is installed: `npm install -g firebase-tools` (or `pnpm add -g firebase-tools`)

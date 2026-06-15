@@ -61,26 +61,7 @@ export class WeddingApp {
     this.scoreboard.initRealtimeScoreboard();
     this.messagesCarousel.init();
     this.countdown.init();
-    this.initRealtimeSync();
     this.initEvents();
-  }
-
-  initRealtimeSync() {
-    try {
-      const q = query(transactionsRef);
-      onSnapshot(q, (snapshot) => {
-        if (this.scoreboard && typeof this.scoreboard.updateFromSnapshot === 'function') {
-          this.scoreboard.updateFromSnapshot(snapshot);
-        }
-        if (this.messagesCarousel && typeof this.messagesCarousel.updateFromSnapshot === 'function') {
-          this.messagesCarousel.updateFromSnapshot(snapshot);
-        }
-      }, (error) => {
-        console.warn('Erro ao sincronizar dados em tempo real:', error);
-      });
-    } catch (e) {
-      console.warn('Firebase não configurado ou offline para sincronização.', e);
-    }
   }
 
   initEvents() {

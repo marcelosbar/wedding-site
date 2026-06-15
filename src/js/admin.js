@@ -1,11 +1,37 @@
-import { db, onSnapshot, query, auth, googleProvider } from './firebase.js';
-import { doc, updateDoc, collection, getDoc } from 'firebase/firestore';
-import { signInWithPopup, signOut, onAuthStateChanged, setPersistence, browserSessionPersistence } from 'firebase/auth';
+import {
+  db,
+  onSnapshot,
+  query,
+  auth,
+  googleProvider
+} from './firebase.js';
+import {
+  doc,
+  updateDoc,
+  collection,
+  getDoc,
+  where,
+  orderBy,
+  startAfter,
+  limit
+} from 'firebase/firestore';
+import {
+  signInWithPopup,
+  signOut,
+  onAuthStateChanged,
+  setPersistence,
+  browserSessionPersistence
+} from 'firebase/auth';
 import { escapeHTML } from './utils.js';
 
 class AdminApp {
   loggedIn = false;
   transactions = [];
+  currentPage = 1;
+  currentFilter = 'all';
+  pageCursors = [];
+  currentPageDocs = [];
+  unsubscribe = null;
 
   async isAdmin(email) {
     try {
@@ -29,6 +55,11 @@ class AdminApp {
     this.messageModal = document.getElementById('message-modal');
     this.modalOverlay = document.getElementById('modal-overlay');
     this.modalCloseBtn = document.getElementById('modal-close-btn');
+
+    this.prevBtn = document.getElementById('admin-prev-btn');
+    this.nextBtn = document.getElementById('admin-next-btn');
+    this.pageInfo = document.getElementById('admin-page-info');
+    this.filterStatus = document.getElementById('admin-filter-status');
 
     if (this.modalCloseBtn) {
       this.modalCloseBtn.addEventListener('click', () => this.closeModal());
@@ -63,6 +94,21 @@ class AdminApp {
       logoutBtn.addEventListener('click', () => this.logout());
     }
 
+    if (this.prevBtn) {
+      this.prevBtn.addEventListener('click', () => this.prevPage());
+    }
+    if (this.nextBtn) {
+      this.nextBtn.addEventListener('click', () => this.nextPage());
+    }
+    if (this.filterStatus) {
+      this.filterStatus.addEventListener('change', (e) => {
+        this.currentFilter = e.target.value;
+        this.currentPage = 1;
+        this.pageCursors = [];
+        this.fetchData();
+      });
+    }
+
     // Mudar UI automaticamente quando o login mudar
     if (auth) {
       onAuthStateChanged(auth, async (user) => {
@@ -83,6 +129,10 @@ class AdminApp {
           this.loginScreen.style.display = 'flex';
           this.dashboardScreen.classList.add('u-hidden');
           this.dashboardScreen.style.display = 'none';
+          if (this.unsubscribe) {
+            this.unsubscribe();
+            this.unsubscribe = null;
+          }
         }
       });
     } else {
@@ -114,16 +164,48 @@ class AdminApp {
   }
 
   fetchData() {
+    if (this.unsubscribe) {
+      this.unsubscribe();
+      this.unsubscribe = null;
+    }
+
     try {
-      const q = query(collection(db, "transactions"));
-      onSnapshot(q, (snapshot) => {
+      let q;
+      const baseCol = collection(db, "transactions");
+      
+      if (this.currentFilter !== 'all') {
+        q = query(
+          baseCol,
+          where("status", "==", this.currentFilter),
+          orderBy("timestamp", "desc")
+        );
+      } else {
+        q = query(
+          baseCol,
+          orderBy("timestamp", "desc")
+        );
+      }
+
+      if (this.currentPage > 1 && this.pageCursors[this.currentPage]) {
+        q = query(q, startAfter(this.pageCursors[this.currentPage]), limit(20));
+      } else {
+        q = query(q, limit(20));
+      }
+
+      this.unsubscribe = onSnapshot(q, (snapshot) => {
         this.transactions = [];
-        snapshot.forEach((doc) => {
-          this.transactions.push({ id: doc.id, ...doc.data() });
+        this.currentPageDocs = [];
+        
+        snapshot.forEach((docSnap) => {
+          this.transactions.push({ id: docSnap.id, ...docSnap.data() });
+          this.currentPageDocs.push(docSnap);
         });
-        // Sort by newest first
+
+        // Garantir ordenação local secundária caso ocorra algum problema
         this.transactions.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        
         this.renderTable();
+        this.updatePaginationUI();
       }, (err) => {
         console.error("Firebase fetch error", err);
         alert("Erro ao conectar com Firebase. Verifique se as regras e configurações estão corretas.");
@@ -131,6 +213,32 @@ class AdminApp {
     } catch (e) {
       console.warn("Firebase not initialized yet.", e);
       this.tableBody.innerHTML = `<tr><td colspan="6" class="u-text-center">Firebase não configurado. Adicione a config em firebase.js</td></tr>`;
+    }
+  }
+
+  prevPage() {
+    if (this.currentPage <= 1) return;
+    this.currentPage--;
+    this.fetchData();
+  }
+
+  nextPage() {
+    if (this.currentPageDocs.length < 20) return;
+    // Salva o cursor (último documento da página atual) para a próxima página
+    this.pageCursors[this.currentPage + 1] = this.currentPageDocs[this.currentPageDocs.length - 1];
+    this.currentPage++;
+    this.fetchData();
+  }
+
+  updatePaginationUI() {
+    if (this.prevBtn) {
+      this.prevBtn.disabled = this.currentPage === 1;
+    }
+    if (this.nextBtn) {
+      this.nextBtn.disabled = this.currentPageDocs.length < 20;
+    }
+    if (this.pageInfo) {
+      this.pageInfo.innerText = `Página ${this.currentPage}`;
     }
   }
 
@@ -267,3 +375,4 @@ class AdminApp {
 
 const adminApp = new AdminApp();
 globalThis.adminApp = adminApp;
+export { AdminApp };

@@ -15,8 +15,10 @@ service cloud.firestore {
     }
 
     match /transactions/{transactionId} {
-      // Anyone can read (for the scoreboard)
-      allow read: if true;
+      // Only authorized admins can read
+      allow read: if request.auth != null
+                    && request.auth.token.email_verified == true
+                    && request.auth.token.email in get(/databases/$(database)/documents/config/admins).data.emails;
       
       allow create: if request.resource.data.keys().hasOnly(['guestName', 'totalAmount', 'listChosen', 'status', 'timestamp', 'message', 'isPublic', 'items'])
                     && request.resource.data.status == 'pending'
@@ -44,6 +46,16 @@ service cloud.firestore {
       allow delete: if request.auth != null
                     && request.auth.token.email_verified == true
                     && request.auth.token.email in get(/databases/$(database)/documents/config/admins).data.emails;
+    }
+
+    match /scoreboard/{docId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    match /publicMessages/{messageId} {
+      allow read: if true;
+      allow write: if false;
     }
   }
 }

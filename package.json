@@ -6,9 +6,9 @@
   "packageManager": "pnpm@9.15.4",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "dev": "concurrently \"vite\" \"npx firebase emulators:start --only auth,firestore\"",
+    "dev": "concurrently \"vite\" \"npx firebase emulators:start --only auth,firestore,functions\"",
     "dev:site": "vite",
-    "emulators": "npx firebase emulators:start --only auth,firestore",
+    "emulators": "npx firebase emulators:start --only auth,firestore,functions",
     "preview:secure": "pnpm run build && npx firebase emulators:start",
     "build": "vite build",
     "preview": "vite preview",

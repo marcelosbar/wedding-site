@@ -8,6 +8,7 @@ vi.mock('../src/js/firebase.js', () => {
   globalThis.__mockOnSnapshot = globalThis.__mockOnSnapshot || vi.fn();
   globalThis.__mockQuery = globalThis.__mockQuery || vi.fn();
   globalThis.__mockAuth = globalThis.__mockAuth !== undefined ? globalThis.__mockAuth : {};
+  
   return {
     db: {},
     onSnapshot: globalThis.__mockOnSnapshot,
@@ -23,7 +24,11 @@ vi.mock('firebase/firestore', () => ({
   doc: vi.fn(),
   updateDoc: vi.fn(),
   collection: vi.fn(),
-  getDoc: vi.fn()
+  getDoc: vi.fn(),
+  where: vi.fn(),
+  orderBy: vi.fn(),
+  startAfter: vi.fn(),
+  limit: vi.fn()
 }));
 
 vi.mock('firebase/auth', () => {

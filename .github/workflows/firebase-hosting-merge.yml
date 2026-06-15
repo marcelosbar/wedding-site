@@ -99,7 +99,7 @@ jobs:
           export GOOGLE_APPLICATION_CREDENTIALS=gcp-key.json
           export GOOGLE_CLOUD_PROJECT=lorenaemarcelo2026
           export GOOGLE_CLOUD_QUOTA_PROJECT=lorenaemarcelo2026
-          npx firebase deploy --only firestore --project lorenaemarcelo2026
+          npx firebase deploy --only firestore --project lorenaemarcelo2026 --debug
           rm gcp-key.json
       - uses: FirebaseExtended/action-hosting-deploy@e2eda2e106cfa35cdbcf4ac9ddaf6c4756df2c8c # v0
         with:

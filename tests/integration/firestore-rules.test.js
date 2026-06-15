@@ -267,14 +267,28 @@ describe('/transactions — Create', () => {
 });
 
 // ──────────────────────────────────────────────
+// ──────────────────────────────────────────────
 // /transactions — Read
 // ──────────────────────────────────────────────
 
 describe('/transactions — Read', () => {
-  it('allows unauthenticated read (for scoreboard)', async () => {
+  beforeEach(async () => {
+    await seedAdminsDoc();
     await seedTransaction('tx-read-test', buildValidTransaction());
+  });
 
+  it('rejects unauthenticated read', async () => {
     const db = getUnauthedDb();
+    await assertFails(getDoc(doc(db, 'transactions', 'tx-read-test')));
+  });
+
+  it('rejects non-admin authenticated read', async () => {
+    const db = getNonAdminDb();
+    await assertFails(getDoc(doc(db, 'transactions', 'tx-read-test')));
+  });
+
+  it('allows authenticated admin read', async () => {
+    const db = getAdminDb();
     await assertSucceeds(getDoc(doc(db, 'transactions', 'tx-read-test')));
   });
 });
@@ -426,5 +440,49 @@ describe('/config/admins', () => {
         emails: ['hacker@evil.com'],
       }));
     });
+  });
+});
+
+// ──────────────────────────────────────────────
+// /scoreboard
+// ──────────────────────────────────────────────
+
+describe('/scoreboard', () => {
+  it('allows unauthenticated read on totals', async () => {
+    const db = getUnauthedDb();
+    await assertSucceeds(getDoc(doc(db, 'scoreboard', 'totals')));
+  });
+
+  it('rejects client write (unauthenticated)', async () => {
+    const db = getUnauthedDb();
+    await assertFails(setDoc(doc(db, 'scoreboard', 'totals'), { groomTotal: 100 }));
+  });
+
+  it('rejects client write (authenticated admin)', async () => {
+    await seedAdminsDoc();
+    const db = getAdminDb();
+    await assertFails(setDoc(doc(db, 'scoreboard', 'totals'), { groomTotal: 100 }));
+  });
+});
+
+// ──────────────────────────────────────────────
+// /publicMessages
+// ──────────────────────────────────────────────
+
+describe('/publicMessages', () => {
+  it('allows unauthenticated read on message doc', async () => {
+    const db = getUnauthedDb();
+    await assertSucceeds(getDoc(doc(db, 'publicMessages', 'msg-123')));
+  });
+
+  it('rejects client write (unauthenticated)', async () => {
+    const db = getUnauthedDb();
+    await assertFails(setDoc(doc(db, 'publicMessages', 'msg-123'), { message: 'hi' }));
+  });
+
+  it('rejects client write (authenticated admin)', async () => {
+    await seedAdminsDoc();
+    const db = getAdminDb();
+    await assertFails(setDoc(doc(db, 'publicMessages', 'msg-123'), { message: 'hi' }));
   });
 });

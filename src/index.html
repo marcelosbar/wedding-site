@@ -413,7 +413,7 @@
           <canvas id="pix-qr-code"></canvas>
         </div>
 
-        <p class="u-mb-2">Ou use o Pix Copia e Cola:</p>
+        <label for="pix-payload" class="u-mb-2 u-display-block">Ou use o Pix Copia e Cola:</label>
         <div class="copy-paste-container">
           <input type="text" id="pix-payload" class="copy-input" readonly value="00020126580014br.gov.bcb.pix..." />
           <button id="copy-pix-payload-btn" class="btn btn-primary copy-btn">Copiar</button>
@@ -585,7 +585,8 @@
             <h4>Contribuição Livre</h4>
             <p class="gift-description">Escolha o valor com o qual deseja contribuir para a nossa lua de mel dos sonhos.</p>
             <div class="gift-custom-price-wrapper">
-              <input type="number" class="u-input-text gift-custom-price-input" min="1" max="5000" placeholder="Valor (R$)" data-list="Groom" />
+              <label for="gift-custom-price-groom" class="u-sr-only">Valor da contribuição livre para o Noivo</label>
+              <input type="number" id="gift-custom-price-groom" class="u-input-text gift-custom-price-input" min="1" max="5000" placeholder="Valor (R$)" data-list="Groom" />
               <span class="gift-custom-error field-error u-hidden">Por favor, insira um valor inteiro válido entre R$ 1 e R$ 5.000.</span>
             </div>
             <button class="btn btn-primary btn-sm add-custom-to-cart-btn"
@@ -692,7 +693,8 @@
             <h4>Contribuição Livre</h4>
             <p class="gift-description">Escolha o valor com o qual deseja contribuir para a nossa lua de mel dos sonhos.</p>
             <div class="gift-custom-price-wrapper">
-              <input type="number" class="u-input-text gift-custom-price-input" min="1" max="5000" placeholder="Valor (R$)" data-list="Bride" />
+              <label for="gift-custom-price-bride" class="u-sr-only">Valor da contribuição livre para a Noiva</label>
+              <input type="number" id="gift-custom-price-bride" class="u-input-text gift-custom-price-input" min="1" max="5000" placeholder="Valor (R$)" data-list="Bride" />
               <span class="gift-custom-error field-error u-hidden">Por favor, insira um valor inteiro válido entre R$ 1 e R$ 5.000.</span>
             </div>
             <button class="btn btn-secondary btn-sm add-custom-to-cart-btn"

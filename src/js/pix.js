@@ -195,13 +195,13 @@ function calculateCRC16(str) {
   let crc = 0xFFFF;
   const polynomial = 0x1021;
   for (let i = 0; i < str.length; i++) {
-    const code = str.charCodeAt(i);
+    const code = str.codePointAt(i);
     crc ^= (code << 8);
     for (let j = 0; j < 8; j++) {
-      if ((crc & 0x8000) !== 0) {
-        crc = (crc << 1) ^ polynomial;
-      } else {
+      if ((crc & 0x8000) === 0) {
         crc = crc << 1;
+      } else {
+        crc = (crc << 1) ^ polynomial;
       }
       crc &= 0xFFFF;
     }

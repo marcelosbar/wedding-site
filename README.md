@@ -11,7 +11,7 @@ Welcome to the source code of Lorena and Marcelo's wedding website. This is a fa
 - **Honeymoon Competition**: A built-in cart and points system where guests can "vote" on the honeymoon destination by choosing gifts.
 - **PIX Integration**: Generates a dynamic PIX QR Code for easy payments.
 - **Hidden Admin Panel**: A secure area to review and validate guest contributions.
-- **RSVP**: Integration with the Assessoria VIP platform.
+- **RSVP**: A redirect link to the external Assessoria VIP platform.
 
 ## Tech Stack
 
@@ -102,7 +102,7 @@ This project uses GitHub Actions for automated deployment. Any commit pushed or 
 **Pull Request Previews**: Opening a pull request runs automated tests, security scans, and build validation. To deploy a temporary staging/preview environment, you must add the `deploy-preview` label to the pull request in GitHub. This builds and deploys the changes to Firebase Hosting, posting the preview URL in the PR checks.
 
 > [!WARNING]
-> Due to strict HTTP Referrer restrictions on the production Firebase API key, cloud database features (such as RSVP submissions and live scoreboard fetches) **will not function** in PR preview URLs (returning 403 Forbidden errors). We chose not to allow the `*.web.app/*` wildcard on the production key to maximize security, and have not yet set up a separate staging project. Please use the local Firebase Emulator Suite (`pnpm run dev`) to test all database-related functionality.
+> Due to strict HTTP Referrer restrictions on the production Firebase API key, cloud database features (such as transaction creation and live scoreboard fetches) **will not function** in PR preview URLs (returning 403 Forbidden errors). We chose not to allow the `*.web.app/*` wildcard on the production key to maximize security, and have not yet set up a separate staging project. Please use the local Firebase Emulator Suite (`pnpm run dev`) to test all database-related functionality.
 
 Authentication is configured securely using **Workload Identity Federation (OIDC)**, eliminating the need for long-lived JSON keys in GitHub Secrets. The workflows use Google's official auth action to request short-lived, dynamic access tokens.
 

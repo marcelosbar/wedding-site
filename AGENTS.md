@@ -3,7 +3,7 @@
 This document is the primary entrypoint of instructions for AI Agents working on this project. For global development instructions, see [GEMINI.md](file:///C:/Users/marce/.gemini/GEMINI.md).
 
 ## Project Overview
-This is a wedding website for Lorena and Marcelo featuring an RSVP system and a "Honeymoon Competition" scoreboard (Disney vs. Cote D'Azur).
+This is a wedding website for Lorena and Marcelo featuring an external RSVP link and a "Honeymoon Competition" scoreboard (Disney vs. Cote D'Azur).
 
 ## Package Manager & Tooling
 - **Package Manager**: **pnpm** (specifically version `9.15.4`, enforced via a `preinstall` script).

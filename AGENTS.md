@@ -17,6 +17,7 @@ This is a wedding website for Lorena and Marcelo featuring an RSVP system and a 
 - **Frontend**: Vanilla HTML, CSS, and JS. Do not introduce JS frameworks (React, Vue) or Tailwind CSS.
 - **Backend**: Firebase Firestore (tracking honeymoon competition points).
 - **CSP**: Content Security Policy is strictly configured in `firebase.json` without `'unsafe-inline'`. No inline styles or script event handlers are allowed.
+- **Database & Previews**: The production Firebase API key has strict HTTP Referrer restrictions. The `*.web.app/*` wildcard is explicitly blocked to protect production integrity, and no separate staging project has been created yet. As a result, database operations (Firestore, Auth, Installations) will fail with 403 Forbidden in PR preview URLs. All database features must be tested locally using the Firebase Emulator Suite.
 
 ## Topic-Specific Guides
 Refer to the following documents for comprehensive technical standards:

@@ -89,6 +89,7 @@ jobs:
           VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
           VITE_FIREBASE_MEASUREMENT_ID: ${{ secrets.VITE_FIREBASE_MEASUREMENT_ID }}
           VITE_RECAPTCHA_SITE_KEY: ${{ secrets.VITE_RECAPTCHA_SITE_KEY }}
+          VITE_FIRESTORE_DATABASE_ID: "preview"
       - id: auth
         if: ${{ github.actor != 'dependabot[bot]' }}
         uses: google-github-actions/auth@71f986410dfbc7added4569d411d040a91dc6935 # v2.1.8

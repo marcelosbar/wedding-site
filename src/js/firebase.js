@@ -16,7 +16,8 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-export const db = getFirestore(app);
+const dbId = import.meta.env.VITE_FIRESTORE_DATABASE_ID || "(default)";
+export const db = getFirestore(app, dbId);
 
 // Ativar o App Check de forma segura
 let appCheckInstance = null;

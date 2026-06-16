@@ -96,7 +96,10 @@ This command automatically starts the Firestore Emulator, runs the tests in `tes
 ## Deployment
 
 ### CI/CD (Automated)
-This project uses GitHub Actions for automated deployment. Any commit pushed or merged to `main` is automatically built and deployed to Firebase Hosting. Opening a pull request automatically generates a temporary staging/preview environment.
+
+This project uses GitHub Actions for automated deployment. Any commit pushed or merged to `main` is automatically built and deployed to Firebase Hosting.
+
+**Pull Request Previews**: Opening a pull request runs automated tests, security scans, and build validation. To deploy a temporary staging/preview environment, you must add the `deploy-preview` label to the pull request in GitHub. This builds and deploys the changes to Firebase Hosting, posting the preview URL in the PR checks.
 
 Authentication is configured securely using **Workload Identity Federation (OIDC)**, eliminating the need for long-lived JSON keys in GitHub Secrets. The workflows use Google's official auth action to request short-lived, dynamic access tokens.
 

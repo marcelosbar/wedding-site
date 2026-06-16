@@ -30,6 +30,7 @@ service cloud.firestore {
                     && request.resource.data.guestName.size() < 100
                     && (request.resource.data.listChosen == 'Groom' || request.resource.data.listChosen == 'Bride')
                     && request.resource.data.timestamp is string
+                    && request.resource.data.timestamp.size() < 50
                     && request.resource.data.message is string
                     && request.resource.data.message.size() <= 500
                     && request.resource.data.isPublic is bool

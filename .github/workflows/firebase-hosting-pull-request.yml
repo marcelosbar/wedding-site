@@ -91,14 +91,14 @@ jobs:
           VITE_RECAPTCHA_SITE_KEY: ${{ secrets.VITE_RECAPTCHA_SITE_KEY }}
           VITE_FIRESTORE_DATABASE_ID: "preview"
       - id: auth
-        if: ${{ github.actor != 'dependabot[bot]' }}
+        if: ${{ github.actor != 'dependabot[bot]' && contains(github.event.pull_request.labels.*.name, 'deploy-preview') }}
         uses: google-github-actions/auth@71f986410dfbc7added4569d411d040a91dc6935 # v2.1.8
         with:
           workload_identity_provider: 'projects/587786769343/locations/global/workloadIdentityPools/github-pool/providers/github-provider'
           service_account: 'github-action-1241764119@lorenaemarcelo2026.iam.gserviceaccount.com'
           create_credentials_file: true
       - name: Read credential file
-        if: ${{ github.actor != 'dependabot[bot]' }}
+        if: ${{ github.actor != 'dependabot[bot]' && contains(github.event.pull_request.labels.*.name, 'deploy-preview') }}
         id: read_cred
         run: |
           echo "cred_content<<EOF" >> $GITHUB_OUTPUT
@@ -106,7 +106,7 @@ jobs:
           echo "" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
       - uses: FirebaseExtended/action-hosting-deploy@e2eda2e106cfa35cdbcf4ac9ddaf6c4756df2c8c # v0
-        if: ${{ github.actor != 'dependabot[bot]' }}
+        if: ${{ github.actor != 'dependabot[bot]' && contains(github.event.pull_request.labels.*.name, 'deploy-preview') }}
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
           firebaseServiceAccount: '${{ steps.read_cred.outputs.cred_content }}'

@@ -417,7 +417,11 @@ describe('WeddingApp Orchestrator', () => {
 
 
 
-  it('should enter art-mode when view-art-btn is clicked and manage accessibility/focus', () => {
+  it('should enter art-mode when view-art-btn is clicked and manage accessibility/focus and scroll to top', () => {
+    const scrollToSpy = vi.spyOn(globalThis, 'scrollTo').mockImplementation(() => {});
+    const originalScrollY = globalThis.scrollY;
+    Object.defineProperty(globalThis, 'scrollY', { value: 150, configurable: true, writable: true });
+
     const heroSection = document.getElementById('hero');
     const viewArtBtn = document.getElementById('view-art-btn');
     const artHint = document.querySelector('.hero-art-hint');
@@ -438,13 +442,20 @@ describe('WeddingApp Orchestrator', () => {
     expect(artHint.getAttribute('tabindex')).toBe('0');
     expect(artHint.getAttribute('aria-hidden')).toBe('false');
     expect(document.activeElement).toBe(artHint);
+    expect(scrollToSpy).toHaveBeenCalledWith(0, 0);
 
     // Clean up body
     document.body.removeChild(heroSection);
     document.body.classList.remove('art-mode-active');
+    scrollToSpy.mockRestore();
+    Object.defineProperty(globalThis, 'scrollY', { value: originalScrollY, configurable: true, writable: true });
   });
 
-  it('should exit art-mode and restore focus when hero section is clicked', () => {
+  it('should exit art-mode and restore focus and scroll position when hero section is clicked', () => {
+    const scrollToSpy = vi.spyOn(globalThis, 'scrollTo').mockImplementation(() => {});
+    const originalScrollY = globalThis.scrollY;
+    Object.defineProperty(globalThis, 'scrollY', { value: 250, configurable: true, writable: true });
+
     const heroSection = document.getElementById('hero');
     const viewArtBtn = document.getElementById('view-art-btn');
     const artHint = document.querySelector('.hero-art-hint');
@@ -455,6 +466,7 @@ describe('WeddingApp Orchestrator', () => {
     viewArtBtn.click();
     expect(heroSection.classList.contains('art-mode')).toBe(true);
     expect(document.body.classList.contains('art-mode-active')).toBe(true);
+    expect(scrollToSpy).toHaveBeenCalledWith(0, 0);
 
     // Click on the section background to exit
     const event = new MouseEvent('click', { bubbles: true });
@@ -466,9 +478,12 @@ describe('WeddingApp Orchestrator', () => {
     expect(artHint.getAttribute('tabindex')).toBe('-1');
     expect(artHint.getAttribute('aria-hidden')).toBe('true');
     expect(document.activeElement).toBe(viewArtBtn);
+    expect(scrollToSpy).toHaveBeenLastCalledWith(0, 250);
 
     document.body.removeChild(heroSection);
     document.body.classList.remove('art-mode-active');
+    scrollToSpy.mockRestore();
+    Object.defineProperty(globalThis, 'scrollY', { value: originalScrollY, configurable: true, writable: true });
   });
 
   it('should exit art-mode when Escape key is pressed', () => {

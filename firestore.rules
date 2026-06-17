@@ -2,16 +2,13 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Admin config document — only admins can read/write, or anyone if the doc doesn't exist yet (allows local auto-seeding)
+    // Admin config document — only admins can read, or anyone if the doc doesn't exist yet (allows local auto-seeding)
     match /config/admins {
       allow read: if request.auth != null
                    && request.auth.token.email_verified == true
                    && resource != null
                    && request.auth.token.email in resource.data.emails;
-      allow write: if !exists(/databases/$(database)/documents/config/admins) || (request.auth != null
-                    && request.auth.token.email_verified == true
-                    && resource != null
-                    && request.auth.token.email in resource.data.emails);
+      allow write: if !exists(/databases/$(database)/documents/config/admins);
     }
 
     match /transactions/{transactionId} {
@@ -42,11 +39,6 @@ service cloud.firestore {
                     && request.auth.token.email_verified == true
                     && request.auth.token.email in get(/databases/$(database)/documents/config/admins).data.emails
                     && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']);
-      
-      // Only the authorized admins can delete
-      allow delete: if request.auth != null
-                    && request.auth.token.email_verified == true
-                    && request.auth.token.email in get(/databases/$(database)/documents/config/admins).data.emails;
     }
 
     match /scoreboard/{docId} {

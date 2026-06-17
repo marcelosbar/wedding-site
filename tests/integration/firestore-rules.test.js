@@ -356,9 +356,9 @@ describe('/transactions — Delete', () => {
     await seedTransaction(TX_ID, buildValidTransaction());
   });
 
-  it('allows admin to delete a transaction', async () => {
+  it('rejects admin delete', async () => {
     const db = getAdminDb();
-    await assertSucceeds(deleteDoc(doc(db, 'transactions', TX_ID)));
+    await assertFails(deleteDoc(doc(db, 'transactions', TX_ID)));
   });
 
   it('rejects non-admin delete', async () => {
@@ -417,10 +417,10 @@ describe('/config/admins', () => {
       }));
     });
 
-    it('allows admin to overwrite when document exists', async () => {
+    it('rejects admin overwrite when document exists', async () => {
       await seedAdminsDoc();
       const db = getAdminDb();
-      await assertSucceeds(setDoc(doc(db, 'config', 'admins'), {
+      await assertFails(setDoc(doc(db, 'config', 'admins'), {
         emails: [ADMIN_EMAIL, 'another@test.com'],
       }));
     });

@@ -271,8 +271,12 @@ export class WeddingApp {
     const viewArtBtn = document.getElementById('view-art-btn');
     const artHint = document.querySelector('.hero-art-hint');
 
+    let lastScrollY = 0;
+
     const enterArtMode = () => {
       if (!heroSection) return;
+      lastScrollY = globalThis.scrollY;
+      globalThis.scrollTo(0, 0);
       heroSection.classList.add('art-mode');
       document.body.classList.add('art-mode-active');
       if (artHint) {
@@ -286,6 +290,7 @@ export class WeddingApp {
       if (!heroSection) return;
       heroSection.classList.remove('art-mode');
       document.body.classList.remove('art-mode-active');
+      globalThis.scrollTo(0, lastScrollY);
       if (artHint) {
         artHint.setAttribute('tabindex', '-1');
         artHint.setAttribute('aria-hidden', 'true');

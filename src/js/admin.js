@@ -295,30 +295,31 @@ class AdminApp {
     const groupTotalRow = document.getElementById('modal-group-total-row');
     const groupTotalEl = document.getElementById('modal-group-total');
 
-    if (groupIdRow && groupTotalRow) {
-      if (transaction.groupId) {
-        groupIdRow.classList.remove('u-hidden');
-        groupTotalRow.classList.remove('u-hidden');
+    if (!groupIdRow || !groupTotalRow) return;
 
-        if (groupIdEl) {
-          const shortCode = transaction.groupId.slice(-5).toUpperCase();
-          groupIdEl.innerHTML = `<span class="group-badge">#${shortCode}</span><span class="group-id-subtext">(${transaction.groupId})</span>`;
-        }
+    if (!transaction.groupId) {
+      groupIdRow.classList.add('u-hidden');
+      groupTotalRow.classList.add('u-hidden');
+      return;
+    }
 
-        if (groupTotalEl) {
-          const groupTxs = this.transactions.filter(t => t.groupId === transaction.groupId);
-          const totalBrl = groupTxs.reduce((sum, t) => sum + t.totalAmount, 0);
+    groupIdRow.classList.remove('u-hidden');
+    groupTotalRow.classList.remove('u-hidden');
 
-          if (transaction.paymentMethod === 'mbway') {
-            const totalEur = groupTxs.reduce((sum, t) => sum + (t.eurAmount || 0), 0);
-            groupTotalEl.innerText = `R$ ${totalBrl.toFixed(2).replace('.', ',')} | € ${totalEur.toFixed(2).replace('.', ',')}`;
-          } else {
-            groupTotalEl.innerText = `R$ ${totalBrl.toFixed(2).replace('.', ',')}`;
-          }
-        }
+    if (groupIdEl) {
+      const shortCode = transaction.groupId.slice(-5).toUpperCase();
+      groupIdEl.innerHTML = `<span class="group-badge">#${shortCode}</span><span class="group-id-subtext">(${transaction.groupId})</span>`;
+    }
+
+    if (groupTotalEl) {
+      const groupTxs = this.transactions.filter(t => t.groupId === transaction.groupId);
+      const totalBrl = groupTxs.reduce((sum, t) => sum + t.totalAmount, 0);
+
+      if (transaction.paymentMethod === 'mbway') {
+        const totalEur = groupTxs.reduce((sum, t) => sum + (t.eurAmount || 0), 0);
+        groupTotalEl.innerText = `R$ ${totalBrl.toFixed(2).replace('.', ',')} | € ${totalEur.toFixed(2).replace('.', ',')}`;
       } else {
-        groupIdRow.classList.add('u-hidden');
-        groupTotalRow.classList.add('u-hidden');
+        groupTotalEl.innerText = `R$ ${totalBrl.toFixed(2).replace('.', ',')}`;
       }
     }
   }

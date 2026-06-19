@@ -245,19 +245,29 @@ class AdminApp {
   showModal(transaction) {
     if (!this.messageModal) return;
 
+    this._populateModalBasic(transaction);
+    this._populateModalPaymentAndEur(transaction);
+    this._populateModalGroupInfo(transaction);
+    this._populateModalGifts(transaction);
+
+    this.messageModal.classList.remove('u-hidden');
+  }
+
+  _populateModalBasic(transaction) {
     const guestNameEl = document.getElementById('modal-guest-name');
     const amountEl = document.getElementById('modal-amount');
     const listEl = document.getElementById('modal-list');
     const privacyEl = document.getElementById('modal-privacy');
     const textEl = document.getElementById('modal-message-text');
-    const giftsListEl = document.getElementById('modal-gifts-list');
 
     if (guestNameEl) guestNameEl.innerText = transaction.guestName;
     if (amountEl) amountEl.innerText = `R$ ${transaction.totalAmount.toFixed(2)}`;
     if (listEl) listEl.innerText = transaction.listChosen === 'Groom' ? 'Noivo' : 'Noiva';
     if (privacyEl) privacyEl.innerText = transaction.isPublic ? 'Pública' : 'Privada';
     if (textEl) textEl.innerText = transaction.message || '';
+  }
 
+  _populateModalPaymentAndEur(transaction) {
     const paymentMethodEl = document.getElementById('modal-payment-method');
     const eurAmountRow = document.getElementById('modal-eur-amount-row');
     const eurAmountEl = document.getElementById('modal-eur-amount');
@@ -277,7 +287,9 @@ class AdminApp {
         eurAmountRow.classList.add('u-hidden');
       }
     }
+  }
 
+  _populateModalGroupInfo(transaction) {
     const groupIdRow = document.getElementById('modal-group-id-row');
     const groupIdEl = document.getElementById('modal-group-id');
     const groupTotalRow = document.getElementById('modal-group-total-row');
@@ -309,7 +321,10 @@ class AdminApp {
         groupTotalRow.classList.add('u-hidden');
       }
     }
+  }
 
+  _populateModalGifts(transaction) {
+    const giftsListEl = document.getElementById('modal-gifts-list');
     if (giftsListEl) {
       giftsListEl.innerHTML = '';
       if (transaction.items && transaction.items.length > 0) {
@@ -322,9 +337,8 @@ class AdminApp {
         });
       }
     }
-
-    this.messageModal.classList.remove('u-hidden');
   }
+
 
   closeModal() {
     if (this.messageModal) {

@@ -14,7 +14,7 @@ export class PixCheckout {
     this.mbwayView = elements.mbwayView || document.getElementById('mbway-view');
     this.successView = elements.successView;
     this.isProcessing = false;
-    this.exchangeRate = 6.00;
+    this.exchangeRate = 6;
   }
 
   async proceedToPix() {
@@ -105,6 +105,20 @@ export class PixCheckout {
     const eurTotal = Math.max(1, Math.round(rawTotal / this.exchangeRate));
     const adjustedBrlTotal = Math.round(eurTotal * this.exchangeRate);
 
+    this._updateMbWaySummaryDOM(rawTotal, eurTotal, adjustedBrlTotal);
+
+    const groomItems = this.cart.items.filter(item => item.list === 'Groom');
+    const brideItems = this.cart.items.filter(item => item.list === 'Bride');
+    const breakdownEl = document.getElementById('mbway-mixed-breakdown');
+
+    if (groomItems.length > 0 && brideItems.length > 0) {
+      this._updateMbWayBreakdownDOM(eurTotal, groomItems, brideItems, breakdownEl);
+    } else if (breakdownEl) {
+      breakdownEl.classList.add('u-hidden');
+    }
+  }
+
+  _updateMbWaySummaryDOM(rawTotal, eurTotal, adjustedBrlTotal) {
     const displayOriginal = document.getElementById('mbway-original-total');
     if (displayOriginal) {
       displayOriginal.textContent = `R$ ${rawTotal.toFixed(2).replace('.', ',')}`;
@@ -124,36 +138,35 @@ export class PixCheckout {
     if (displayPoints) {
       displayPoints.textContent = `${adjustedBrlTotal} pts`;
     }
+  }
 
-    // Handle mixed items breakdown display
-    const groomItems = this.cart.items.filter(item => item.list === 'Groom');
-    const brideItems = this.cart.items.filter(item => item.list === 'Bride');
-    const breakdownEl = document.getElementById('mbway-mixed-breakdown');
+  _updateMbWayBreakdownDOM(eurTotal, groomItems, brideItems, breakdownEl) {
+    if (breakdownEl) {
+      breakdownEl.classList.remove('u-hidden');
+    }
 
-    if (groomItems.length > 0 && brideItems.length > 0) {
-      if (breakdownEl) breakdownEl.classList.remove('u-hidden');
-      
-      const groomRawBrl = groomItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-      const brideRawBrl = brideItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-      const rawTotalVal = groomRawBrl + brideRawBrl;
-      
-      let groomEur = Math.round(eurTotal * (groomRawBrl / rawTotalVal));
-      if (groomEur === 0 && eurTotal >= 2) {
-        groomEur = 1;
-      } else if (groomEur === eurTotal && eurTotal >= 2) {
-        groomEur = eurTotal - 1;
-      }
-      const brideEur = eurTotal - groomEur;
-      
-      const groomPoints = Math.round(groomEur * this.exchangeRate);
-      const bridePoints = Math.round(brideEur * this.exchangeRate);
-      
-      const groomPointsEl = document.getElementById('mbway-groom-points');
-      const bridePointsEl = document.getElementById('mbway-bride-points');
-      if (groomPointsEl) groomPointsEl.textContent = groomPoints;
-      if (bridePointsEl) bridePointsEl.textContent = bridePoints;
-    } else {
-      if (breakdownEl) breakdownEl.classList.add('u-hidden');
+    const groomRawBrl = groomItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const brideRawBrl = brideItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const rawTotalVal = groomRawBrl + brideRawBrl;
+
+    let groomEur = Math.round(eurTotal * (groomRawBrl / rawTotalVal));
+    if (groomEur === 0 && eurTotal >= 2) {
+      groomEur = 1;
+    } else if (groomEur === eurTotal && eurTotal >= 2) {
+      groomEur = eurTotal - 1;
+    }
+    const brideEur = eurTotal - groomEur;
+
+    const groomPoints = Math.round(groomEur * this.exchangeRate);
+    const bridePoints = Math.round(brideEur * this.exchangeRate);
+
+    const groomPointsEl = document.getElementById('mbway-groom-points');
+    const bridePointsEl = document.getElementById('mbway-bride-points');
+    if (groomPointsEl) {
+      groomPointsEl.textContent = groomPoints;
+    }
+    if (bridePointsEl) {
+      bridePointsEl.textContent = bridePoints;
     }
   }
 
@@ -251,23 +264,12 @@ export class PixCheckout {
     }
 
     if (paymentMethod === 'mbway' && eurAmount !== null && exchangeRate !== null) {
-      if (groomItems.length > 0 && brideItems.length > 0) {
-        const rawTotal = groomBrl + brideBrl;
-        groomEur = Math.round(eurAmount * (groomBrl / rawTotal));
-        if (groomEur === 0 && eurAmount >= 2) {
-          groomEur = 1;
-        } else if (groomEur === eurAmount && eurAmount >= 2) {
-          groomEur = eurAmount - 1;
-        }
-        brideEur = eurAmount - groomEur;
-      } else if (groomItems.length > 0) {
-        groomEur = eurAmount;
-      } else if (brideItems.length > 0) {
-        brideEur = eurAmount;
-      }
+      const split = this._calculateMbWaySplit(eurAmount, groomItems, brideItems, groomBrl, brideBrl);
+      groomEur = split.groomEur;
+      brideEur = split.brideEur;
       
-      groomBrl = groomEur !== null ? Math.round(groomEur * exchangeRate) : 0;
-      brideBrl = brideEur !== null ? Math.round(brideEur * exchangeRate) : 0;
+      groomBrl = groomEur === null ? 0 : Math.round(groomEur * exchangeRate);
+      brideBrl = brideEur === null ? 0 : Math.round(brideEur * exchangeRate);
     }
 
     const buildTransactionPayload = (listChosen, totalAmount, items, eurVal) => {
@@ -305,6 +307,28 @@ export class PixCheckout {
     }
 
     return promises;
+  }
+
+  _calculateMbWaySplit(eurAmount, groomItems, brideItems, groomBrl, brideBrl) {
+    let groomEur = null;
+    let brideEur = null;
+
+    if (groomItems.length > 0 && brideItems.length > 0) {
+      const rawTotal = groomBrl + brideBrl;
+      groomEur = Math.round(eurAmount * (groomBrl / rawTotal));
+      if (groomEur === 0 && eurAmount >= 2) {
+        groomEur = 1;
+      } else if (groomEur === eurAmount && eurAmount >= 2) {
+        groomEur = eurAmount - 1;
+      }
+      brideEur = eurAmount - groomEur;
+    } else if (groomItems.length > 0) {
+      groomEur = eurAmount;
+    } else if (brideItems.length > 0) {
+      brideEur = eurAmount;
+    }
+
+    return { groomEur, brideEur };
   }
 
   _resetFormAndUI() {

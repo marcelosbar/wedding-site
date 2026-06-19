@@ -157,14 +157,14 @@ export class PixCheckout {
     }
   }
 
-  async confirmMbWayTransfer() {
+  async _executeTransferCheckout(confirmMessage, confirmBtnId, getPromisesFn) {
     if (this.isProcessing) return;
     this.isProcessing = true;
 
-    const confirmBtn = document.getElementById('confirm-mbway-transfer-btn');
+    const confirmBtn = document.getElementById(confirmBtnId);
 
     try {
-      const confirmed = await showConfirm('Você está finalizando a sua contribuição. Tem certeza de que já realizou a transferência via MB WAY?');
+      const confirmed = await showConfirm(confirmMessage);
       if (!confirmed) {
         return;
       }
@@ -174,25 +174,17 @@ export class PixCheckout {
         confirmBtn.classList.add('is-loading');
         confirmBtn.textContent = 'Processando...';
       }
+
       const guestName = document.getElementById('guest-name') ? document.getElementById('guest-name').value.trim() : '';
       const messageEl = document.getElementById('guest-message');
       const message = messageEl ? messageEl.value.trim() : '';
       const publicEl = document.getElementById('message-public');
       const isPublic = publicEl ? publicEl.checked : true;
 
-      const rawTotal = this.cart.getTotal();
-      if (rawTotal <= 0) return;
+      const total = this.cart.getTotal();
+      if (total <= 0) return;
 
-      const eurTotal = Math.max(1, Math.round(rawTotal / this.exchangeRate));
-
-      const promises = this._createTransactionPromises(
-        guestName,
-        message,
-        isPublic,
-        'mbway',
-        this.exchangeRate,
-        eurTotal
-      );
+      const promises = getPromisesFn(guestName, message, isPublic, total);
 
       try {
         await Promise.race([
@@ -214,6 +206,24 @@ export class PixCheckout {
         confirmBtn.textContent = 'Já fiz a transferência!';
       }
     }
+  }
+
+  async confirmMbWayTransfer() {
+    return this._executeTransferCheckout(
+      'Você está finalizando a sua contribuição. Tem certeza de que já realizou a transferência via MB WAY?',
+      'confirm-mbway-transfer-btn',
+      (guestName, message, isPublic, total) => {
+        const eurTotal = Math.max(1, Math.round(total / this.exchangeRate));
+        return this._createTransactionPromises(
+          guestName,
+          message,
+          isPublic,
+          'mbway',
+          this.exchangeRate,
+          eurTotal
+        );
+      }
+    );
   }
 
   _createTransactionPromises(guestName, message, isPublic, paymentMethod = 'pix', exchangeRate = null, eurAmount = null) {
@@ -316,55 +326,13 @@ export class PixCheckout {
   }
 
   async confirmTransfer() {
-    if (this.isProcessing) return;
-    this.isProcessing = true;
-
-    const confirmBtn = document.getElementById('confirm-transfer-btn');
-
-    try {
-      const confirmed = await showConfirm('Você está finalizando a sua contribuição. Tem certeza de que já realizou a transferência?');
-      if (!confirmed) {
-        return;
+    return this._executeTransferCheckout(
+      'Você está finalizando a sua contribuição. Tem certeza de que já realizou a transferência?',
+      'confirm-transfer-btn',
+      (guestName, message, isPublic) => {
+        return this._createTransactionPromises(guestName, message, isPublic, 'pix');
       }
-
-      if (confirmBtn) {
-        confirmBtn.disabled = true;
-        confirmBtn.classList.add('is-loading');
-        confirmBtn.textContent = 'Processando...';
-      }
-      const guestName = document.getElementById('guest-name') ? document.getElementById('guest-name').value.trim() : '';
-      const messageEl = document.getElementById('guest-message');
-      const message = messageEl ? messageEl.value.trim() : '';
-      const publicEl = document.getElementById('message-public');
-      const isPublic = publicEl ? publicEl.checked : true;
-
-      const total = this.cart.getTotal();
-
-      if (total <= 0) return;
-
-      const promises = this._createTransactionPromises(guestName, message, isPublic, 'pix');
-
-      try {
-        // Wait for database write or timeout after 4 seconds (forces error if offline/unreachable)
-        await Promise.race([
-          Promise.all(promises),
-          new Promise((_, reject) => setTimeout(() => reject(new Error('Firebase Timeout')), 4000))
-        ]);
-      } catch (e) {
-        console.error('Firebase save error:', e);
-        await showAlert('Houve um problema de conexão ao salvar a sua contribuição. Por favor, tente confirmar novamente. Se o problema persistir, avise os noivos!');
-        return;
-      }
-
-      this._resetFormAndUI();
-    } finally {
-      this.isProcessing = false;
-      if (confirmBtn) {
-        confirmBtn.disabled = false;
-        confirmBtn.classList.remove('is-loading');
-        confirmBtn.textContent = 'Já fiz a transferência!';
-      }
-    }
+    );
   }
 }
 

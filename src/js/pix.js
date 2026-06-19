@@ -220,9 +220,13 @@ export class PixCheckout {
     const groomItems = this.cart.items.filter(item => item.list === 'Groom');
     const brideItems = this.cart.items.filter(item => item.list === 'Bride');
     const promises = [];
-    const groupId = (groomItems.length > 0 && brideItems.length > 0)
-      ? 'group_' + Date.now().toString(36) + '_' + Math.random().toString(36).substr(2, 9)
-      : null;
+    
+    let groupId = null;
+    if (groomItems.length > 0 && brideItems.length > 0) {
+      const array = new Uint32Array(1);
+      globalThis.crypto.getRandomValues(array);
+      groupId = 'group_' + Date.now().toString(36) + '_' + array[0].toString(36);
+    }
 
     let groomEur = null;
     let brideEur = null;
@@ -256,16 +260,16 @@ export class PixCheckout {
       brideBrl = brideEur !== null ? Math.round(brideEur * exchangeRate) : 0;
     }
 
-    if (groomItems.length > 0) {
-      const groomData = {
+    const buildTransactionPayload = (listChosen, totalAmount, items, eurVal) => {
+      const data = {
         guestName,
-        totalAmount: groomBrl,
-        listChosen: 'Groom',
+        totalAmount,
+        listChosen,
         status: 'pending',
         timestamp: new Date().toISOString(),
         message,
         isPublic,
-        items: groomItems.map(item => ({
+        items: items.map(item => ({
           name: item.name,
           price: item.price,
           quantity: item.quantity
@@ -273,39 +277,21 @@ export class PixCheckout {
         paymentMethod
       };
       if (paymentMethod === 'mbway') {
-        groomData.eurAmount = groomEur;
-        groomData.exchangeRate = exchangeRate;
+        data.eurAmount = eurVal;
+        data.exchangeRate = exchangeRate;
       }
       if (groupId) {
-        groomData.groupId = groupId;
+        data.groupId = groupId;
       }
-      promises.push(addDoc(transactionsRef, groomData));
+      return data;
+    };
+
+    if (groomItems.length > 0) {
+      promises.push(addDoc(transactionsRef, buildTransactionPayload('Groom', groomBrl, groomItems, groomEur)));
     }
 
     if (brideItems.length > 0) {
-      const brideData = {
-        guestName,
-        totalAmount: brideBrl,
-        listChosen: 'Bride',
-        status: 'pending',
-        timestamp: new Date().toISOString(),
-        message,
-        isPublic,
-        items: brideItems.map(item => ({
-          name: item.name,
-          price: item.price,
-          quantity: item.quantity
-        })),
-        paymentMethod
-      };
-      if (paymentMethod === 'mbway') {
-        brideData.eurAmount = brideEur;
-        brideData.exchangeRate = exchangeRate;
-      }
-      if (groupId) {
-        brideData.groupId = groupId;
-      }
-      promises.push(addDoc(transactionsRef, brideData));
+      promises.push(addDoc(transactionsRef, buildTransactionPayload('Bride', brideBrl, brideItems, brideEur)));
     }
 
     return promises;

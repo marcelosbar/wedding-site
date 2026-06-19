@@ -11,6 +11,7 @@ This is a wedding website for Lorena and Marcelo featuring an external RSVP link
   - `pnpm dev`: Concurrently starts the Vite development server and the Firebase Emulator Suite (Auth and Firestore).
   - `pnpm run test:integration`: Executes Firestore security rules tests against a temporary emulator instance.
   - `pnpm run preview:secure`: Builds the project and runs it in the full Firebase Emulator suite to verify CSP headers.
+- **Emulator Port Collisions**: Do not run `pnpm run test:integration` while `pnpm dev` is active; the Firestore emulator instances will collide on port `8080`. Always stop the local development server before executing integration tests.
 
 ## Development Constraints
 - **Language**: All source code, comments, variables, and commits must be in **English**. All user-facing UI text (HTML, alerts) must be in **Portuguese (pt-BR)**.

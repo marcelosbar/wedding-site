@@ -17,7 +17,7 @@ service cloud.firestore {
                     && request.auth.token.email_verified == true
                     && request.auth.token.email in get(/databases/$(database)/documents/config/admins).data.emails;
       
-      allow create: if request.resource.data.keys().hasOnly(['guestName', 'totalAmount', 'listChosen', 'status', 'timestamp', 'message', 'isPublic', 'items'])
+      allow create: if request.resource.data.keys().hasOnly(['guestName', 'totalAmount', 'listChosen', 'status', 'timestamp', 'message', 'isPublic', 'items', 'paymentMethod', 'eurAmount', 'exchangeRate', 'groupId'])
                     && request.resource.data.status == 'pending'
                     && request.resource.data.totalAmount is int
                     && request.resource.data.totalAmount > 0
@@ -32,7 +32,11 @@ service cloud.firestore {
                     && request.resource.data.message.size() <= 500
                     && request.resource.data.isPublic is bool
                     && request.resource.data.items is list
-                    && request.resource.data.items.size() <= 50;
+                    && request.resource.data.items.size() <= 50
+                    && (!('paymentMethod' in request.resource.data) || (request.resource.data.paymentMethod is string && (request.resource.data.paymentMethod == 'pix' || request.resource.data.paymentMethod == 'mbway')))
+                    && (!('eurAmount' in request.resource.data) || (request.resource.data.eurAmount is int && request.resource.data.eurAmount > 0))
+                    && (!('exchangeRate' in request.resource.data) || (request.resource.data.exchangeRate is number && request.resource.data.exchangeRate >= 5.50 && request.resource.data.exchangeRate <= 6.50))
+                    && (!('groupId' in request.resource.data) || (request.resource.data.groupId is string && request.resource.data.groupId.size() < 100));
       
       // Only the authorized admins can update
       allow update: if request.auth != null

@@ -32,3 +32,66 @@
 .copy-btn {
   border-radius: 0 var(--radius-md) var(--radius-md) 0;
 }
+
+/* MB WAY Section Specific Styles */
+
+.mbway-summary-card {
+  background: var(--color-surface);
+  border: 1px solid #cdbf9f;
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  box-shadow: var(--shadow-md);
+  text-align: left;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px dashed rgba(205, 191, 159, 0.4);
+  font-size: 0.9rem;
+  color: var(--color-text-main);
+}
+
+.summary-row:last-child {
+  border-bottom: none;
+}
+
+.summary-row.highlight {
+  font-size: 1rem;
+  font-weight: 700;
+  padding: 0.75rem 0;
+}
+
+.summary-row.highlight:nth-last-child(2) {
+  color: var(--color-primary);
+  border-top: 1px solid #cdbf9f;
+  margin-top: 0.25rem;
+}
+
+.summary-row.highlight:last-child {
+  color: var(--color-secondary);
+}
+
+.mbway-instructions {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--color-text-muted);
+  background: rgba(221, 189, 114, 0.15);
+  border-left: 3px solid var(--color-accent);
+  padding: 0.75rem 1rem;
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  text-align: left;
+}
+
+.mbway-explanation {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--color-text-muted);
+  background: rgba(29, 70, 153, 0.08);
+  border-left: 3px solid var(--color-primary);
+  padding: 0.75rem 1rem;
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  text-align: left;
+  margin-bottom: 1.5rem;
+}

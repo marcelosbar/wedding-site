@@ -182,6 +182,46 @@ describe('/transactions — Create', () => {
     await assertFails(addDoc(collection(db, 'transactions'), data));
   });
 
+  it('allows paymentMethod, eurAmount, and exchangeRate when valid', async () => {
+    const db = getUnauthedDb();
+    const data = buildValidTransaction({
+      paymentMethod: 'mbway',
+      eurAmount: 42,
+      exchangeRate: 6.00
+    });
+    await assertSucceeds(addDoc(collection(db, 'transactions'), data));
+  });
+
+  it('rejects invalid paymentMethod', async () => {
+    const db = getUnauthedDb();
+    const data1 = buildValidTransaction({ paymentMethod: 'invalid_method' });
+    const data2 = buildValidTransaction({ paymentMethod: 123 });
+    await assertFails(addDoc(collection(db, 'transactions'), data1));
+    await assertFails(addDoc(collection(db, 'transactions'), data2));
+  });
+
+  it('rejects invalid eurAmount', async () => {
+    const db = getUnauthedDb();
+    const data1 = buildValidTransaction({ eurAmount: -10 });
+    const data2 = buildValidTransaction({ eurAmount: 0 });
+    const data3 = buildValidTransaction({ eurAmount: 15.5 }); // non-int
+    const data4 = buildValidTransaction({ eurAmount: '100' });
+    await assertFails(addDoc(collection(db, 'transactions'), data1));
+    await assertFails(addDoc(collection(db, 'transactions'), data2));
+    await assertFails(addDoc(collection(db, 'transactions'), data3));
+    await assertFails(addDoc(collection(db, 'transactions'), data4));
+  });
+
+  it('rejects invalid exchangeRate', async () => {
+    const db = getUnauthedDb();
+    const data1 = buildValidTransaction({ exchangeRate: 5.49 }); // out of range low
+    const data2 = buildValidTransaction({ exchangeRate: 6.51 }); // out of range high
+    const data3 = buildValidTransaction({ exchangeRate: '6.0' }); // string
+    await assertFails(addDoc(collection(db, 'transactions'), data1));
+    await assertFails(addDoc(collection(db, 'transactions'), data2));
+    await assertFails(addDoc(collection(db, 'transactions'), data3));
+  });
+
   it('rejects empty guestName', async () => {
     const db = getUnauthedDb();
     const data = buildValidTransaction({ guestName: '' });
@@ -262,6 +302,24 @@ describe('/transactions — Create', () => {
   it('rejects non-list items', async () => {
     const db = getUnauthedDb();
     const data = buildValidTransaction({ items: 'not-a-list' });
+    await assertFails(addDoc(collection(db, 'transactions'), data));
+  });
+
+  it('allows optional valid string groupId', async () => {
+    const db = getUnauthedDb();
+    const data = buildValidTransaction({ groupId: 'group_abc123' });
+    await assertSucceeds(addDoc(collection(db, 'transactions'), data));
+  });
+
+  it('rejects non-string groupId', async () => {
+    const db = getUnauthedDb();
+    const data = buildValidTransaction({ groupId: 12345 });
+    await assertFails(addDoc(collection(db, 'transactions'), data));
+  });
+
+  it('rejects too long groupId', async () => {
+    const db = getUnauthedDb();
+    const data = buildValidTransaction({ groupId: 'x'.repeat(101) });
     await assertFails(addDoc(collection(db, 'transactions'), data));
   });
 });

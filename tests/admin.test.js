@@ -20,6 +20,17 @@ vi.mock('../src/js/firebase.js', () => {
   };
 });
 
+const mockShowToast = vi.fn();
+const mockShowConfirm = vi.fn().mockResolvedValue(true);
+const mockShowAlert = vi.fn().mockResolvedValue();
+
+vi.mock('../src/js/utils.js', () => ({
+  escapeHTML: (str) => str,
+  showToast: mockShowToast,
+  showConfirm: mockShowConfirm,
+  showAlert: mockShowAlert,
+}));
+
 vi.mock('firebase/firestore', () => ({
   doc: vi.fn(),
   updateDoc: vi.fn(),
@@ -92,6 +103,16 @@ describe('AdminApp', () => {
         <span id="modal-amount"></span>
         <span id="modal-list"></span>
         <span id="modal-privacy"></span>
+        <span id="modal-payment-method"></span>
+        <div id="modal-eur-amount-row" class="u-hidden">
+          <span id="modal-eur-amount"></span>
+        </div>
+        <div id="modal-group-id-row" class="u-hidden">
+          <span id="modal-group-id"></span>
+        </div>
+        <div id="modal-group-total-row" class="u-hidden">
+          <span id="modal-group-total"></span>
+        </div>
         <div id="modal-gifts-wrapper">
           <ul id="modal-gifts-list"></ul>
         </div>
@@ -107,6 +128,8 @@ describe('AdminApp', () => {
     adminApp.transactions = [];
     adminApp.tableBody.innerHTML = '';
     vi.clearAllMocks();
+    mockShowConfirm.mockReset().mockResolvedValue(true);
+    mockShowAlert.mockReset().mockResolvedValue();
   });
 
   afterEach(() => {
@@ -186,7 +209,7 @@ describe('AdminApp', () => {
 
     await firebaseAuthMock.__triggerAuthStateChange({ email: 'hacker@test.com' });
 
-    expect(alertMock).toHaveBeenCalledWith('Acesso negado. Este e-mail não tem permissão de administrador.');
+    expect(mockShowAlert).toHaveBeenCalledWith('Acesso negado. Este e-mail não tem permissão de administrador.');
     expect(signOut).toHaveBeenCalled();
     expect(adminApp.loggedIn).toBe(false);
     expect(adminApp.loginScreen.style.display).toBe('flex');
@@ -209,7 +232,7 @@ describe('AdminApp', () => {
   it('should handle login error gracefully', async () => {
     signInWithPopup.mockRejectedValueOnce(new Error('Login Failed'));
     await adminApp.login();
-    expect(alertMock).toHaveBeenCalledWith('Falha ao fazer login com o Google.');
+    expect(mockShowAlert).toHaveBeenCalledWith('Falha ao fazer login com o Google.');
   });
 
   it('should call signOut on logout()', async () => {
@@ -252,7 +275,7 @@ describe('AdminApp', () => {
     adminApp.fetchData();
     const errorCallback = globalThis.__mockOnSnapshot.mock.calls[0][2];
     errorCallback(new Error('Permission denied'));
-    expect(alertMock).toHaveBeenCalledWith(expect.stringContaining('Erro ao conectar com Firebase'));
+    expect(mockShowAlert).toHaveBeenCalledWith(expect.stringContaining('Erro ao conectar com Firebase'));
   });
 
   it('should render empty table when no transactions', () => {
@@ -269,26 +292,47 @@ describe('AdminApp', () => {
     expect(adminApp.tableBody.innerHTML).toContain('Rejeitado');
   });
 
-  it('updateStatus should update doc if confirmed', async () => {
-    confirmMock.mockReturnValueOnce(true);
+  it('updateStatus should update doc if confirmed using custom confirm', async () => {
+    mockShowConfirm.mockResolvedValueOnce(true);
+    adminApp.transactions = [
+      { id: '123', guestName: 'Alice', totalAmount: 100, listChosen: 'Groom', status: 'pending' }
+    ];
     await adminApp.updateStatus('123', 'approved');
-    expect(confirmMock).toHaveBeenCalled();
+    expect(mockShowConfirm).toHaveBeenCalled();
     expect(updateDoc).toHaveBeenCalled();
   });
 
-  it('updateStatus should NOT update doc if not confirmed', async () => {
-    confirmMock.mockReturnValueOnce(false);
+  it('updateStatus should NOT update doc if custom confirm returns false', async () => {
+    mockShowConfirm.mockResolvedValueOnce(false);
     updateDoc.mockClear();
+    adminApp.transactions = [
+      { id: '123', guestName: 'Alice', totalAmount: 100, listChosen: 'Groom', status: 'pending' }
+    ];
     await adminApp.updateStatus('123', 'approved');
-    expect(confirmMock).toHaveBeenCalled();
+    expect(mockShowConfirm).toHaveBeenCalled();
     expect(updateDoc).not.toHaveBeenCalled();
   });
 
-  it('updateStatus should handle update errors', async () => {
-    confirmMock.mockReturnValueOnce(true);
+  it('updateStatus should handle update errors with custom alert', async () => {
+    mockShowConfirm.mockResolvedValueOnce(true);
     updateDoc.mockRejectedValueOnce(new Error('Failed'));
+    adminApp.transactions = [
+      { id: '123', guestName: 'Alice', totalAmount: 100, listChosen: 'Groom', status: 'pending' }
+    ];
     await adminApp.updateStatus('123', 'approved');
-    expect(alertMock).toHaveBeenCalledWith('Erro ao atualizar. Verifique as regras do Firebase Firestore.');
+    expect(mockShowAlert).toHaveBeenCalledWith('Erro ao atualizar. Verifique as regras do Firebase Firestore.');
+  });
+
+  it('updateStatus should update all transactions sharing same groupId', async () => {
+    mockShowConfirm.mockResolvedValueOnce(true);
+    updateDoc.mockClear();
+    adminApp.transactions = [
+      { id: 't1', guestName: 'Bob', totalAmount: 120, listChosen: 'Groom', status: 'pending', groupId: 'group_test_123' },
+      { id: 't2', guestName: 'Bob', totalAmount: 80, listChosen: 'Bride', status: 'pending', groupId: 'group_test_123' }
+    ];
+    await adminApp.updateStatus('t1', 'approved');
+    expect(mockShowConfirm).toHaveBeenCalledWith(expect.stringContaining('contribuição conjunta'));
+    expect(updateDoc).toHaveBeenCalledTimes(2);
   });
 
   it('should render configuration error when collection throws', () => {
@@ -416,10 +460,8 @@ describe('AdminApp', () => {
     expect(appWithoutAuth.loggedIn).toBe(false);
 
     // Test login guard with null auth
-    const alertSpy = vi.spyOn(globalThis, 'alert').mockImplementation(() => {});
     await appWithoutAuth.login();
-    expect(alertSpy).toHaveBeenCalledWith(expect.stringContaining('Firebase Auth não está configurado localmente'));
-    alertSpy.mockRestore();
+    expect(mockShowAlert).toHaveBeenCalledWith(expect.stringContaining('Firebase Auth não está configurado localmente'));
 
     // Test logout guard with null auth
     expect(async () => {
@@ -535,6 +577,74 @@ describe('AdminApp', () => {
       
       prevSpy.mockRestore();
       nextSpy.mockRestore();
+    });
+  });
+
+  describe('MB WAY Detail Display in Modal', () => {
+    it('should show PIX as default payment method and hide Euro fields', () => {
+      const transaction = {
+        guestName: 'No Method User',
+        totalAmount: 100,
+        listChosen: 'Groom',
+        isPublic: true,
+        message: 'Congrats!',
+        items: []
+      };
+
+      adminApp.showModal(transaction);
+
+      expect(document.getElementById('modal-payment-method').innerText).toBe('PIX');
+      expect(document.getElementById('modal-eur-amount-row').classList.contains('u-hidden')).toBe(true);
+    });
+
+    it('should show MB WAY details and display converted Euro amount and rate', () => {
+      const transaction = {
+        guestName: 'Portugal User',
+        totalAmount: 102,
+        listChosen: 'Groom',
+        isPublic: true,
+        message: 'Viva!',
+        items: [],
+        paymentMethod: 'mbway',
+        eurAmount: 17,
+        exchangeRate: 6.00
+      };
+
+      adminApp.showModal(transaction);
+
+      expect(document.getElementById('modal-payment-method').innerText).toBe('MB WAY');
+      expect(document.getElementById('modal-eur-amount-row').classList.contains('u-hidden')).toBe(false);
+      expect(document.getElementById('modal-eur-amount').innerText).toBe('€ 17,00 (câmbio R$ 6,00)');
+    });
+
+    it('should show group ID and combined totals in modal if transaction has groupId', () => {
+      adminApp.transactions = [
+        { id: 't1', guestName: 'Bob', totalAmount: 120, listChosen: 'Groom', status: 'pending', groupId: 'group_test_123', paymentMethod: 'mbway', eurAmount: 20 },
+        { id: 't2', guestName: 'Bob', totalAmount: 80, listChosen: 'Bride', status: 'pending', groupId: 'group_test_123', paymentMethod: 'mbway', eurAmount: 13 }
+      ];
+
+      adminApp.showModal(adminApp.transactions[0]);
+
+      expect(document.getElementById('modal-group-id-row').classList.contains('u-hidden')).toBe(false);
+      expect(document.getElementById('modal-group-id').innerHTML).toContain('#T_123');
+      expect(document.getElementById('modal-group-id').innerHTML).toContain('group_test_123');
+      expect(document.getElementById('modal-group-total-row').classList.contains('u-hidden')).toBe(false);
+      expect(document.getElementById('modal-group-total').innerText).toBe('R$ 200,00 | € 33,00');
+    });
+
+    it('should hide group ID and combined totals in modal if transaction does not have groupId', () => {
+      const transaction = {
+        guestName: 'Single User',
+        totalAmount: 100,
+        listChosen: 'Groom',
+        isPublic: true,
+        items: []
+      };
+
+      adminApp.showModal(transaction);
+
+      expect(document.getElementById('modal-group-id-row').classList.contains('u-hidden')).toBe(true);
+      expect(document.getElementById('modal-group-total-row').classList.contains('u-hidden')).toBe(true);
     });
   });
 

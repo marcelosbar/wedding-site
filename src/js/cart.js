@@ -9,6 +9,7 @@ export class Cart {
     this.overlay = elements.overlay;
     this.cartView = elements.cartView;
     this.pixView = elements.pixView;
+    this.mbwayView = elements.mbwayView;
     this.successView = elements.successView;
     this.cartItemsContainer = elements.cartItemsContainer;
     this.cartTotalValue = elements.cartTotalValue;
@@ -393,6 +394,7 @@ export class Cart {
     this.cartView.style.display = 'block';
     this.cartView.classList.add('active');
     this.pixView.classList.remove('active');
+    if (this.mbwayView) this.mbwayView.classList.remove('active');
     this.successView.classList.remove('active');
 
     this._configureBackButton(previousModalId);

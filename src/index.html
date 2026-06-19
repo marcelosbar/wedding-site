@@ -399,6 +399,7 @@
         </div>
 
         <button id="proceed-to-pix-btn" class="btn btn-secondary u-w-full">Finalizar com PIX</button>
+        <button id="proceed-to-mbway-btn" class="btn btn-link u-w-full u-mt-3">Reside em Portugal? Contribua via MB WAY</button>
       </div>
 
       <!-- PIX Payment Section -->
@@ -421,6 +422,53 @@
 
         <button id="confirm-transfer-btn" class="btn btn-accent u-w-full u-mt-4">
           Já fiz a transferência!
+        </button>
+      </div>
+
+      <!-- MB WAY Payment Section -->
+      <div id="mbway-view" class="pix-section">
+        <div class="cart-header">
+          <h3 id="mbway-title" tabindex="-1">Pagamento via MB WAY</h3>
+          <button class="close-btn close-cart-btn" aria-label="Fechar Carrinho">&times;</button>
+        </div>
+        <p class="mbway-explanation">
+          Para simplificar a contagem dos pontos na disputa, aplicamos uma taxa de conversão fixa de <strong>6 pontos por Euro</strong> (1 € = R$ 6,00). Além disso, arredondamos o valor em Euro para facilitar a sua transferência. O valor final enviado em Euros será convertido nos pontos equivalentes no placar.
+        </p>
+
+        <!-- Conversion Transparency Summary Table -->
+        <div class="mbway-summary-card u-mb-4">
+          <div class="summary-row">
+            <span>Valor dos presentes:</span>
+            <span id="mbway-original-total" class="u-font-weight-500">R$ 0,00</span>
+          </div>
+          <div class="summary-row">
+            <span>Câmbio aplicado:</span>
+            <span id="mbway-summary-rate">R$ 6,00</span>
+          </div>
+          <div class="summary-row highlight">
+            <span>Total a enviar (MB WAY):</span>
+            <span id="mbway-eur-total" class="u-font-weight-600">€ 0,00</span>
+          </div>
+          <div class="summary-row highlight">
+            <span>Pontos no Placar:</span>
+            <span id="mbway-points-total" class="u-font-weight-600">0 pts</span>
+          </div>
+          <div id="mbway-mixed-breakdown" class="summary-row u-hidden">
+            <span>Distribuição dos pontos:</span>
+            <span class="u-font-weight-500">Noivo: <span id="mbway-groom-points">0</span> pts | Noiva: <span id="mbway-bride-points">0</span> pts</span>
+          </div>
+        </div>
+
+        <p class="mbway-instructions u-mb-4">
+          Por favor, realize a transferência através da aplicação MB WAY para o número de telemóvel do noivo (o contato que você já possui).
+        </p>
+
+        <button id="confirm-mbway-transfer-btn" class="btn btn-accent u-w-full u-mt-2">
+          Já fiz a transferência!
+        </button>
+
+        <button id="back-to-cart-from-mbway-btn" class="btn btn-link u-w-full u-mt-3">
+          Voltar para o carrinho
         </button>
       </div>
 

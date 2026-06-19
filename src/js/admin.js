@@ -22,7 +22,7 @@ import {
   setPersistence,
   browserSessionPersistence
 } from 'firebase/auth';
-import { escapeHTML } from './utils.js';
+import { escapeHTML, showConfirm, showAlert } from './utils.js';
 
 class AdminApp {
   loggedIn = false;
@@ -121,8 +121,8 @@ class AdminApp {
           this.fetchData();
         } else {
           if (user) {
-            alert('Acesso negado. Este e-mail não tem permissão de administrador.');
-            signOut(auth);
+            await showAlert('Acesso negado. Este e-mail não tem permissão de administrador.');
+            await signOut(auth);
           }
           this.loggedIn = false;
           this.loginScreen.classList.remove('u-hidden');
@@ -142,7 +142,7 @@ class AdminApp {
 
   async login() {
     if (!auth) {
-      alert("Firebase Auth não está configurado localmente. Adicione as chaves no arquivo .env.");
+      await showAlert("Firebase Auth não está configurado localmente. Adicione as chaves no arquivo .env.");
       return;
     }
     try {
@@ -150,7 +150,7 @@ class AdminApp {
       await signInWithPopup(auth, googleProvider);
     } catch (error) {
       console.error("Erro no login com Google", error);
-      alert("Falha ao fazer login com o Google.");
+      await showAlert("Falha ao fazer login com o Google.");
     }
   }
 
@@ -206,9 +206,9 @@ class AdminApp {
         
         this.renderTable();
         this.updatePaginationUI();
-      }, (err) => {
+      }, async (err) => {
         console.error("Firebase fetch error", err);
-        alert("Erro ao conectar com Firebase. Verifique se as regras e configurações estão corretas.");
+        await showAlert("Erro ao conectar com Firebase. Verifique se as regras e configurações estão corretas.");
       });
     } catch (e) {
       console.warn("Firebase not initialized yet.", e);
@@ -257,6 +257,58 @@ class AdminApp {
     if (listEl) listEl.innerText = transaction.listChosen === 'Groom' ? 'Noivo' : 'Noiva';
     if (privacyEl) privacyEl.innerText = transaction.isPublic ? 'Pública' : 'Privada';
     if (textEl) textEl.innerText = transaction.message || '';
+
+    const paymentMethodEl = document.getElementById('modal-payment-method');
+    const eurAmountRow = document.getElementById('modal-eur-amount-row');
+    const eurAmountEl = document.getElementById('modal-eur-amount');
+
+    if (paymentMethodEl) {
+      paymentMethodEl.innerText = transaction.paymentMethod === 'mbway' ? 'MB WAY' : 'PIX';
+    }
+
+    if (eurAmountRow) {
+      if (transaction.paymentMethod === 'mbway' && transaction.eurAmount !== undefined && transaction.eurAmount !== null) {
+        eurAmountRow.classList.remove('u-hidden');
+        if (eurAmountEl) {
+          const rateText = transaction.exchangeRate ? ` (câmbio R$ ${transaction.exchangeRate.toFixed(2).replace('.', ',')})` : '';
+          eurAmountEl.innerText = `€ ${transaction.eurAmount.toFixed(2).replace('.', ',')}${rateText}`;
+        }
+      } else {
+        eurAmountRow.classList.add('u-hidden');
+      }
+    }
+
+    const groupIdRow = document.getElementById('modal-group-id-row');
+    const groupIdEl = document.getElementById('modal-group-id');
+    const groupTotalRow = document.getElementById('modal-group-total-row');
+    const groupTotalEl = document.getElementById('modal-group-total');
+
+    if (groupIdRow && groupTotalRow) {
+      if (transaction.groupId) {
+        groupIdRow.classList.remove('u-hidden');
+        groupTotalRow.classList.remove('u-hidden');
+
+        if (groupIdEl) {
+          const shortCode = transaction.groupId.slice(-5).toUpperCase();
+          groupIdEl.innerHTML = `<span class="group-badge">#${shortCode}</span><span class="group-id-subtext">(${transaction.groupId})</span>`;
+        }
+
+        if (groupTotalEl) {
+          const groupTxs = this.transactions.filter(t => t.groupId === transaction.groupId);
+          const totalBrl = groupTxs.reduce((sum, t) => sum + t.totalAmount, 0);
+
+          if (transaction.paymentMethod === 'mbway') {
+            const totalEur = groupTxs.reduce((sum, t) => sum + (t.eurAmount || 0), 0);
+            groupTotalEl.innerText = `R$ ${totalBrl.toFixed(2).replace('.', ',')} | € ${totalEur.toFixed(2).replace('.', ',')}`;
+          } else {
+            groupTotalEl.innerText = `R$ ${totalBrl.toFixed(2).replace('.', ',')}`;
+          }
+        }
+      } else {
+        groupIdRow.classList.add('u-hidden');
+        groupTotalRow.classList.add('u-hidden');
+      }
+    }
 
     if (giftsListEl) {
       giftsListEl.innerHTML = '';
@@ -361,13 +413,31 @@ class AdminApp {
   }
 
   async updateStatus(id, newStatus) {
-    if (confirm(`Tem certeza que deseja marcar como ${newStatus === 'approved' ? 'Aprovado' : 'Rejeitado'}?`)) {
+    const targetTx = this.transactions.find(t => t.id === id);
+    if (!targetTx) return;
+
+    const groupId = targetTx.groupId;
+    let txsToUpdate = [targetTx];
+    let confirmMsg = `Tem certeza que deseja marcar como ${newStatus === 'approved' ? 'Aprovado' : 'Rejeitado'}?`;
+
+    if (groupId) {
+      const grouped = this.transactions.filter(t => t.groupId === groupId && t.status !== newStatus);
+      if (grouped.length > 1) {
+        txsToUpdate = grouped;
+        confirmMsg = `Esta transação faz parte de uma contribuição conjunta. Tem certeza que deseja marcar as ${grouped.length} transações associadas como ${newStatus === 'approved' ? 'Aprovadas' : 'Rejeitadas'}?`;
+      }
+    }
+
+    if (await showConfirm(confirmMsg)) {
       try {
-        const docRef = doc(db, "transactions", id);
-        await updateDoc(docRef, { status: newStatus });
+        const promises = txsToUpdate.map(t => {
+          const docRef = doc(db, "transactions", t.id);
+          return updateDoc(docRef, { status: newStatus });
+        });
+        await Promise.all(promises);
       } catch (e) {
         console.error("Erro ao atualizar status", e);
-        alert("Erro ao atualizar. Verifique as regras do Firebase Firestore.");
+        await showAlert("Erro ao atualizar. Verifique as regras do Firebase Firestore.");
       }
     }
   }

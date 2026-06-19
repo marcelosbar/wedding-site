@@ -44,6 +44,19 @@ function setupDOM() {
     <div id="pix-view">
       <h3 id="pix-title" tabindex="-1">Pagamento via PIX</h3>
     </div>
+    <div id="mbway-view">
+      <h3 id="mbway-title" tabindex="-1">Pagamento via MB WAY</h3>
+      <span id="mbway-original-total"></span>
+      <span id="mbway-summary-rate"></span>
+      <span id="mbway-eur-total"></span>
+      <span id="mbway-points-total"></span>
+      <div id="mbway-mixed-breakdown" class="u-hidden">
+        <span id="mbway-groom-points"></span>
+        <span id="mbway-bride-points"></span>
+      </div>
+      <button id="confirm-mbway-transfer-btn"></button>
+      <button id="back-to-cart-from-mbway-btn"></button>
+    </div>
     <div id="success-view">
       <h3 id="success-title" tabindex="-1">Muito Obrigado!</h3>
     </div>
@@ -75,6 +88,7 @@ function createInstances() {
     overlay: document.getElementById('cart-overlay'),
     cartView: document.getElementById('cart-view'),
     pixView: document.getElementById('pix-view'),
+    mbwayView: document.getElementById('mbway-view'),
     successView: document.getElementById('success-view'),
     cartItemsContainer: document.getElementById('cart-items-container'),
     cartTotalValue: document.getElementById('cart-total-value'),
@@ -300,6 +314,8 @@ describe('PixCheckout', () => {
       { name: 'Groom Gift 1', price: 100, quantity: 1 },
       { name: 'Groom Gift 2', price: 150, quantity: 1 }
     ]);
+    expect(call1Args.groupId).toBeDefined();
+    expect(call1Args.groupId).toMatch(/^group_/);
 
     const call2Args = addDoc.mock.calls[1][1];
     expect(call2Args.listChosen).toBe('Bride');
@@ -310,6 +326,7 @@ describe('PixCheckout', () => {
     expect(call2Args.items).toEqual([
       { name: 'Bride Gift 1', price: 200, quantity: 1 }
     ]);
+    expect(call2Args.groupId).toBe(call1Args.groupId);
   });
 
   it('should return early on confirmTransfer if cart total is 0', async () => {
@@ -386,6 +403,128 @@ describe('PixCheckout', () => {
     expect(document.getElementById('success-view').classList.contains('active')).toBe(false);
     expect(cart.items.length).toBe(1); // Cart remains intact
     
+    vi.useRealTimers();
+  });
+
+  it('should alert if guest name is empty in proceedToMbWay', async () => {
+    const nameError = document.getElementById('guest-name-error');
+    expect(nameError.classList.contains('u-hidden')).toBe(true);
+
+    document.getElementById('guest-name').value = '';
+    pix.proceedToMbWay();
+
+    expect(nameError.classList.contains('u-hidden')).toBe(false);
+  });
+
+  it('should switch to MB Way view and render default values', () => {
+    document.getElementById('guest-name').value = 'Maria';
+    cart.addToCart('Groom', 'Gift A', 100); // R$ 100
+    pix.proceedToMbWay();
+
+    expect(document.getElementById('mbway-view').classList.contains('active')).toBe(true);
+    expect(document.getElementById('mbway-original-total').textContent).toBe('R$ 100,00');
+    expect(document.getElementById('mbway-eur-total').textContent).toBe('€ 17,00'); // round(100 / 6) = 17
+    expect(document.getElementById('mbway-points-total').textContent).toBe('102 pts'); // 17 * 6 = 102
+  });
+
+
+  it('should render mixed items points breakdown in MB Way view', () => {
+    document.getElementById('guest-name').value = 'Ana';
+    cart.addToCart('Groom', 'Gift Groom', 150); // R$ 150
+    cart.addToCart('Bride', 'Gift Bride', 100); // R$ 100
+    pix.proceedToMbWay();
+
+    expect(document.getElementById('mbway-mixed-breakdown').classList.contains('u-hidden')).toBe(false);
+    expect(document.getElementById('mbway-groom-points').textContent).toBe('150');
+    expect(document.getElementById('mbway-bride-points').textContent).toBe('102');
+  });
+
+  it('should confirm MB Way transfer successfully and save correct fields', async () => {
+    const { addDoc } = await import('../src/js/firebase.js');
+    addDoc.mockClear();
+
+    document.getElementById('guest-name').value = 'Manuel';
+    document.getElementById('guest-message').value = 'Felicidades!';
+    cart.addToCart('Groom', 'Gift', 150); // R$ 150 -> € 25 at rate 6.00 -> R$ 150
+
+    await pix.confirmMbWayTransfer();
+
+    expect(mockShowConfirm).toHaveBeenCalledWith('Você está finalizando a sua contribuição. Tem certeza de que já realizou a transferência via MB WAY?');
+    expect(addDoc).toHaveBeenCalled();
+    const callArgs = addDoc.mock.calls[0][1];
+    expect(callArgs.guestName).toBe('Manuel');
+    expect(callArgs.message).toBe('Felicidades!');
+    expect(callArgs.paymentMethod).toBe('mbway');
+    expect(callArgs.eurAmount).toBe(25);
+    expect(callArgs.exchangeRate).toBe(6.00);
+    expect(callArgs.totalAmount).toBe(150); // 25 * 6.00 = 150
+
+    expect(document.getElementById('success-view').classList.contains('active')).toBe(true);
+    expect(cart.items.length).toBe(0); // reset
+  });
+
+  it('should handle mixed items with correct proportional BRL/EUR splitting on confirmMbWayTransfer', async () => {
+    const { addDoc } = await import('../src/js/firebase.js');
+    addDoc.mockClear();
+
+    document.getElementById('guest-name').value = 'Ana';
+    cart.addToCart('Groom', 'Gift Groom', 150); // R$ 150
+    cart.addToCart('Bride', 'Gift Bride', 100); // R$ 100
+    // Total raw BRL: 250 -> € 42 at rate 6.00.
+    // Proportional split: Groom gets round(42 * 150/250) = round(25.2) = 25 EUR.
+    // Bride gets 42 - 25 = 17 EUR.
+    // Groom adjusted BRL: 25 * 6 = 150 BRL.
+    // Bride adjusted BRL: 17 * 6 = 102 BRL.
+
+    await pix.confirmMbWayTransfer();
+
+    expect(addDoc).toHaveBeenCalledTimes(2);
+
+    const call1 = addDoc.mock.calls.find(call => call[1].listChosen === 'Groom')[1];
+    const call2 = addDoc.mock.calls.find(call => call[1].listChosen === 'Bride')[1];
+
+    expect(call1.eurAmount).toBe(25);
+    expect(call1.totalAmount).toBe(150);
+    expect(call1.paymentMethod).toBe('mbway');
+    expect(call1.groupId).toBeDefined();
+    expect(call1.groupId).toMatch(/^group_/);
+
+    expect(call2.eurAmount).toBe(17);
+    expect(call2.totalAmount).toBe(102);
+    expect(call2.paymentMethod).toBe('mbway');
+    expect(call2.groupId).toBe(call1.groupId);
+  });
+
+  it('should NOT proceed on confirmMbWayTransfer if user cancels', async () => {
+    mockShowConfirm.mockResolvedValueOnce(false);
+    const { addDoc } = await import('../src/js/firebase.js');
+    addDoc.mockClear();
+
+    document.getElementById('guest-name').value = 'Cancel MB Way';
+    cart.addToCart('Groom', 'Gift', 150);
+
+    await pix.confirmMbWayTransfer();
+
+    expect(addDoc).not.toHaveBeenCalled();
+    expect(document.getElementById('success-view').classList.contains('active')).toBe(false);
+  });
+
+  it('should alert on confirmMbWayTransfer timeout', async () => {
+    const { addDoc } = await import('../src/js/firebase.js');
+    addDoc.mockReturnValueOnce(new Promise(() => {}));
+
+    vi.useFakeTimers();
+
+    document.getElementById('guest-name').value = 'Timeout MB Way';
+    cart.addToCart('Groom', 'Gift', 150);
+
+    const p = pix.confirmMbWayTransfer();
+    await vi.advanceTimersByTimeAsync(4000);
+    await p;
+
+    expect(mockShowAlert).toHaveBeenCalledWith('Houve um problema de conexão ao salvar a sua contribuição. Por favor, tente confirmar novamente. Se o problema persistir, avise os noivos!');
+    expect(document.getElementById('success-view').classList.contains('active')).toBe(false);
+
     vi.useRealTimers();
   });
 });

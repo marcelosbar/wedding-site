@@ -12,6 +12,8 @@ This is a wedding website for Lorena and Marcelo featuring an external RSVP link
   - `pnpm run test:integration`: Executes Firestore security rules tests against a temporary emulator instance.
   - `pnpm run preview:secure`: Builds the project and runs it in the full Firebase Emulator suite to verify CSP headers.
 - **Emulator Port Collisions**: Do not run `pnpm run test:integration` while `pnpm dev` is active; the Firestore emulator instances will collide on port `8080`. Always stop the local development server before executing integration tests.
+- **CI/CD Pipeline Monitoring**: The GitHub Actions pipeline typically takes 3 minutes to complete. When monitoring PR checks, schedule timers for at least 180 seconds (3 minutes) to avoid premature/unnecessary checkups.
+
 
 ## Development Constraints
 - **Language**: All source code, comments, variables, and commits must be in **English**. All user-facing UI text (HTML, alerts) must be in **Portuguese (pt-BR)**.

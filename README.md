@@ -64,13 +64,7 @@ pnpm run preview:secure
 ```
 This builds the site and starts the full Firebase Emulator suite (including the Hosting emulator on port 5000). Visit `http://localhost:5000/admin.html` to verify security compliance.
 
-### 7. Mobile LAN Testing (Optional)
-To test the website on your physical mobile device on the same local network:
-- The Firebase Emulators are configured to bind to `0.0.0.0` (all network interfaces).
-- Open your browser and navigate to `http://<your-computer-ip>:5173/`.
-- The application automatically detects that it is running on a LAN/private IP and resolves connection URLs to your computer's local IP address so database interactions work seamlessly on mobile.
-
-### 8. Seeding Mock Messages (Optional)
+### 7. Seeding Mock Messages (Optional)
 To populate your local Firestore emulator with a set of mock guest messages (ideal for testing the messages carousel):
 ```bash
 node scripts/seed-messages.mjs

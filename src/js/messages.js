@@ -277,8 +277,8 @@ export class MessagesCarousel {
    * triggering the text counter instead of individual dots.
    */
   _shouldUseCounter() {
-    return typeof window !== 'undefined'
-      && window.innerWidth <= 768
+    return typeof globalThis.window !== 'undefined'
+      && globalThis.window.innerWidth <= 768
       && this.messages.length > 8;
   }
 
@@ -461,7 +461,7 @@ export class MessagesCarousel {
     this.progressBarEl.style.transition = 'none';
     this.progressBarEl.style.width = '0%';
     // Force reflow so the reset takes effect before animating
-    void this.progressBarEl.getBoundingClientRect();
+    this.progressBarEl.getBoundingClientRect();
     this.progressBarEl.style.transition = `width ${duration}ms linear`;
     this.progressBarEl.style.width = '100%';
   }
@@ -473,7 +473,7 @@ export class MessagesCarousel {
     if (!this.progressBarEl) return;
     const currentWidth = getComputedStyle(this.progressBarEl).width;
     const parentWidth = this.progressBarEl.parentElement?.offsetWidth || 1;
-    const pct = (parseFloat(currentWidth) / parentWidth) * 100;
+    const pct = (Number.parseFloat(currentWidth) / parentWidth) * 100;
     this.progressBarEl.style.transition = 'none';
     this.progressBarEl.style.width = `${pct}%`;
   }
@@ -483,7 +483,7 @@ export class MessagesCarousel {
    */
   _resumeProgressBar(remaining) {
     if (!this.progressBarEl) return;
-    void this.progressBarEl.getBoundingClientRect();
+    this.progressBarEl.getBoundingClientRect();
     this.progressBarEl.style.transition = `width ${remaining}ms linear`;
     this.progressBarEl.style.width = '100%';
   }

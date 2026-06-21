@@ -1,5 +1,7 @@
 # Static Assets and Performance Optimization
 
+This document covers how static assets (images, videos) are managed in this project: CDN hosting via ImageKit.io, responsive transformation conventions, and rules for local vs. production assets.
+
 To prevent Firebase Hosting bandwidth exhaustion and ensure fast page load times, high-resolution static images are hosted on a CDN and loaded with responsive transformations.
 
 ## 1. CDN Hosting (ImageKit.io)

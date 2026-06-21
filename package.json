@@ -20,7 +20,7 @@
     "@firebase/rules-unit-testing": "^5.0.1",
     "@vitest/coverage-v8": "^4.1.8",
     "concurrently": "^10.0.3",
-    "firebase-tools": "^15.20.0",
+    "firebase-tools": "^15.22.0",
     "jsdom": "^29.1.1",
     "vite": "^8.0.16",
     "vitest": "^4.1.8"
@@ -28,5 +28,11 @@
   "dependencies": {
     "firebase": "^12.14.0",
     "qrcode": "^1.5.4"
+  },
+  "pnpm": {
+    "overrides": {
+      "//": "Security overrides for transitive deps that upstream hasn't updated yet. Remove each entry once `pnpm why <pkg>` no longer shows vulnerable versions without it.",
+      "uuid": ">=11.1.1"
+    }
   }
 }

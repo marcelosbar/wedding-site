@@ -3,9 +3,9 @@
 This document outlines the visual system, style constraints, and responsiveness behaviors for components.
 
 ## 1. Visual Identity
-- **Styling Method**: Use Vanilla CSS written in [style.css](file:///C:/Users/marce/.gemini/antigravity/worktrees/wedding-site/refactor-agents-progressive-disclosure/src/css/style.css).
+- **Styling Method**: Use Vanilla CSS written in [style.css](../src/css/style.css).
 - **No Tailwind CSS**: Do not use Tailwind CSS. Maintain styling in the Vanilla CSS system.
-- **Styling Limits**: Inline styles are strictly prohibited (never use `style="..."` attributes or `<style>` blocks in HTML; always use CSS classes).
+- **No Inline Styles**: `style="..."` attributes and `<style>` blocks in HTML are prohibited by the project's Content Security Policy — see [security.md](security.md) for details. Always use CSS classes.
 - **Color Palette**: Maintain the established theme colors: Blue, Orange, Yellow, and White.
 - **Design Language**: Keep design premium with modern elements like glassmorphism (translucent, blurred backdrops using `backdrop-filter: blur()`), CSS variables, and a mix of `Inter` and `Playfair Display` typography.
 

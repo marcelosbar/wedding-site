@@ -98,21 +98,27 @@
   -webkit-backdrop-filter: blur(7px) saturate(1.05);
   border-radius: 3px;
   box-shadow: 0 24px 60px -18px rgba(22, 48, 107, 0.4);
-  /* moldura azulejo nos 4 cantos */
-  background-image:
-    var(--corner-tl), var(--corner-tr), var(--corner-bl), var(--corner-br),
-    linear-gradient(rgba(252, 250, 244, 0.86), rgba(252, 250, 244, 0.86));
-  background-position: top 8px left 9px, top 8px right 9px, bottom 8px left 9px, bottom 8px right 9px, center;
-  background-repeat: no-repeat;
-  background-size: 58px 58px, 58px 58px, 58px 58px, 58px 58px, cover;
 }
-.hero-content::after {
+/* Moldura linha azul interna */
+.hero-content::before {
   content: '';
   position: absolute;
   inset: 16px;
   border: 1.5px solid var(--color-primary);
   border-radius: 2px;
   pointer-events: none;
+}
+/* Moldura azulejo nos 4 cantos (renderizada por cima da linha azul) */
+.hero-content::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    var(--corner-tl), var(--corner-tr), var(--corner-bl), var(--corner-br);
+  background-position: top 8px left 9px, top 8px right 9px, bottom 8px left 9px, bottom 8px right 9px;
+  background-repeat: no-repeat;
+  background-size: 58px 58px, 58px 58px, 58px 58px, 58px 58px;
 }
 
 /* Nome do casal em caligrafia — protagonista */
@@ -338,10 +344,12 @@ body.art-mode-active #hero .hero-bg-img {
   .hero-intro-accent { font-size: 1.05em; }
   .hero-content {
     padding: 2.75rem 1.6rem 2.5rem;
-    background-size: 44px 44px, 44px 44px, 44px 44px, 44px 44px, cover;
-    background-position: top 6px left 7px, top 6px right 7px, bottom 6px left 7px, bottom 6px right 7px, center;
   }
-  .hero-content::after { inset: 12px; }
+  .hero-content::before { inset: 12px; }
+  .hero-content::after {
+    background-size: 44px 44px, 44px 44px, 44px 44px, 44px 44px;
+    background-position: top 6px left 7px, top 6px right 7px, bottom 6px left 7px, bottom 6px right 7px;
+  }
 
   /* Proporção tipográfica corrigida para mobile/tablet */
   .hero-content h1 {
@@ -365,11 +373,13 @@ body.art-mode-active #hero .hero-bg-img {
   }
   .hero-content {
     padding: 2.25rem 2rem 2rem;
-    background-size: 44px 44px, 44px 44px, 44px 44px, 44px 44px, cover;
-    background-position: top 6px left 7px, top 6px right 7px, bottom 6px left 7px, bottom 6px right 7px, center;
+  }
+  .hero-content::before {
+    inset: 12px;
   }
   .hero-content::after {
-    inset: 12px;
+    background-size: 44px 44px, 44px 44px, 44px 44px, 44px 44px;
+    background-position: top 6px left 7px, top 6px right 7px, bottom 6px left 7px, bottom 6px right 7px;
   }
   .hero-content h1 {
     font-size: clamp(3.8rem, 10vh, 4.8rem);

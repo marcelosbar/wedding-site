@@ -1,26 +1,11 @@
 # Testing and Quality Assurance
 
-This document details the testing framework, test coverage standards, and SonarQube code quality requirements for the project.
+This document covers the testing frameworks (Vitest), coverage requirements, and code quality standards (SonarQube) for the project.
 
 ## 1. Testing Frameworks
-The project uses **Vitest** for testing, structured into two types of tests:
-- **Unit Tests**: Executed in a browser-like environment using **JSDOM**.
-  - Configured in [vite.config.js](file:///C:/Users/marce/.gemini/antigravity/worktrees/wedding-site/refactor-agents-progressive-disclosure/vite.config.js).
-  - Executed via:
-    ```bash
-    pnpm run test
-    ```
-  - Executed in interactive watch mode via:
-    ```bash
-    pnpm run test:watch
-    ```
-- **Integration Tests**: Executed in a Node environment against local Firestore rules.
-  - Configured in [vitest.integration.config.js](file:///C:/Users/marce/.gemini/antigravity/worktrees/wedding-site/refactor-agents-progressive-disclosure/vitest.integration.config.js).
-  - Requires **Java (JDK/JRE 8+)** installed locally to run the Firebase Emulator Suite.
-  - Executed via:
-    ```bash
-    pnpm run test:integration
-    ```
+The project uses **Vitest** for all testing:
+- **Unit Tests**: Run in a JSDOM browser-like environment. Configured in [vite.config.js](../vite.config.js). Use `pnpm test` (single run) or `pnpm test:watch` (interactive).
+- **Integration Tests**: Run in Node against the local Firestore Emulator. Configured in [vitest.integration.config.js](../vitest.integration.config.js). Requires **Java (JDK/JRE 8+)**. Use `pnpm test:integration` — never while `pnpm dev` is running (port collision on 8080).
 
 ## 2. Coverage Requirements
 To satisfy the SonarCloud Quality Gate in CI/CD (GitHub Actions), we enforce strict coverage requirements:

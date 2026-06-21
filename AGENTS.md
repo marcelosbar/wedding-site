@@ -1,6 +1,6 @@
 # Agent Instructions
 
-This document is the primary entrypoint of instructions for AI Agents working on this project.
+This document contains only the essential, day-to-day information needed to work on this project: stack overview, commands, and hard constraints. It is intentionally concise. Topic-specific details (security rules, testing, assets, dependencies) live in the `docs/` guides listed at the bottom — read those only when working on the relevant area.
 
 ## Project Overview
 This is a wedding website for Lorena and Marcelo featuring an external RSVP link and a "Honeymoon Competition" scoreboard (Disney vs. Cote D'Azur).
@@ -15,8 +15,6 @@ This is a wedding website for Lorena and Marcelo featuring an external RSVP link
 - **CI/CD Pipeline Monitoring**: The GitHub Actions pipeline typically takes 3 minutes to complete. When monitoring PR checks, schedule timers for at least 180 seconds (3 minutes) to avoid premature/unnecessary checkups.
 - **Seeding Test Data**: Use `node scripts/seed-messages.mjs` to seed the local emulator with guest messages for testing the carousel.
 
-
-
 ## Development Constraints
 - **Language**: All source code, comments, variables, and commits must be in **English**. All user-facing UI text (HTML, alerts) must be in **Portuguese (pt-BR)**.
 - **Frontend**: Vanilla HTML, CSS, and JS. Do not introduce JS frameworks (React, Vue) or Tailwind CSS.
@@ -25,8 +23,9 @@ This is a wedding website for Lorena and Marcelo featuring an external RSVP link
 - **Database & Previews**: The production Firebase API key has strict HTTP Referrer restrictions. The `*.web.app/*` wildcard is explicitly blocked to protect production integrity, and no separate staging project has been created yet. As a result, database operations (Firestore, Auth, Installations) will fail with 403 Forbidden in PR preview URLs. All database features must be tested locally using the Firebase Emulator Suite.
 
 ## Topic-Specific Guides
-Refer to the following documents for comprehensive technical standards:
-- [Security & Firebase Rules](file:///C:/Users/marce/.gemini/antigravity/worktrees/wedding-site/refactor-agents-progressive-disclosure/docs/security.md): Detailed CSP constraints, Firestore security rules validation, and admin verification.
-- [Testing & Quality Assurance](file:///C:/Users/marce/.gemini/antigravity/worktrees/wedding-site/refactor-agents-progressive-disclosure/docs/testing.md): Unit and integration tests, code coverage targets, and SonarQube CLI parameters.
-- [Static Assets & CDN Management](file:///C:/Users/marce/.gemini/antigravity/worktrees/wedding-site/refactor-agents-progressive-disclosure/docs/assets.md): ImageKit.io CDN integration, responsive size transformations, and local assets directory rules.
-- [UI & Responsive Design](file:///C:/Users/marce/.gemini/antigravity/worktrees/wedding-site/refactor-agents-progressive-disclosure/docs/ui_design.md): Vanilla CSS theme details, script font adjustments, viewport height scaling, and modal stacking indexes.
+Read these documents when working on the specific area — do not read them all upfront.
+- [Security & Firebase Rules](docs/security.md): Read when changing CSP, Firestore rules, admin auth, or Cloud Functions data flow.
+- [Dependencies & Security Alerts](docs/dependencies.md): Read when handling Dependabot alerts, updating transitive dependencies, or managing `pnpm.overrides`.
+- [Testing & Quality Assurance](docs/testing.md): Read when writing or running tests, checking coverage targets, or using SonarQube.
+- [Static Assets & CDN Management](docs/assets.md): Read when adding or updating images, videos, or any CDN-hosted assets.
+- [UI & Responsive Design](docs/ui_design.md): Read when changing layout, CSS theme tokens, fonts, modals, or viewport scaling.

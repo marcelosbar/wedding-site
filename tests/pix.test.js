@@ -49,7 +49,11 @@ function setupDOM() {
       <span id="mbway-original-total"></span>
       <span id="mbway-summary-rate"></span>
       <span id="mbway-eur-total"></span>
+      <span id="mbway-eur-instruction-total"></span>
+      <span id="mbway-eur-checkout-total"></span>
       <span id="mbway-points-total"></span>
+      <span id="mbway-footnote-original"></span>
+      <span id="mbway-footnote-points"></span>
       <div id="mbway-mixed-breakdown" class="u-hidden">
         <span id="mbway-groom-points"></span>
         <span id="mbway-bride-points"></span>
@@ -424,6 +428,7 @@ describe('PixCheckout', () => {
     expect(document.getElementById('mbway-view').classList.contains('active')).toBe(true);
     expect(document.getElementById('mbway-original-total').textContent).toBe('R$ 100,00');
     expect(document.getElementById('mbway-eur-total').textContent).toBe('€ 17,00'); // round(100 / 6) = 17
+    expect(document.getElementById('mbway-eur-instruction-total').textContent).toBe('€ 17,00');
     expect(document.getElementById('mbway-points-total').textContent).toBe('102 pts'); // 17 * 6 = 102
   });
 

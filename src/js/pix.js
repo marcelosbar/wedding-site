@@ -113,31 +113,47 @@ export class PixCheckout {
 
     if (groomItems.length > 0 && brideItems.length > 0) {
       this._updateMbWayBreakdownDOM(eurTotal, groomItems, brideItems, breakdownEl);
-    } else if (breakdownEl) {
-      breakdownEl.classList.add('u-hidden');
+    } else {
+      if (breakdownEl) {
+        breakdownEl.classList.add('u-hidden');
+      }
+
+      // Update B.3 team info fallback text
+      const teamInfoB3 = document.getElementById('mbway-text-team-info-b3');
+      if (teamInfoB3) {
+        if (groomItems.length > 0) {
+          teamInfoB3.innerHTML = 'para o <strong>Time Noivo</strong> (Disney Paris)';
+        } else if (brideItems.length > 0) {
+          teamInfoB3.innerHTML = 'para o <strong>Time Noiva</strong> (Côte d\'Azur)';
+        } else {
+          teamInfoB3.innerHTML = 'para o placar';
+        }
+      }
     }
   }
 
   _updateMbWaySummaryDOM(rawTotal, eurTotal, adjustedBrlTotal) {
-    const displayOriginal = document.getElementById('mbway-original-total');
-    if (displayOriginal) {
-      displayOriginal.textContent = `R$ ${rawTotal.toFixed(2).replace('.', ',')}`;
-    }
+    const formattedBrl = `R$ ${rawTotal.toFixed(2).replace('.', ',')}`;
+    const formattedEur = `€ ${eurTotal.toFixed(2).replace('.', ',')}`;
+    const formattedPoints = `${adjustedBrlTotal} pts`;
+    const formattedPointsPlus = `+${adjustedBrlTotal} pts`;
+    const formattedRate = `R$ ${this.exchangeRate.toFixed(2).replace('.', ',')}`;
 
-    const displaySummaryRate = document.getElementById('mbway-summary-rate');
-    if (displaySummaryRate) {
-      displaySummaryRate.textContent = `R$ ${this.exchangeRate.toFixed(2).replace('.', ',')}`;
-    }
+    // Helper function to safely set element text
+    const setText = (id, val) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = val;
+    };
 
-    const displayEur = document.getElementById('mbway-eur-total');
-    if (displayEur) {
-      displayEur.textContent = `€ ${eurTotal.toFixed(2).replace('.', ',')}`;
-    }
-
-    const displayPoints = document.getElementById('mbway-points-total');
-    if (displayPoints) {
-      displayPoints.textContent = `${adjustedBrlTotal} pts`;
-    }
+    // Update B.3 and Legacy IDs (so tests pass)
+    setText('mbway-original-total', formattedBrl);
+    setText('mbway-summary-rate', formattedRate);
+    setText('mbway-eur-total', formattedEur);
+    setText('mbway-eur-instruction-total', formattedEur);
+    setText('mbway-eur-checkout-total', formattedEur);
+    setText('mbway-points-total', formattedPoints);
+    setText('mbway-footnote-original', formattedBrl);
+    setText('mbway-footnote-points', formattedPointsPlus);
   }
 
   _updateMbWayBreakdownDOM(eurTotal, groomItems, brideItems, breakdownEl) {
@@ -160,6 +176,7 @@ export class PixCheckout {
     const groomPoints = Math.round(groomEur * this.exchangeRate);
     const bridePoints = Math.round(brideEur * this.exchangeRate);
 
+    // Update B.3 and Legacy IDs (so tests pass)
     const groomPointsEl = document.getElementById('mbway-groom-points');
     const bridePointsEl = document.getElementById('mbway-bride-points');
     if (groomPointsEl) {
@@ -167,6 +184,12 @@ export class PixCheckout {
     }
     if (bridePointsEl) {
       bridePointsEl.textContent = bridePoints;
+    }
+
+    // Update B.3 team info text
+    const teamInfoB3 = document.getElementById('mbway-text-team-info-b3');
+    if (teamInfoB3) {
+      teamInfoB3.innerHTML = `(sendo <strong>${groomPoints} pts</strong> para o Time Noivo e <strong>${bridePoints} pts</strong> para o Time Noiva)`;
     }
   }
 

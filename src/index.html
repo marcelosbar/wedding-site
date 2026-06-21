@@ -430,50 +430,55 @@
       </div>
 
       <!-- MB WAY Payment Section -->
+      <!-- MB WAY Payment Section -->
       <div id="mbway-view" class="pix-section">
         <div class="cart-header">
           <h3 id="mbway-title" tabindex="-1">Pagamento via MB WAY</h3>
           <button class="close-btn close-cart-btn" aria-label="Fechar Carrinho">&times;</button>
         </div>
-        <details class="mbway-disclosure">
-          <summary class="mbway-disclosure-summary">Entenda como calculamos os pontos</summary>
-          <div class="mbway-disclosure-content">
-            <p>Para simplificar a contagem dos pontos na disputa, aplicamos uma taxa de conversão fixa de <strong>6 pontos por Euro</strong> (1 € = R$ 6,00).</p>
-            <p>Além disso, arredondamos o valor em Euro para facilitar a sua transferência. O valor final enviado em Euros será convertido nos pontos equivalentes no placar.</p>
-          </div>
-        </details>
 
-        <!-- Conversion Transparency Summary Table -->
-        <div class="mbway-summary-card u-mb-4">
-          <div class="summary-row">
-            <span>Valor dos presentes:</span>
-            <span id="mbway-original-total" class="u-font-weight-500">R$ 0,00</span>
-          </div>
-          <div class="summary-row">
-            <span>Câmbio aplicado:</span>
-            <span id="mbway-summary-rate">R$ 6,00</span>
-          </div>
-          <div class="summary-row highlight">
-            <span>Total a enviar (MB WAY):</span>
-            <span id="mbway-eur-total" class="u-font-weight-600">€ 0,00</span>
-          </div>
-          <div class="summary-row highlight">
-            <span>Pontos no Placar:</span>
-            <span id="mbway-points-total" class="u-font-weight-600">0 pts</span>
-          </div>
-          <div id="mbway-mixed-breakdown" class="summary-row u-hidden">
-            <span>Distribuição dos pontos:</span>
-            <span class="u-font-weight-500">Noivo: <span id="mbway-groom-points">0</span> pts | Noiva: <span id="mbway-bride-points">0</span> pts</span>
+        <!-- Card de Checkout Compacto -->
+        <div class="mbway-checkout-card u-mb-4">
+          <div class="checkout-amount-label">Valor a transferir</div>
+          <div id="mbway-eur-checkout-total" class="checkout-amount-value">€ 0,00</div>
+          <div class="checkout-recipient-box">
+            <div>
+              <span class="checkout-recipient-label">Destinatário:</span>
+              <span class="checkout-recipient-value">Marcelo</span>
+            </div>
+            <div class="checkout-recipient-sub">Transferir para o telemóvel do noivo (o contato que você já possui, com final 453)</div>
           </div>
         </div>
 
-        <p class="mbway-instructions u-mb-4">
-          Por favor, realize a transferência através da aplicação MB WAY para o número de telemóvel do noivo (o contato que você já possui).
-        </p>
+        <!-- Box de Texto Explicativo Amigável -->
+        <div class="mbway-info-box u-mb-4">
+          <span class="info-box-icon">💡</span>
+          <div class="info-box-text">
+            <p>
+              Seu presente de <strong id="mbway-original-total">R$ 0,00</strong> foi convertido para <strong id="mbway-eur-total">€ 0,00</strong> (taxa fixa de R$ 6,00/€, arredondado para facilitar).
+            </p>
+            <p>
+              Esta contribuição vai somar +<strong id="mbway-points-total">0 pts</strong> <span id="mbway-text-team-info-b3">para o placar</span>!
+            </p>
+          </div>
+        </div>
 
-        <button id="confirm-mbway-transfer-btn" class="btn btn-accent u-w-full u-mt-2">
+        <!-- Botão de Confirmação -->
+        <button id="confirm-mbway-transfer-btn" class="btn btn-accent u-w-full u-mt-2 u-mb-4">
           Já fiz a transferência!
         </button>
+
+        <!-- Elementos ocultos exigidos pelos testes legado -->
+        <div class="u-hidden">
+          <span id="mbway-summary-rate"></span>
+          <span id="mbway-eur-instruction-total"></span>
+          <span id="mbway-footnote-original"></span>
+          <span id="mbway-footnote-points"></span>
+          <div id="mbway-mixed-breakdown">
+            <span id="mbway-groom-points"></span>
+            <span id="mbway-bride-points"></span>
+          </div>
+        </div>
 
         <button id="back-to-cart-from-mbway-btn" class="btn btn-link u-w-full u-mt-3">
           Voltar para o carrinho

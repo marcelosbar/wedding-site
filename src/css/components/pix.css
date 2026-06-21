@@ -84,14 +84,54 @@
   text-align: left;
 }
 
-.mbway-explanation {
+.mbway-disclosure {
   font-size: 0.9rem;
   line-height: 1.5;
   color: var(--color-text-muted);
   background: rgba(29, 70, 153, 0.08);
   border-left: 3px solid var(--color-primary);
-  padding: 0.75rem 1rem;
   border-radius: 0 var(--radius-md) var(--radius-md) 0;
   text-align: left;
   margin-bottom: 1.5rem;
+}
+
+.mbway-disclosure-summary {
+  padding: 0.75rem 1rem;
+  font-weight: 500;
+  color: var(--color-primary);
+  cursor: pointer;
+  outline: none;
+  list-style: none; /* Hide default arrow in modern browsers */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.mbway-disclosure-summary::-webkit-details-marker {
+  display: none; /* Hide default arrow in safari/chrome */
+}
+
+/* Custom indicator chevron */
+.mbway-disclosure-summary::after {
+  content: '▼';
+  font-size: 0.7rem;
+  transition: transform 0.2s ease;
+  color: var(--color-primary);
+}
+
+.mbway-disclosure[open] .mbway-disclosure-summary::after {
+  transform: rotate(180deg);
+}
+
+.mbway-disclosure-content {
+  padding: 0 1rem 0.75rem 1rem;
+  color: var(--color-text-muted);
+}
+
+.mbway-disclosure-content p {
+  margin: 0;
+}
+
+.mbway-disclosure-content p:not(:last-child) {
+  margin-bottom: 0.5rem;
 }

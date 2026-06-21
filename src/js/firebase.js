@@ -22,7 +22,7 @@ export const db = getFirestore(app, dbId);
 // Ativar o App Check de forma segura
 let appCheckInstance = null;
 
-const isLocalhost = globalThis.window !== undefined && 
+const isLocalhost = globalThis.window !== undefined &&
   (globalThis.window.location.hostname === 'localhost' || globalThis.window.location.hostname === '127.0.0.1');
 const isTest = import.meta.env.MODE === 'test';
 

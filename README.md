@@ -9,7 +9,7 @@ Welcome to the source code of Lorena and Marcelo's wedding website. This is a fa
 - **Countdown Timer**: A beautiful glassmorphic countdown timer on the hero section showing the days, hours, minutes, and seconds left until the big day, with a custom post-event state.
 - **Art Mode on Hero**: A clean view mode enabling guests to appreciate the watercolor background illustration in fullscreen without any content overlays, complete with keyboard accessibility (Escape key, focus trap prevention) and device orientation hints.
 - **Honeymoon Competition**: A built-in cart and points system where guests can "vote" on the honeymoon destination by choosing gifts.
-- **PIX Integration**: Generates a dynamic PIX QR Code for easy payments.
+- **PIX & MB WAY Integration**: Generates a dynamic PIX QR Code for Brazilian guests and offers an interactive MB WAY checkout (with pre-defined exchange rate conversion and breakdown transparency) for European guests.
 - **Hidden Admin Panel**: A secure area to review and validate guest contributions.
 - **RSVP**: A redirect link to the external Assessoria VIP platform.
 
@@ -63,6 +63,13 @@ To test the production build with strict security headers (Content Security Poli
 pnpm run preview:secure
 ```
 This builds the site and starts the full Firebase Emulator suite (including the Hosting emulator on port 5000). Visit `http://localhost:5000/admin.html` to verify security compliance.
+
+### 7. Seeding Mock Messages (Optional)
+To populate your local Firestore emulator with a set of mock guest messages (ideal for testing the messages carousel):
+```bash
+node scripts/seed-messages.mjs
+```
+
 
 ## Running Tests
 

@@ -16,6 +16,7 @@ export class WeddingApp {
       overlay: document.getElementById('cart-overlay'),
       cartView: document.getElementById('cart-view'),
       pixView: document.getElementById('pix-view'),
+      mbwayView: document.getElementById('mbway-view'),
       successView: document.getElementById('success-view'),
       cartItemsContainer: document.getElementById('cart-items-container'),
       cartTotalValue: document.getElementById('cart-total-value'),
@@ -211,10 +212,15 @@ export class WeddingApp {
       btn.addEventListener('click', () => this.closeCart());
     });
 
-    // 5. Checkout / PIX buttons
+    // 5. Checkout / PIX / MB WAY buttons
     const proceedToPixBtn = document.getElementById('proceed-to-pix-btn');
     if (proceedToPixBtn) {
       proceedToPixBtn.addEventListener('click', () => this.proceedToPix());
+    }
+
+    const proceedToMbWayBtn = document.getElementById('proceed-to-mbway-btn');
+    if (proceedToMbWayBtn) {
+      proceedToMbWayBtn.addEventListener('click', () => this.proceedToMbWay());
     }
 
     const copyPixPayloadBtn = document.getElementById('copy-pix-payload-btn');
@@ -226,6 +232,18 @@ export class WeddingApp {
     if (confirmTransferBtn) {
       confirmTransferBtn.addEventListener('click', () => this.confirmTransfer());
     }
+
+    const confirmMbWayTransferBtn = document.getElementById('confirm-mbway-transfer-btn');
+    if (confirmMbWayTransferBtn) {
+      confirmMbWayTransferBtn.addEventListener('click', () => this.confirmMbWayTransfer());
+    }
+
+    const backToCartFromMbWayBtn = document.getElementById('back-to-cart-from-mbway-btn');
+    if (backToCartFromMbWayBtn) {
+      backToCartFromMbWayBtn.addEventListener('click', () => this.backToCartFromMbWay());
+    }
+
+
 
     const backToSiteBtn = document.getElementById('back-to-site-btn');
     if (backToSiteBtn) {
@@ -376,10 +394,16 @@ export class WeddingApp {
 
 
 
-  // --- Delegate PIX methods ---
+  // --- Delegate PIX / MB WAY methods ---
   proceedToPix() { return this.pix.proceedToPix(); }
   copyPixPayload() { return this.pix.copyPixPayload(); }
   confirmTransfer() { return this.pix.confirmTransfer(); }
+  proceedToMbWay() { return this.pix.proceedToMbWay(); }
+  confirmMbWayTransfer() { return this.pix.confirmMbWayTransfer(); }
+  backToCartFromMbWay() {
+    if (this.pix.mbwayView) this.pix.mbwayView.classList.remove('active');
+    if (this.cart.cartView) this.cart.cartView.style.display = 'block';
+  }
 
   // --- Delegate Scoreboard methods ---
   simulateLocalScoreboard(list, amount) { this.scoreboard.simulateLocalScoreboard(list, amount); }

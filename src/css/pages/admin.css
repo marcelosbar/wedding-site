@@ -413,3 +413,21 @@ body.admin-body {
   color: var(--color-text-muted);
 }
 
+.group-badge {
+  background-color: #e0e7ff;
+  color: #3730a3;
+  font-size: 0.8rem;
+  padding: 0.15rem 0.45rem;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  display: inline-block;
+  font-family: monospace;
+}
+
+.group-id-subtext {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  font-family: monospace;
+  margin-left: 0.25rem;
+}
+

@@ -22,8 +22,8 @@ export const db = getFirestore(app, dbId);
 // Ativar o App Check de forma segura
 let appCheckInstance = null;
 
-const isLocalhost = globalThis.window !== undefined && 
-  (globalThis.window.location.hostname === 'localhost' || globalThis.window.location.hostname === '127.0.0.1');
+const _hostname = globalThis.window !== undefined ? globalThis.window.location.hostname : '';
+const isLocalhost = _hostname === 'localhost' || _hostname === '127.0.0.1' || /^192\.168\./.test(_hostname) || /^10\./.test(_hostname) || /^172\.(1[6-9]|2[0-9]|3[01])\./.test(_hostname);
 const isTest = import.meta.env.MODE === 'test';
 
 if (globalThis.window !== undefined && !isTest) {
@@ -67,11 +67,13 @@ try {
 // Connect to Emulators locally in development or preview mode
 if (isLocalhost && !isTest) {
   try {
-    connectFirestoreEmulator(db, 'localhost', 8080);
-    console.log("Conectado ao Emulador do Firestore (porta 8080)");
+    // Use the actual hostname so mobile devices on the same LAN reach the emulator
+    const emulatorHost = _hostname === 'localhost' || _hostname === '127.0.0.1' ? 'localhost' : _hostname;
+    connectFirestoreEmulator(db, emulatorHost, 8080);
+    console.log(`Conectado ao Emulador do Firestore (${emulatorHost}:8080)`);
     if (authInstance) {
-      connectAuthEmulator(authInstance, 'http://localhost:9099');
-      console.log("Conectado ao Emulador do Firebase Auth (porta 9099)");
+      connectAuthEmulator(authInstance, `http://${emulatorHost}:9099`);
+      console.log(`Conectado ao Emulador do Firebase Auth (${emulatorHost}:9099)`);
     }
 
     // Auto-seed admin document for local testing

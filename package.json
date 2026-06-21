@@ -30,8 +30,8 @@
     "qrcode": "^1.5.4"
   },
   "pnpm": {
+    "//": "Security overrides for transitive deps that upstream hasn't updated yet. Remove each entry once `pnpm why <pkg>` no longer shows vulnerable versions without it.",
     "overrides": {
-      "//": "Security overrides for transitive deps that upstream hasn't updated yet. Remove each entry once `pnpm why <pkg>` no longer shows vulnerable versions without it.",
       "uuid": ">=11.1.1"
     }
   }

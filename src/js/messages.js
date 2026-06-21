@@ -277,7 +277,7 @@ export class MessagesCarousel {
    * triggering the text counter instead of individual dots.
    */
   _shouldUseCounter() {
-    return typeof globalThis.window !== 'undefined'
+    return globalThis.window !== undefined
       && globalThis.window.innerWidth <= 768
       && this.messages.length > 8;
   }

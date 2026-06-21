@@ -432,4 +432,179 @@ describe('MessagesCarousel', () => {
       expect(carousel.messages[0].guestName).toBe('User 1');
     });
   });
+  describe('Adaptive timing, pause/resume, progress bar & counter', () => {
+    let cc; // carousel with container wrapper
+    let ccEls;
+
+    beforeEach(() => {
+      document.body.innerHTML = `
+        <section id="competition"></section>
+        <section id="messages">
+          <div class="messages-carousel-container">
+            <div id="cc-track"></div>
+            <button id="cc-prev"></button>
+            <button id="cc-next"></button>
+            <div id="cc-dots"></div>
+            <button id="cc-load-more"></button>
+          </div>
+        </section>
+      `;
+      ccEls = {
+        trackEl: document.getElementById('cc-track'),
+        prevBtn: document.getElementById('cc-prev'),
+        nextBtn: document.getElementById('cc-next'),
+        dotsEl: document.getElementById('cc-dots'),
+        loadMoreBtn: document.getElementById('cc-load-more'),
+      };
+      cc = new MessagesCarousel(ccEls);
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+      Object.defineProperty(window, 'innerWidth', { value: 1024, configurable: true });
+    });
+
+    it('_getReadingTime clamps to MIN (5000ms) for short messages', () => {
+      expect(cc._getReadingTime('Hello')).toBe(5000);
+      expect(cc._getReadingTime('')).toBe(5000);
+    });
+
+    it('_getReadingTime clamps to MAX (18000ms) for very long messages', () => {
+      expect(cc._getReadingTime('word '.repeat(200))).toBe(18000);
+    });
+
+    it('_getReadingTime returns proportional time for mid-length messages', () => {
+      // 27 words at 180 wpm = 9000ms
+      const result = cc._getReadingTime('word '.repeat(27));
+      expect(result).toBeGreaterThan(5000);
+      expect(result).toBeLessThan(18000);
+    });
+
+    it('_initProgressBar injects .carousel-progress-bar into the container', () => {
+      cc._initProgressBar();
+      expect(cc.progressBarEl).not.toBeNull();
+      expect(document.querySelector('.carousel-progress-bar')).not.toBeNull();
+      expect(document.querySelector('.carousel-progress')).not.toBeNull();
+    });
+
+    it('_startProgressBar animates bar to 100% over given duration', () => {
+      cc._initProgressBar();
+      cc._startProgressBar(8000);
+      expect(cc.progressBarEl.style.width).toBe('100%');
+      expect(cc.progressBarEl.style.transition).toContain('8000ms');
+    });
+
+    it('_pauseProgressBar freezes bar (sets transition to none)', () => {
+      cc._initProgressBar();
+      cc._startProgressBar(8000);
+      cc._pauseProgressBar();
+      expect(cc.progressBarEl.style.transition).toBe('none');
+    });
+
+    it('_resumeProgressBar resumes animation over remaining duration', () => {
+      cc._initProgressBar();
+      cc._startProgressBar(8000);
+      cc._pauseProgressBar();
+      cc._resumeProgressBar(4000);
+      expect(cc.progressBarEl.style.transition).toContain('4000ms');
+      expect(cc.progressBarEl.style.width).toBe('100%');
+    });
+
+    it('_pauseAutoplay sets isPaused, stops timer and records remaining time', () => {
+      vi.useFakeTimers();
+      cc.messages = [
+        { guestName: 'A', message: 'Msg A', timestamp: '2026-05-31T12:00:00Z' },
+        { guestName: 'B', message: 'Msg B', timestamp: '2026-05-31T12:01:00Z' },
+      ];
+      cc.init();
+      cc.render();
+
+      vi.advanceTimersByTime(1000);
+      cc._pauseAutoplay();
+
+      expect(cc.isPaused).toBe(true);
+      expect(cc.autoplayTimer).toBeNull();
+      expect(cc._remainingTime).toBeGreaterThan(0);
+
+      // Calling again is a no-op
+      const remaining = cc._remainingTime;
+      cc._pauseAutoplay();
+      expect(cc._remainingTime).toBe(remaining);
+    });
+
+    it('_resumeAutoplay resumes from stored remaining time and updates _currentSlideDuration', () => {
+      vi.useFakeTimers();
+      cc.messages = [
+        { guestName: 'A', message: 'Msg A', timestamp: '2026-05-31T12:00:00Z' },
+        { guestName: 'B', message: 'Msg B', timestamp: '2026-05-31T12:01:00Z' },
+      ];
+      cc.init();
+      cc.render();
+
+      vi.advanceTimersByTime(1000);
+      cc._pauseAutoplay();
+      const remaining = cc._remainingTime;
+
+      cc._resumeAutoplay();
+      expect(cc.isPaused).toBe(false);
+      expect(cc.autoplayTimer).not.toBeNull();
+      // _currentSlideDuration should equal remaining so next pause calculates correctly
+      expect(cc._currentSlideDuration).toBe(remaining);
+      expect(cc._remainingTime).toBe(0);
+
+      // Calling when not paused is a no-op
+      const timerBefore = cc.autoplayTimer;
+      cc._resumeAutoplay();
+      expect(cc.autoplayTimer).toBe(timerBefore);
+    });
+
+    it('_shouldUseCounter returns true only on mobile with > 8 messages', () => {
+      Object.defineProperty(window, 'innerWidth', { value: 375, configurable: true });
+
+      cc.messages = Array(8).fill({ guestName: 'A', message: 'Hi', timestamp: '2026-05-31T12:00:00Z' });
+      expect(cc._shouldUseCounter()).toBe(false); // exactly 8 → dots
+
+      cc.messages = Array(9).fill({ guestName: 'A', message: 'Hi', timestamp: '2026-05-31T12:00:00Z' });
+      expect(cc._shouldUseCounter()).toBe(true); // 9 > 8 → counter
+
+      Object.defineProperty(window, 'innerWidth', { value: 1280, configurable: true });
+      expect(cc._shouldUseCounter()).toBe(false); // desktop → dots
+    });
+
+    it('renders counter instead of dots on mobile when messages > 8', () => {
+      Object.defineProperty(window, 'innerWidth', { value: 375, configurable: true });
+
+      cc.messages = Array.from({ length: 9 }, (_, i) => ({
+        id: `m${i}`,
+        guestName: `Guest ${i}`,
+        message: 'Hello world',
+        timestamp: `2026-05-31T${String(i).padStart(2, '0')}:00:00Z`,
+      }));
+      cc.render();
+
+      const counter = ccEls.dotsEl.querySelector('.carousel-counter');
+      const dots = ccEls.dotsEl.querySelectorAll('.carousel-dot');
+      expect(counter).not.toBeNull();
+      expect(dots.length).toBe(0);
+      expect(counter.textContent).toBe('1 / 9');
+
+      // Navigate to next — counter updates
+      cc.nextSlide();
+      expect(counter.textContent).toBe('2 / 9');
+    });
+
+    it('renders dots normally on mobile when messages <= 8', () => {
+      Object.defineProperty(window, 'innerWidth', { value: 375, configurable: true });
+
+      cc.messages = Array.from({ length: 4 }, (_, i) => ({
+        id: `m${i}`, guestName: `G${i}`, message: 'Hi', timestamp: `2026-05-31T0${i}:00:00Z`,
+      }));
+      cc.render();
+
+      const counter = ccEls.dotsEl.querySelector('.carousel-counter');
+      const dots = ccEls.dotsEl.querySelectorAll('.carousel-dot');
+      expect(counter).toBeNull();
+      expect(dots.length).toBe(4);
+    });
+  });
 });

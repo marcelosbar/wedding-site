@@ -20,7 +20,12 @@ export class MessagesCarousel {
     
     this.currentIndex = 0;
     this.autoplayTimer = null;
-    this.autoplayInterval = 6000; // 6 seconds
+    this.autoplayInterval = 6000; // fallback minimum (ms)
+    this.isPaused = false;
+    this.progressBarEl = null;
+    this._currentSlideDuration = 6000;
+    this._slideStartTime = 0;
+    this._remainingTime = 0;
     this.isAllLoaded = false;
     this.isLoadingMore = false;
   }
@@ -31,6 +36,7 @@ export class MessagesCarousel {
   init() {
     if (!this.trackEl) return;
 
+    this._initProgressBar();
     this.setupListeners();
     this.loadMessages();
     this.startRealtimeListener();
@@ -266,6 +272,16 @@ export class MessagesCarousel {
     }
   }
 
+  /**
+   * Returns true on mobile when there are more than 8 messages,
+   * triggering the text counter instead of individual dots.
+   */
+  _shouldUseCounter() {
+    return typeof window !== 'undefined'
+      && window.innerWidth <= 768
+      && this.messages.length > 8;
+  }
+
   _renderSlidesAndDots(showControls) {
     this.trackEl.innerHTML = '';
     if (this.dotsEl) this.dotsEl.innerHTML = '';
@@ -274,12 +290,20 @@ export class MessagesCarousel {
       const slide = this._createSlideElement(msg, idx);
       this.trackEl.appendChild(slide);
 
-      // Create dots
-      if (this.dotsEl && showControls) {
+      // Dots only when not in counter mode
+      if (this.dotsEl && showControls && !this._shouldUseCounter()) {
         const dot = this._createDotElement(idx);
         this.dotsEl.appendChild(dot);
       }
     });
+
+    // Render counter when there are too many dots for mobile
+    if (this.dotsEl && showControls && this._shouldUseCounter()) {
+      const counter = document.createElement('span');
+      counter.className = 'carousel-counter';
+      counter.textContent = `${this.currentIndex + 1} / ${this.messages.length}`;
+      this.dotsEl.appendChild(counter);
+    }
   }
 
   render() {
@@ -349,6 +373,15 @@ export class MessagesCarousel {
         this.resetAutoplay();
       });
     }
+
+    // Pause autoplay on hover (desktop) and touch (mobile)
+    const container = this.trackEl?.closest('.messages-carousel-container');
+    if (container) {
+      container.addEventListener('mouseenter', () => this._pauseAutoplay());
+      container.addEventListener('mouseleave', () => this._resumeAutoplay());
+      container.addEventListener('touchstart', () => this._pauseAutoplay(), { passive: true });
+      container.addEventListener('touchend', () => this._resumeAutoplay(), { passive: true });
+    }
   }
 
   prevSlide() {
@@ -384,25 +417,125 @@ export class MessagesCarousel {
     if (dots[this.currentIndex]) {
       dots[this.currentIndex].classList.add('active');
     }
+
+    // Update text counter if active
+    const counter = this.dotsEl?.querySelector('.carousel-counter');
+    if (counter) {
+      counter.textContent = `${this.currentIndex + 1} / ${this.messages.length}`;
+    }
+  }
+
+  /**
+   * Calculates reading time in ms based on word count (~180 wpm).
+   * Clamped between 5s and 18s.
+   */
+  _getReadingTime(message) {
+    const WORDS_PER_MIN = 180;
+    const MIN_MS = 5000;
+    const MAX_MS = 18000;
+    const wordCount = (message || '').trim().split(/\s+/).length;
+    const ms = Math.ceil((wordCount / WORDS_PER_MIN) * 60 * 1000);
+    return Math.min(Math.max(ms, MIN_MS), MAX_MS);
+  }
+
+  /**
+   * Injects the progress bar element into the carousel container.
+   */
+  _initProgressBar() {
+    const container = this.trackEl?.closest('.messages-carousel-container');
+    if (!container) return;
+    const prog = document.createElement('div');
+    prog.className = 'carousel-progress';
+    const bar = document.createElement('div');
+    bar.className = 'carousel-progress-bar';
+    prog.appendChild(bar);
+    container.appendChild(prog);
+    this.progressBarEl = bar;
+  }
+
+  /**
+   * Animates the progress bar over the given duration.
+   */
+  _startProgressBar(duration) {
+    if (!this.progressBarEl) return;
+    this.progressBarEl.style.transition = 'none';
+    this.progressBarEl.style.width = '0%';
+    // Force reflow so the reset takes effect before animating
+    void this.progressBarEl.getBoundingClientRect();
+    this.progressBarEl.style.transition = `width ${duration}ms linear`;
+    this.progressBarEl.style.width = '100%';
+  }
+
+  /**
+   * Freezes the progress bar at its current position.
+   */
+  _pauseProgressBar() {
+    if (!this.progressBarEl) return;
+    const currentWidth = getComputedStyle(this.progressBarEl).width;
+    const parentWidth = this.progressBarEl.parentElement?.offsetWidth || 1;
+    const pct = (parseFloat(currentWidth) / parentWidth) * 100;
+    this.progressBarEl.style.transition = 'none';
+    this.progressBarEl.style.width = `${pct}%`;
+  }
+
+  /**
+   * Resumes the progress bar animation from its frozen position over the remaining duration.
+   */
+  _resumeProgressBar(remaining) {
+    if (!this.progressBarEl) return;
+    void this.progressBarEl.getBoundingClientRect();
+    this.progressBarEl.style.transition = `width ${remaining}ms linear`;
+    this.progressBarEl.style.width = '100%';
+  }
+
+  _pauseAutoplay() {
+    if (this.isPaused) return;
+    this.isPaused = true;
+    const elapsed = Date.now() - this._slideStartTime;
+    this._remainingTime = Math.max(0, this._currentSlideDuration - elapsed);
+    this.stopAutoplay();
+    this._pauseProgressBar();
+  }
+
+  _resumeAutoplay() {
+    if (!this.isPaused) return;
+    this.isPaused = false;
+    const remaining = this._remainingTime > 0 ? this._remainingTime : this._currentSlideDuration;
+    // Update so subsequent pauses compute elapsed against this remaining window
+    this._currentSlideDuration = remaining;
+    this._remainingTime = 0;
+    this._slideStartTime = Date.now();
+    this._resumeProgressBar(remaining);
+    this.autoplayTimer = setTimeout(() => {
+      this.nextSlide();
+      this.startAutoplay();
+    }, remaining);
   }
 
   startAutoplay() {
     this.stopAutoplay();
-    if (this.messages.length <= 1) return;
-    this.autoplayTimer = setInterval(() => {
+    if (this.messages.length <= 1 || this.isPaused) return;
+    const msg = this.messages[this.currentIndex];
+    const duration = msg ? this._getReadingTime(msg.message) : this.autoplayInterval;
+    this._currentSlideDuration = duration;
+    this._remainingTime = 0;
+    this._slideStartTime = Date.now();
+    this._startProgressBar(duration);
+    this.autoplayTimer = setTimeout(() => {
       this.nextSlide();
-    }, this.autoplayInterval);
+      this.startAutoplay();
+    }, duration);
   }
 
   stopAutoplay() {
     if (this.autoplayTimer) {
-      clearInterval(this.autoplayTimer);
+      clearTimeout(this.autoplayTimer);
       this.autoplayTimer = null;
     }
   }
 
   resetAutoplay() {
-    this.stopAutoplay();
+    this.isPaused = false;
     this.startAutoplay();
   }
 }

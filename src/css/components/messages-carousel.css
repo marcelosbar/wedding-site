@@ -67,13 +67,13 @@
 }
 
 .message-text::before {
-  content: '“';
+  content: '\201C';
   left: -0.5rem;
   top: -0.5rem;
 }
 
 .message-text::after {
-  content: '”';
+  content: '\201D';
   right: -0.5rem;
   bottom: -1rem;
 }
@@ -100,13 +100,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.75rem;
   color: var(--color-text-muted);
   transition: all 0.3s ease;
   z-index: 10;
   box-shadow: var(--shadow-sm);
   padding: 0;
-  line-height: 1;
 }
 
 .carousel-control:hover {
@@ -132,6 +130,7 @@
 .carousel-dots {
   display: flex;
   justify-content: center;
+  align-items: center;
   gap: 0.5rem;
   margin-top: 1.5rem;
 }
@@ -157,19 +156,76 @@
   outline-offset: 2px;
 }
 
+/* Progress bar */
+.carousel-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: rgba(205, 191, 159, 0.25);
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  overflow: hidden;
+}
+
+.carousel-progress-bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--color-accent), var(--color-primary));
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+}
+
+/* Text counter — shown on mobile when messages exceed 8 */
+.carousel-counter {
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+  user-select: none;
+}
+
 /* Responsiveness */
-@media (max-width: 640px) {
+@media (max-width: 768px) {
   .messages-carousel-container {
-    padding: 2.5rem 1.5rem;
+    padding: 2rem 1.5rem 4rem;
     margin: 1.5rem 1rem 3rem 1rem;
   }
 
   .messages-carousel-track {
-    min-height: 240px;
+    min-height: 180px;
   }
 
+  /* Arrows sit at left and right edges, aligned with the dots/counter row */
   .carousel-control {
-    display: none; /* Hide next/prev arrows on mobile screens */
+    top: auto;
+    bottom: 1rem;
+    transform: none;
+  }
+
+  .carousel-control:hover {
+    transform: scale(1.05);
+  }
+
+  .carousel-control.prev {
+    left: 1rem;
+  }
+
+  .carousel-control.next {
+    right: 1rem;
+  }
+
+  /* Dots and counter absolutely centered, same baseline as arrows */
+  .carousel-dots {
+    position: absolute;
+    bottom: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: 0;
+    height: 44px;
+    display: flex;
+    align-items: center;
   }
 
   .message-text {

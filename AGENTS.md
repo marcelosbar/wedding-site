@@ -1,6 +1,6 @@
 # Agent Instructions
 
-This document is the primary entrypoint of instructions for AI Agents working on this project. For global development instructions, see [GEMINI.md](file:///C:/Users/marce/.gemini/GEMINI.md).
+This document is the primary entrypoint of instructions for AI Agents working on this project.
 
 ## Project Overview
 This is a wedding website for Lorena and Marcelo featuring an external RSVP link and a "Honeymoon Competition" scoreboard (Disney vs. Cote D'Azur).

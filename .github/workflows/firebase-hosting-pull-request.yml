@@ -97,7 +97,7 @@ jobs:
           VITE_FIRESTORE_DATABASE_ID: "preview"
       - id: auth
         if: ${{ github.actor != 'dependabot[bot]' && contains(github.event.pull_request.labels.*.name, 'deploy-preview') }}
-        uses: google-github-actions/auth@71f986410dfbc7added4569d411d040a91dc6935 # v2.1.8
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
         with:
           workload_identity_provider: 'projects/587786769343/locations/global/workloadIdentityPools/github-pool/providers/github-provider'
           service_account: 'github-action-1241764119@lorenaemarcelo2026.iam.gserviceaccount.com'

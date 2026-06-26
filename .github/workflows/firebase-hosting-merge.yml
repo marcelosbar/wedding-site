@@ -41,7 +41,6 @@ jobs:
       - run: pnpm install --frozen-lockfile --ignore-scripts
       - name: Snyk Open Source Scan
         uses: snyk/actions/node@8e119fbb6c251787721d34ba683ed48eba792766 # master @ 2026-05-27
-        continue-on-error: true
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
@@ -55,7 +54,6 @@ jobs:
           command: monitor
       - name: Snyk Code Analysis
         uses: snyk/actions/node@8e119fbb6c251787721d34ba683ed48eba792766 # master @ 2026-05-27
-        continue-on-error: true
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:

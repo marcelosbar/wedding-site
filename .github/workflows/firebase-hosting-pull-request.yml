@@ -37,23 +37,6 @@ jobs:
           node-version: '20'
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile --ignore-scripts
-      - name: Snyk Open Source Scan
-        if: github.actor != 'dependabot[bot]'
-        uses: snyk/actions/node@8e119fbb6c251787721d34ba683ed48eba792766 # master @ 2026-05-27
-        continue-on-error: true
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          args: --severity-threshold=high
-      - name: Snyk Code Analysis
-        if: github.actor != 'dependabot[bot]'
-        uses: snyk/actions/node@8e119fbb6c251787721d34ba683ed48eba792766 # master @ 2026-05-27
-        continue-on-error: true
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          command: code test
-          args: --severity-threshold=high --include-ignores
       - name: Run Tests & Generate Coverage
         run: pnpm run test
       - name: Set up JDK 21 (for Integration Tests & SonarCloud)

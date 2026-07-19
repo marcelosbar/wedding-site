@@ -20,7 +20,7 @@
     "@firebase/rules-unit-testing": "^5.0.1",
     "@vitest/coverage-v8": "^4.1.8",
     "concurrently": "^10.0.3",
-    "firebase-tools": "^15.22.0",
+    "firebase-tools": "^15.24.0",
     "jsdom": "^29.1.1",
     "vite": "^8.1.4",
     "vitest": "^4.1.8"
